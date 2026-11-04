@@ -1,0 +1,24 @@
+%% Bagan alir penelitian (Bab III - Desain Penelitian)
+%% Dua kolom berdampingan; penyambungan memakai penghubung bernomor (konvensi lambang diagram alir)
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#ffffff", "primaryTextColor": "#111111", "primaryBorderColor": "#333333", "lineColor": "#444444", "clusterBkg": "#fafafa", "clusterBorder": "#999999", "fontFamily": "Times New Roman, serif"}, "flowchart": {"nodeSpacing": 28, "rankSpacing": 34}}}%%
+flowchart TB
+    subgraph COL2["Kolom 2: Tahap Pelaksanaan dan Analisis"]
+        CN2(["Penghubung 1"]) --> H["Ukur baseline JSON.parse:<br/>ns, ns/op, memori, CPU load harian"]
+        H --> I["Integrasikan ze_json (WASM64)<br/>ke lapisan repository SAQ"]
+        I --> J["Ukur perlakuan ze_json:<br/>metrik identik dengan baseline"]
+        J --> K{"Data valid dan<br/>dapat direproduksi?"}
+        K -->|"Tidak"| L["Perbaiki instrumen: kalibrasi,<br/>warm-up, device-label, telemetry"]
+        L --> H
+        K -->|"Ya"| M["Analisis data: P50, CI95, ops/s,<br/>MiB/s, trade-off RAM vs CPU"]
+        M --> N(["Selesai: kesimpulan<br/>dan rekomendasi"])
+    end
+
+    subgraph COL1["Kolom 1: Tahap Persiapan"]
+        A(["Mulai"]) --> B["Studi literatur: parsing on-demand,<br/>SWAR, WebAssembly, metodologi benchmark"]
+        B --> C["Identifikasi masalah pada jalur JSON<br/>aplikasi SAQ (JsonRepository)"]
+        C --> D{"Masalah terformulasi<br/>dan terukur?"}
+        D -->|"Tidak"| B
+        D -->|"Ya"| E["Rancang desain eksperimen:<br/>baseline vs perlakuan ze_json,<br/>lingkungan tertutup identik"]
+        E --> F["Siapkan korpus uji fixture<br/>deterministik (SHA-256 terverifikasi)"]
+        F --> CN1(["Penghubung 1"])
+    end

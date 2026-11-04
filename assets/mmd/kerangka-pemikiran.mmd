@@ -1,0 +1,15 @@
+%% Kerangka pemikiran (Bab II)
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#ffffff", "primaryTextColor": "#111111", "primaryBorderColor": "#333333", "lineColor": "#444444", "clusterBkg": "#fafafa", "clusterBorder": "#999999", "fontFamily": "Times New Roman, serif"}, "flowchart": {"nodeSpacing": 45, "rankSpacing": 50}}}%%
+flowchart LR
+    P1["Masalah nyata:<br/>SAQ memproses dokumen JSON<br/>melalui JSON.parse bawaan runtime<br/>dengan pola akses parsial"]
+    P2["Resep literatur:<br/>parsing on-demand (tanpa pohon parse),<br/>pemindaian SWAR,<br/>WebAssembly untuk Node.js"]
+    G["Research gap:<br/>belum ada evaluasi parser on-demand<br/>SWAR-Wasm pada aplikasi<br/>pelaporan nyata"]
+    H["Hipotesis:<br/>ze_json menurunkan latensi dan memori<br/>dengan pertukaran beban CPU<br/>yang terkendali"]
+    M["Metode:<br/>eksperimen baseline vs perlakuan<br/>pada lingkungan tertutup;<br/>instrumen ns dan ns/op"]
+    K["Keluaran:<br/>keputusan kelayakan ze_json<br/>pada aplikasi pelaporan otomatis SAQ"]
+
+    P1 --> G
+    P2 --> G
+    G --> H
+    H --> M
+    M --> K

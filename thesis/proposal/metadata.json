@@ -1,0 +1,134 @@
+{
+	"document": {
+		"title": {
+			"primary": "Optimalisasi dan Evaluasi Performa Parser JSON On-Demand Berbasis SWAR dan WebAssembly pada Aplikasi Pelaporan Otomatis",
+			"secondary": [
+				"Peningkatan Performa Parser JSON On-Demand Berbasis SWAR dan WebAssembly pada Aplikasi Pelaporan Otomatis Lab SAQ",
+				"Rancang Bangun dan Evaluasi Performa Parser JSON On-Demand Berbasis SWAR dan WebAssembly untuk Aplikasi Pelaporan Otomatis Lab SAQ",
+				"Optimalisasi Performa Parsing JSON Menggunakan Pendekatan On-Demand Berbasis SWAR pada Aplikasi Pelaporan Otomatis Lab SAQ"
+			]
+		},
+		"topic": {
+			"primary": "",
+			"secondary": []
+		},
+		"keywords": [
+			"JSON parser",
+			"WebAssembly",
+			"parsing on-demand",
+			"SWAR",
+			"benchmark kinerja"
+		],
+		"kind": "Proposal Tugas Akhir",
+		"date": "",
+		"timestamp": ""
+	},
+	"student": {
+		"id": "202331291",
+		"first_name": "Rafi",
+		"middle_name": "Indra Pramudhito",
+		"last_name": "Zuhayr",
+		"full_name": "Rafi Indra Pramudhito Zuhayr",
+		"sex": "Laki-laki",
+		"religion": "Islam",
+		"major": "Teknik Informatika",
+		"faculty": "Telematika Energi",
+		"phone": "62+81231387443",
+		"email": "rafizuhayr001@gmail.com",
+		"pob": {
+			"city": "Trenggalek",
+			"date": 24,
+			"month": "Oktober",
+			"year": "2004"
+		},
+		"address": {
+			"streets": [
+				"Jl. Raya Duri Kosambi",
+				"RT.6/RW.1",
+				"Duri Kosambi"
+			],
+			"subdistrict": "Cengkareng",
+			"city": "Jakarta Barat",
+			"province": {
+			"primary": "Daerah Khusus Ibukota Jakarta",
+				"secondary": [
+					"Jakarta",
+					"DKI Jakarta"
+				]
+			},
+			"zip_code": "11750"
+		},
+		"academic": {
+			"SD": "SDI Al-Huda Kota Kediri",
+			"SMP": "MTsN 1 Kota Kediri",
+			"SMA": "MAN 1 Kota Kediri",
+			"Diploma III": null,
+			"Sarjana": "Institut Teknologi PLN"
+		}
+	},
+	"lecture": {
+		"academic_advisor": {
+			"id": "0315117304",
+			"first_name": "Widya",
+			"middle_name": "Nita",
+			"last_name": "Suliyanti",
+			"full_name": "Widya Nita Suliyanti",
+			"prefixes": [
+				"Dr."
+			],
+			"suffixes": [
+				"ST.",
+				"M.Comp.Sc."
+			]
+		},
+		"thesis_supervisor": {
+			"id": "0310068702",
+			"first_name": "Abdurrasyid",
+			"middle_name": null,
+			"last_name": null,
+			"full_name": "Abdurrasyid",
+			"prefixes": null,
+			"suffixes": [
+				"S.Kom.",
+				"MMSI."
+			]
+		},
+		"head_of_study_program": {
+			"id": "0315067601",
+			"first_name": "Meilia",
+			"middle_name": "Nur Indah",
+			"last_name": "Susanti",
+			"full_name": "Meilia Nur Indah Susanti",
+			"prefixes": [
+				"Assoc.", 
+				"Prof.", 
+				"Dr."
+			],
+			"suffixes": [
+				"S.T.", 
+				"M.Kom."
+			]
+		}
+	},
+	"institute": {
+		"full_name": "Institut Teknologi PLN",
+		"short_name": "ITPLN",
+		"address": {
+			"streets": [
+				"Jl. Duri Cengkareng Raya No.3",
+				"RT.1/RW.1",
+				"Duri Kosambi"
+			],
+			"subdistrict": "Cengkareng",
+			"city": "Jakarta Barat",
+			"province": {
+			"primary": "Daerah Khusus Ibukota Jakarta",
+				"secondary": [
+					"Jakarta",
+					"DKI Jakarta"
+				]
+			},
+			"zip_code": "11750"
+		}
+	}
+}

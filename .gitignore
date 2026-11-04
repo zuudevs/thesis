@@ -1,0 +1,14 @@
+metadata.typ
+me.*
+papers/
+images/
+node_modules/
+package.json
+package-lock.json
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.zip
+data/raw/
+data/commons/

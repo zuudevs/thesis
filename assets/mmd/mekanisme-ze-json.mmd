@@ -1,0 +1,20 @@
+%% Diagram high-level mekanisme Parser JSON On-Demand ze_json
+%% Sumber: include/ze_json/{scanner,ondemand,memory}, include/ze_json/ffi/ze_json_c.h
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#ffffff", "primaryTextColor": "#111111", "primaryBorderColor": "#333333", "lineColor": "#444444", "clusterBkg": "#fafafa", "clusterBorder": "#999999", "fontFamily": "Times New Roman, serif"}, "flowchart": {"nodeSpacing": 30, "rankSpacing": 40, "wrappingWidth": 460}}}%%
+flowchart TB
+    P["Masukan: payload JSON mentah (UTF-8)<br/>dari berkas konfigurasi atau payload repository"]
+
+    subgraph STAGE1["Tahap 1: Pemindaian Struktural (sekali jalan)"]
+        S["Scanner SWAR / bit-paralel<br/>scanner8, scanner32, scanner64<br/>validasi UTF-8 dan struktur"]
+        T["Structural Tape<br/>larik posisi struktur dokumen"]
+    end
+
+    subgraph STAGE2["Tahap 2: Akses On-Demand (malas)"]
+        SE["Session on-demand: kursor maju tunggal,<br/>arena allocator, kueri find_field / find_path"]
+        V["Getter bertipe: get_int, get_double,<br/>get_string, get_bool (string zero-copy)"]
+    end
+
+    O["Keluaran: nilai yang diminta saja,<br/>tanpa membentuk pohon DOM lengkap"]
+
+    P --> S --> T --> SE --> V --> O
+    SE -.->|"memori dialokasikan saat nilai diakses"| O

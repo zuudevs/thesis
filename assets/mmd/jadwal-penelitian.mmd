@@ -1,0 +1,20 @@
+%% Jadwal penelitian 6 bulan (Bab III - Jadwal Penelitian)
+%%{init: {"theme": "base", "themeVariables": {"primaryTextColor": "#111111", "lineColor": "#444444", "fontFamily": "Times New Roman, serif"}}}%%
+gantt
+    title Rencana Jadwal Penelitian (6 bulan)
+    dateFormat YYYY-MM
+    axisFormat %b %Y
+    section Studi dan Persiapan
+    Studi literatur dan penyusunan proposal       :a1, 2026-11, 1M
+    Studi kode sumber SAQ dan ze_json             :a2, after a1, 1M
+    section Instrumentasi
+    Penyiapan korpus uji dan fixture              :b1, 2026-12, 1M
+    Pengukuran baseline JSON.parse                :b2, after b1, 1M
+    section Implementasi
+    Integrasi binding WASM ze_json                :c1, 2027-01, 1M
+    Pengukuran perlakuan ze_json                  :c2, after c1, 1M
+    section Evaluasi
+    Analisis data dan uji hipotesis               :d1, 2027-02, 1M
+    section Pelaporan
+    Penyusunan laporan tugas akhir                :e1, 2027-03, 1M
+    Revisi dan persiapan sidang                   :e2, 2027-04, 1M

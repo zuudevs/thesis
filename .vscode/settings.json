@@ -1,0 +1,20 @@
+{
+  "terminal.integrated.env.windows": {
+    "ZE_JSON": "${workspaceFolder}/ze_json",
+	"SAQ_REPORT": "${workspaceFolder}/saq-report",
+	"THESIS": "${workspaceFolder}/thesis",
+    "RESEARCH": "${workspaceFolder}/research",
+    "SAMPLE": "${workspaceFolder}/data/sample",
+    "RAW": "${workspaceFolder}/data/raw",
+  },
+  "cmake.environment": {
+	"ZE_JSON": "${workspaceFolder}/ze_json",
+	"SAQ_REPORT": "${workspaceFolder}/saq-report",
+	"THESIS": "${workspaceFolder}/thesis",
+    "RESEARCH": "${workspaceFolder}/research",
+    "SAMPLE": "${workspaceFolder}/data/sample",
+    "RAW": "${workspaceFolder}/data/raw",
+  },
+  "cmake.sourceDirectory": "${workspaceFolder}/ze_json",
+  "cmake.copyCompileCommands": "${workspaceFolder}/ze_json/compile_commands.json"
+}

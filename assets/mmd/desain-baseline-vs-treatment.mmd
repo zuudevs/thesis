@@ -1,0 +1,35 @@
+%% Desain penelitian: baseline vs perlakuan ze_json (Bab III - Desain Penelitian)
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#ffffff", "primaryTextColor": "#111111", "primaryBorderColor": "#333333", "lineColor": "#444444", "clusterBkg": "#fafafa", "clusterBorder": "#999999", "fontFamily": "Times New Roman, serif"}, "flowchart": {"nodeSpacing": 40, "rankSpacing": 50}}}%%
+flowchart LR
+    subgraph KORPUS["Korpus Uji Tunggal (variabel kontrol)"]
+        FIX["Fixture JSON deterministik SAQ<br/>21 berkas: persisted, service-output,<br/>route-input (SHA-256 terverifikasi)"]
+    end
+
+    subgraph ENV["Lingkungan Tertutup (close environment)"]
+        direction TB
+        HW["Perangkat keras identik<br/>CPU, RAM, penyimpanan, OS, Node.js"]
+    end
+
+    subgraph BASE["Kelompok Baseline (sebelum)"]
+        B1["JsonRepository.read()<br/>fs.readFileSync + JSON.parse (V8)"]
+        B2["Metrik: latensi ns & ns/op,<br/>ops/s, MiB/s, P50, CI95,<br/>memori heap/RSS"]
+    end
+
+    subgraph TREAT["Kelompok Perlakuan (sesudah)"]
+        T1["Integrasi ze_json<br/>binding WASM64 on-demand"]
+        T2["Metrik: latensi ns & ns/op,<br/>ops/s, MiB/s, P50, CI95,<br/>memori heap/RSS"]
+    end
+
+    subgraph CMP["Analisis Perbandingan"]
+        A1["Selisih metrik per fixture<br/>dan per mode pengukuran"]
+        A2["Interpretasi trade-off<br/>RAM vs CPU"]
+    end
+
+    FIX --> HW
+    HW --> B1
+    HW --> T1
+    B1 --> B2
+    T1 --> T2
+    B2 --> A1
+    T2 --> A1
+    A1 --> A2

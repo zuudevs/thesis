@@ -1,0 +1,31 @@
+%% Arsitektur integrasi ze_json ke aplikasi SAQ (Bab III)
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#ffffff", "primaryTextColor": "#111111", "primaryBorderColor": "#333333", "lineColor": "#444444", "clusterBkg": "#fafafa", "clusterBorder": "#999999", "fontFamily": "Times New Roman, serif"}, "flowchart": {"nodeSpacing": 35, "rankSpacing": 45}}}%%
+flowchart TB
+    subgraph SAQ["Aplikasi SAQ (Node.js / Express)"]
+        direction LR
+        R["Routes / Services<br/>(laporan, rekap, jadwal, settings)"]
+        REPO["Lapisan Repository<br/>JsonRepository.read()<br/>MongoJsonRepository.cloneJson()"]
+    end
+
+    subgraph WASM["Modul WebAssembly ze_json_core.wasm"]
+        direction LR
+        BIND["Binding JS<br/>ze_json.mjs"]
+        FFI["Kontrak C ABI:<br/>create_session, find_path,<br/>get_int_at, get_string_at"]
+        SCAN["Scanner SWAR +<br/>Session on-demand<br/>+ arena allocator"]
+        BIND --> FFI --> SCAN
+    end
+
+    subgraph DATA["Sumber Data"]
+        direction LR
+        FS["Berkas JSON konfigurasi"]
+        MDB["MongoDB"]
+    end
+
+    FS --> REPO
+    MDB --> REPO
+    R -->|"permintaan data"| REPO
+    REPO -->|"jalur baseline: JSON.parse (V8)"| R
+    REPO -.->|"jalur perlakuan: payload ke linear memory"| BIND
+    SCAN --> FFI
+    FFI -->|"nilai terpilih dibaca on-demand"| BIND
+    BIND -->|"nilai terpilih"| REPO

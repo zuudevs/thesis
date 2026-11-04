@@ -1,0 +1,6 @@
+[submodule "sample"]
+	path = "data/sample"
+	url = "https://github.com/zuudevs/json_sample.git"
+[submodule "ze_json"]
+	path = "ze_json"
+	url = "https://github.com/zuudevs/ze_json.git"
