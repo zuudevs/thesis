@@ -12,3 +12,5 @@ package-lock.json
 *.zip
 data/raw/
 data/commons/
+__pycache__/
+out/
