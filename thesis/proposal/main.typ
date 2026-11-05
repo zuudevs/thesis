@@ -39,7 +39,7 @@
 	set align(center)
 	it
 }
-
+#show heading.where(level: 2): set text(size: 12pt)
 #show outline.entry.where(level: 1): it => {
 	set text(size: 14pt)
 	set align(left)
@@ -95,12 +95,11 @@
 #v(1em)
 #outline(target: figure.where(kind: image))
 #pagebreak()
-
 #set par(
 	justify: true,
 	first-line-indent: (
 		all: true,
-		amount: 2em
+		amount: 1.6em
 	)
 )
 #set page(numbering: "1")
