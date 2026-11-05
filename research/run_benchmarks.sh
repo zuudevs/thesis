@@ -102,6 +102,12 @@ fi
 if [[ $SKIP_ZE_JSON_JS -eq 0 ]]; then
     echo ""
     echo "=== [4/5] ze_json_js benchmark (WASM vs JSON.parse) ==="
+    # ze_json_core.wasm tidak ikut git (artefak build) — build dulu bila belum ada.
+    if [[ ! -f "$ZE_REPO/bindings/js/ze_json_core.wasm" ]]; then
+        echo "-- build wasm64 core (ze_json_core.wasm belum ada)"
+        (cd "$ZE_REPO" && cmake --preset wasm64-release \
+            && cmake --build build/wasm64-release --target ze_json_core)
+    fi
     node "$WORKSPACE/research/benchmark_ze_json_js.mjs" \
         --input="$SAMPLE" --out="$RAW/benchmark/ze_json_js"
 else

@@ -146,6 +146,18 @@ if (-not $SkipSaqReport) {
 # ---------------------------------------------------------------------------
 if (-not $SkipZeJsonJs) {
     Write-Host "`n=== [4/5] ze_json_js benchmark (WASM vs JSON.parse) ===" -ForegroundColor Cyan
+    # ze_json_core.wasm tidak ikut git (artefak build) - build dulu bila belum ada.
+    $wasmPath = Join-Path $zeRepo "bindings\js\ze_json_core.wasm"
+    if (-not (Test-Path $wasmPath)) {
+        Write-Host "-- build wasm64 core (ze_json_core.wasm belum ada)" -ForegroundColor DarkCyan
+        Push-Location $zeRepo
+        try {
+            cmake --preset wasm64-release
+            if ($LASTEXITCODE -ne 0) { throw "configure wasm64-release gagal." }
+            cmake --build build/wasm64-release --target ze_json_core
+            if ($LASTEXITCODE -ne 0) { throw "build ze_json_core gagal." }
+        } finally { Pop-Location }
+    }
     node "$PSScriptRoot\benchmark_ze_json_js.mjs" --input=$env:SAMPLE --out="$env:RAW\benchmark\ze_json_js"
     if ($LASTEXITCODE -ne 0) { throw "benchmark_ze_json_js.mjs gagal (butuh Node >= 24 utk WASM memory64)." }
 } else {
