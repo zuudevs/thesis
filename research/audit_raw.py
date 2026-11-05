@@ -16,6 +16,10 @@
 #  saq-report— R1 nama = RUN_ID polos; R3 metadata.run_id == nama file &
 #              errors kosong; R4 schema_version + metadata ada (report
 #              self-contained, TANPA sidecar terpisah)
+#  ze_json_js— kontrak sama dengan saq-report: report self-contained
+#              benchmark Node (ze_json WASM binding vs JSON.parse), R1 nama
+#              = RUN_ID polos, R3 metadata.run_id == nama file & errors
+#              kosong, tanpa sidecar terpisah
 #  legacy    — file di root kategori (layout lama) hanya dicek R1 ze_json +
 #              R5 (secara historis akan DELETE)
 #
@@ -89,7 +93,7 @@ def audit(raw_dir: Path) -> list[dict]:
         verdict = "KEEP"
 
         # ---- R1 nama ------------------------------------------------------
-        if package == "saq-report":
+        if package in ("saq-report", "ze_json_js"):
             # Nama file = RUN_ID polos.
             run_id = stem if RUN_ID_RE.fullmatch(stem) else None
             if run_id is None:
@@ -119,7 +123,7 @@ def audit(raw_dir: Path) -> list[dict]:
             reasons.append(f"R3: report tak bisa di-parse: {error}")
 
         if data is not None:
-            if package == "saq-report":
+            if package in ("saq-report", "ze_json_js"):
                 meta = data.get("metadata", {})
                 if run_id and meta.get("run_id") != run_id:
                     verdict = "DELETE"

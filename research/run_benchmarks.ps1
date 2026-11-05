@@ -14,7 +14,10 @@
 #       termasuk corpus_benchmark yang mengukur SELURUH $SAMPLE (scanner64).
 #    3. saq-report: benchmark-json.js di atas korpus terpadu yang sama
 #       (JSON.parse baseline; guard json-clone 64 MB otomatis).
-#    4. audit_raw.py: gerbang integritas - semua artefak HARUS KEEP.
+#    4. ze_json_js: benchmark_ze_json_js.mjs - ze_json WASM binding vs
+#       JSON.parse di runtime Node yang sama (perbandingan inti skripsi;
+#       butuh Node >= 24 / WASM memory64).
+#    5. audit_raw.py: gerbang integritas - semua artefak HARUS KEEP.
 #
 #  Pemakaian:
 #    powershell research/run_benchmarks.ps1                    # full (5 repetisi)
@@ -22,13 +25,15 @@
 #    powershell research/run_benchmarks.ps1 -Quick             # 3 repetisi (sanity)
 #    powershell research/run_benchmarks.ps1 -SkipZeJson        # hanya saq-report
 #    powershell research/run_benchmarks.ps1 -SkipSaqReport     # hanya ze_json
+#    powershell research/run_benchmarks.ps1 -SkipZeJsonJs      # tanpa benchmark JS
 #
 #  CATATAN ENCODING: file ini sengaja ASCII-murni - Windows PowerShell 5.1
 #  membaca .ps1 tanpa BOM sebagai ANSI, jadi karakter non-ASCII (em-dash dll)
 #  merusak parsing string.
 #
 #  DURASI (5 repetisi): parser ~11 min + scanner ~26 min + session ~2,7 jam +
-#  span_iso ~2 jam + corpus ~50 min + saq-report ~20 min = sekitar 6-7 jam.
+#  span_iso ~2 jam + corpus ~50 min + saq-report ~20 min + ze_json_js ~30-60
+#  min = sekitar 7-8 jam.
 #  Jalankan di device yang tidak tidur (sleep AC sudah dimatikan oleh runner).
 # ============================================================================
 param(
@@ -36,6 +41,7 @@ param(
     [switch]$Quick,           # mode cepat: 3 repetisi (sanity, bukan angka skripsi)
     [switch]$SkipZeJson,
     [switch]$SkipSaqReport,
+    [switch]$SkipZeJsonJs,
     [switch]$SkipCorpusPreflight
 )
 
@@ -64,7 +70,7 @@ Write-Host "Sleep/hibernate (AC) dimatikan selama run." -ForegroundColor DarkGra
 # 1. Preflight korpus terpadu
 # ---------------------------------------------------------------------------
 if (-not $SkipCorpusPreflight) {
-    Write-Host "`n=== [1/4] Preflight korpus terpadu ===" -ForegroundColor Cyan
+    Write-Host "`n=== [1/5] Preflight korpus terpadu ===" -ForegroundColor Cyan
 
     Write-Host "-- corpus install --skip-existing" -ForegroundColor DarkCyan
     Push-Location $zeRepo
@@ -91,14 +97,14 @@ if (-not $SkipCorpusPreflight) {
         if ($LASTEXITCODE -ne 0) { throw "corpus verify gagal: korpus tidak konsisten." }
     } finally { Pop-Location }
 } else {
-    Write-Host "`n=== [1/4] Preflight korpus DILEWATI (-SkipCorpusPreflight) ===" -ForegroundColor Yellow
+    Write-Host "`n=== [1/5] Preflight korpus DILEWATI (-SkipCorpusPreflight) ===" -ForegroundColor Yellow
 }
 
 # ---------------------------------------------------------------------------
 # 2. ze_json - 5 export benchmark (repetisi terstandar)
 # ---------------------------------------------------------------------------
 if (-not $SkipZeJson) {
-    Write-Host "`n=== [2/4] ze_json benchmark (repetisi=$Repetitions) ===" -ForegroundColor Cyan
+    Write-Host "`n=== [2/5] ze_json benchmark (repetisi=$Repetitions) ===" -ForegroundColor Cyan
     Push-Location $zeRepo
     try {
         cmake --preset native-release "-DZE_BENCH_REPETITIONS=$Repetitions"
@@ -118,32 +124,43 @@ if (-not $SkipZeJson) {
         }
     } finally { Pop-Location }
 } else {
-    Write-Host "`n=== [2/4] ze_json DILEWATI (-SkipZeJson) ===" -ForegroundColor Yellow
+    Write-Host "`n=== [2/5] ze_json DILEWATI (-SkipZeJson) ===" -ForegroundColor Yellow
 }
 
 # ---------------------------------------------------------------------------
 # 3. saq-report - JSON.parse baseline di korpus terpadu
 # ---------------------------------------------------------------------------
 if (-not $SkipSaqReport) {
-    Write-Host "`n=== [3/4] saq-report benchmark (JSON.parse) ===" -ForegroundColor Cyan
+    Write-Host "`n=== [3/5] saq-report benchmark (JSON.parse) ===" -ForegroundColor Cyan
     Push-Location $saqRepo
     try {
         node benchmark/benchmark-json.js --input=$env:SAMPLE --out="$env:RAW\benchmark\saq-report"
         if ($LASTEXITCODE -ne 0) { throw "benchmark-json.js gagal." }
     } finally { Pop-Location }
 } else {
-    Write-Host "`n=== [3/4] saq-report DILEWATI (-SkipSaqReport) ===" -ForegroundColor Yellow
+    Write-Host "`n=== [3/5] saq-report DILEWATI (-SkipSaqReport) ===" -ForegroundColor Yellow
 }
 
 # ---------------------------------------------------------------------------
-# 4. Audit - gerbang integritas artefak
+# 4. ze_json_js - binding WASM vs JSON.parse di runtime Node yang sama
 # ---------------------------------------------------------------------------
-Write-Host "`n=== [4/4] Audit artefak ===" -ForegroundColor Cyan
+if (-not $SkipZeJsonJs) {
+    Write-Host "`n=== [4/5] ze_json_js benchmark (WASM vs JSON.parse) ===" -ForegroundColor Cyan
+    node "$PSScriptRoot\benchmark_ze_json_js.mjs" --input=$env:SAMPLE --out="$env:RAW\benchmark\ze_json_js"
+    if ($LASTEXITCODE -ne 0) { throw "benchmark_ze_json_js.mjs gagal (butuh Node >= 24 utk WASM memory64)." }
+} else {
+    Write-Host "`n=== [4/5] ze_json_js DILEWATI (-SkipZeJsonJs) ===" -ForegroundColor Yellow
+}
+
+# ---------------------------------------------------------------------------
+# 5. Audit - gerbang integritas artefak
+# ---------------------------------------------------------------------------
+Write-Host "`n=== [5/5] Audit artefak ===" -ForegroundColor Cyan
 python "$PSScriptRoot\audit_raw.py" --raw $env:RAW
 if ($LASTEXITCODE -ne 0) {
     throw "audit_raw menemukan pelanggaran - perbaiki sebelum analisa."
 }
 
-Write-Host "`nSelesai. Artefak: $env:RAW\benchmark (ze_json + saq-report)" -ForegroundColor Green
+Write-Host "`nSelesai. Artefak: $env:RAW\benchmark (ze_json + saq-report + ze_json_js)" -ForegroundColor Green
 Write-Host "Analisa : python research/analyze_benchmarks.py"
 Write-Host "Visual  : python research/visualize.py"

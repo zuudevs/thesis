@@ -12,8 +12,10 @@
 #    3. scanner8_vs_64          — efek lebar SIMD per fixture
 #    4. gram_base_vs_tapewalk   — isolasi biaya tulis tape
 #    5. perf_vs_size            — throughput vs ukuran dataset (log-log)
-#    6. cross_package           — ze_json scanner64 vs JSON.parse per fixture
-#                                  korpus terpadu (join sha256; chart inti)
+#    6. cross_package           — perbandingan inti skripsi per fixture korpus
+#                                  terpadu (join sha256): ze_json scanner64
+#                                  (C++) vs ze_json WASM binding (Node, bila
+#                                  paket ze_json_js ada) vs JSON.parse
 # ============================================================================
 from __future__ import annotations
 
@@ -259,9 +261,12 @@ def chart_perf_vs_size(rows: list[dict]) -> None:
 
 # ---------------------------------------------------------------- chart 6
 def chart_cross_package(rows: list[dict]) -> None:
-    """ze_json scanner64 (corpus_benchmark) vs JSON.parse — join per sha256."""
+    """Perbandingan inti skripsi per fixture (join sha256):
+    ze_json scanner64 (C++) vs ze_json WASM binding (Node) vs JSON.parse.
+    Seri WASM hanya muncul bila paket ze_json_js sudah ada di CSV."""
     ze: dict[str, dict] = {}   # sha256 -> row (korpus terpadu)
     saq: dict[str, dict] = {}
+    wasm: dict[str, dict] = {}
     for r in rows:
         if not r["fixture_sha256"]:
             continue
@@ -269,6 +274,8 @@ def chart_cross_package(rows: list[dict]) -> None:
             ze.setdefault(r["fixture_sha256"], r)
         elif r["package"] == "saq-report" and r["benchmark"] == "JSON.parse/parse-only":
             saq.setdefault(r["fixture_sha256"], r)
+        elif r["package"] == "ze_json_js" and r["benchmark"] == "ze_json.wasm/end-to-end":
+            wasm.setdefault(r["fixture_sha256"], r)
     joined = sorted((sha for sha in ze if sha in saq),
                     key=lambda sha: ze[sha]["fixture"])
     if not joined:
@@ -278,16 +285,33 @@ def chart_cross_package(rows: list[dict]) -> None:
     fixtures = [ze[sha]["fixture"] for sha in joined]
     ze_gbs = [gbps(ze[sha]["bytes_per_second"]) or 0 for sha in joined]
     saq_gbs = [gbps(saq[sha]["bytes_per_second"]) or 0 for sha in joined]
+    has_wasm = bool(wasm) and any(sha in wasm for sha in joined)
+    wasm_gbs = [gbps(wasm[sha]["bytes_per_second"]) or 0 if sha in wasm else 0
+                for sha in joined]
 
+    n_series = 3 if has_wasm else 2
+    w = 0.8 / n_series
     fig, ax = plt.subplots(figsize=(10, 5))
     x = range(len(fixtures))
-    w = 0.38
-    ax.bar([i - w / 2 for i in x], ze_gbs, w, label="ze_json scanner64 (C++)")
-    ax.bar([i + w / 2 for i in x], saq_gbs, w, label="JSON.parse (Node V8)")
+    offsets = {
+        2: [-w / 2, w / 2],
+        3: [-w, 0.0, w],
+    }[n_series]
+    ax.bar([i + offsets[0] for i in x], ze_gbs, w, label="ze_json scanner64 (C++)")
+    if has_wasm:
+        ax.bar([i + offsets[1] for i in x], wasm_gbs, w,
+               label="ze_json WASM (Node)")
+        ax.bar([i + offsets[2] for i in x], saq_gbs, w,
+               label="JSON.parse (Node V8)")
+    else:
+        ax.bar([i + offsets[1] for i in x], saq_gbs, w,
+               label="JSON.parse (Node V8)")
     ax.set_xticks(list(x))
     ax.set_xticklabels(fixtures, rotation=45, ha="right", fontsize=8)
     ax.set_ylabel("Throughput (GB/s)")
-    ax.set_title(f"Lintas-paket pada korpus terpadu — {device_tag(rows)}")
+    title_series = ("ze_json C++ vs WASM vs JSON.parse" if has_wasm
+                    else "ze_json C++ vs JSON.parse")
+    ax.set_title(f"{title_series} pada korpus terpadu — {device_tag(rows)}")
     ax.legend()
     ax.grid(axis="y", alpha=0.3)
     save(fig, "cross_package_throughput")

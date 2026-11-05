@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # ============================================================================
-#  analyze_benchmarks.py — Analisa benchmark ze_json + saq-report lintas-device
+#  analyze_benchmarks.py — Analisa benchmark ze_json + saq-report + ze_json_js
 # ============================================================================
 #  Membaca SEMUA artefak KEEP hasil audit_raw.py, lalu:
 #
@@ -13,8 +13,9 @@
 #       - tabel per-target ze_json (P50 + throughput)
 #       - perbandingan lintas-device (fixture sha256 identik + library sama)
 #       - perbandingan lintas-PAKET: ze_json scanner64 (corpus_benchmark) vs
-#         JSON.parse saq-report per fixture sha256 identik — perbandingan
-#         inti skripsi
+#         JSON.parse saq-report per fixture sha256 identik
+#       - perbandingan TIGA ARAH (inti skripsi): ze_json C++ (native ceiling)
+#         vs ze_json WASM binding di Node (paket ze_json_js) vs JSON.parse
 #       - test (correctness record)
 #
 #  Pemakaian:  python research/analyze_benchmarks.py [--raw <dir>] [--out <dir>]
@@ -90,10 +91,10 @@ def load_keep_runs(raw_dir: Path) -> list[dict]:
         except (OSError, json.JSONDecodeError):
             continue
 
-        if package == "saq-report":
+        if package in ("saq-report", "ze_json_js"):
             runs.append({
-                "package": "saq-report", "category": category,
-                "target": "saq-benchmark",
+                "package": package, "category": category,
+                "target": "saq-benchmark" if package == "saq-report" else "ze-js-benchmark",
                 "run_id": data.get("metadata", {}).get("run_id", stem),
                 "commit": (data.get("metadata", {}).get("source", {}) or {}).get("git_commit"),
                 "data": data, "sidecar": None,
@@ -113,9 +114,13 @@ def load_keep_runs(raw_dir: Path) -> list[dict]:
 
         # Dua indeks fixture -> (sha256, size):
         #   by name   : utk benchmark lama (hand-register, nama file polos)
-        #   by (grup, stem sanitasi): utk corpus_benchmark (nama grup+stem)
+        #   by (grup, stem sanitasi): utk corpus_benchmark (nama grup+stem).
+        #     Stem yang ber-tabrakan dalam satu grup (mis. resolved-relations
+        #     di enriched-reports/ DAN enriched-schedules/) di-re-key dengan
+        #     suffix __<dir-induk> — rule yang sama dengan disambiguasi di
+        #     corpus_benchmark/main.cpp.
         fixtures: dict[str, dict] = {}
-        fixtures_by_group_stem: dict[tuple[str, str], dict] = {}
+        by_gs: dict[tuple[str, str], list[tuple[str, dict]]] = defaultdict(list)
         for d in md.get("datasets", []):
             path = d.get("path", "").replace("\\", "/")
             name = Path(path).name
@@ -123,7 +128,16 @@ def load_keep_runs(raw_dir: Path) -> list[dict]:
             fixtures[name] = info
             group = sanitize_stem(path.split("/", 1)[0]).lower() if "/" in path else ""
             stem_key = sanitize_stem(Path(path).stem)
-            fixtures_by_group_stem[(group, stem_key)] = info
+            parent = sanitize_stem(Path(path).parent.name)
+            by_gs[(group, stem_key)].append((parent, info))
+
+        fixtures_by_group_stem: dict[tuple[str, str], dict] = {}
+        for (group, stem_key), members in by_gs.items():
+            if len(members) == 1:
+                fixtures_by_group_stem[(group, stem_key)] = members[0][1]
+            else:
+                for parent, info in members:
+                    fixtures_by_group_stem[(group, f"{stem_key}__{parent}")] = info
 
         runs.append({
             "package": package, "category": category,
@@ -253,6 +267,57 @@ def saqreport_rows(run: dict) -> list[dict]:
     return rows
 
 
+def zejsonjs_rows(run: dict) -> list[dict]:
+    """Baris tidy dari satu report ze_json_js (binding WASM vs JSON.parse).
+
+    Satu report memuat beberapa mode per fixture:
+      json-parse            -> `JSON.parse/same-process` (baseline V8)
+      wasm-parse            -> `ze_json.wasm/end-to-end` (encode + scan)
+      wasm-parse-preloaded  -> `ze_json.wasm/parse-only` (scan saja)
+    """
+    rows: list[dict] = []
+    meta = run["data"].get("metadata", {})
+    runtime = meta.get("runtime", {})
+    cpu = short_device(runtime.get("cpu_model", "?"))
+    mode_names = {
+        "json-parse": "JSON.parse/same-process",
+        "wasm-parse": "ze_json.wasm/end-to-end",
+        "wasm-parse-preloaded": "ze_json.wasm/parse-only",
+    }
+    for result in run["data"].get("results", []):
+        if result.get("status") != "success":
+            continue
+        payload = result.get("payload", {})
+        for mode, measurement in (result.get("measurements", {}) or {}).items():
+            if not measurement or measurement.get("skipped"):
+                continue
+            latency = measurement.get("latency", {})
+            throughput = measurement.get("throughput", {})
+            elapsed_ns = measurement.get("total_elapsed_ns") or 0
+            rows.append({
+                "package": "ze_json_js", "target": run["target"],
+                "run_id": run["run_id"], "commit": run["commit"] or "",
+                "device_cpu": cpu,
+                "device_cores": runtime.get("logical_cores", ""),
+                "os": (meta.get("environment", {}) or {}).get("os_release", ""),
+                "build_type": "node-" + str(runtime.get("node_version", "")),
+                "library_version": str(runtime.get("ze_json_wasm_version") or
+                                       meta.get("benchmark_version", "")),
+                "benchmark": mode_names.get(mode, mode),
+                "fixture": Path(result.get("file", "")).stem,
+                "fixture_sha256": payload.get("sha256", ""),
+                "aggregate": "median+ci95",
+                "time_unit": "ns",
+                "p50_cpu_time": latency.get("median_ns", ""),
+                "p50_real_time": latency.get("median_ns", ""),
+                "stddev_real_time": latency.get("stddev_ns", ""),
+                "repetitions": measurement.get("samples") and len(measurement["samples"]) or "",
+                "bytes_per_second": (throughput.get("data_processed_bytes") / (elapsed_ns / 1e9))
+                                    if elapsed_ns else "",
+            })
+    return rows
+
+
 CSV_FIELDS = [
     "package", "target", "run_id", "commit", "device_cpu", "device_cores", "os",
     "build_type", "library_version", "benchmark", "fixture", "fixture_sha256",
@@ -301,7 +366,7 @@ def write_summary(rows: list[dict], runs: list[dict], out_md: Path) -> None:
     saq_rows = [r for r in rows if r["package"] == "saq-report"]
     test_runs = [r for r in runs if r["category"] == "test"]
     lines: list[str] = []
-    lines.append("# Ringkasan benchmark ze_json + saq-report\n")
+    lines.append("# Ringkasan benchmark ze_json + saq-report + ze_json_js\n")
     lines.append(f"Sumber: `{out_md.parent}` — dihasilkan otomatis oleh "
                  "`research/analyze_benchmarks.py`. Angka hanya sah untuk "
                  "fixture sha256 yang tercantum (docs/telemetry-sidecar.md).\n")
@@ -408,6 +473,65 @@ def write_summary(rows: list[dict], runs: list[dict], out_md: Path) -> None:
             lines.append("_Belum ada pasangan joinable — pastikan kedua paket dijalankan "
                          "di korpus terpadu yang sama (runner research/run_benchmarks.*)._ \n")
 
+    # ------------------------------------------------------------------
+    # Perbandingan tiga arah (inti skripsi): ze_json scanner64 (C++,
+    # native ceiling) vs ze_json WASM binding (Node) vs JSON.parse (Node)
+    # — join per fixture sha256 identik.
+    # ------------------------------------------------------------------
+    js_rows = [r for r in rows if r["package"] == "ze_json_js"]
+    wasm_rows = [r for r in js_rows if r["benchmark"] == "ze_json.wasm/end-to-end"]
+    jsparse_rows = [r for r in js_rows if r["benchmark"] == "JSON.parse/same-process"]
+    if wasm_rows and saq_parse:
+        by_sha_ze3: dict[str, dict] = {}
+        for r in corpus_ze:
+            if r["fixture_sha256"]:
+                by_sha_ze3.setdefault(r["fixture_sha256"], r)
+        by_sha_saq3: dict[str, dict] = {}
+        for r in saq_parse:
+            if r["fixture_sha256"]:
+                by_sha_saq3.setdefault(r["fixture_sha256"], r)
+        by_sha_wasm: dict[str, dict] = {}
+        for r in wasm_rows:
+            if r["fixture_sha256"]:
+                by_sha_wasm.setdefault(r["fixture_sha256"], r)
+        by_sha_jsparse: dict[str, dict] = {}
+        for r in jsparse_rows:
+            if r["fixture_sha256"]:
+                by_sha_jsparse.setdefault(r["fixture_sha256"], r)
+
+        joined3 = sorted(
+            (sha for sha in by_sha_ze3 if sha in by_sha_wasm and sha in by_sha_saq3),
+            key=lambda sha: by_sha_ze3[sha]["fixture"],
+        )
+        lines.append("## Tiga arah — ze_json C++ vs ze_json WASM (Node) vs JSON.parse (korpus terpadu)\n")
+        lines.append(f"Join: fixture sha256 identik ({len(joined3)} fixture). Ini perbandingan "
+                     "inti skripsi: binding JS ze_json (WASM memory64) vs JSON.parse di runtime "
+                     "Node yang sama; angka C++ sebagai native ceiling. WASM end-to-end mencakup "
+                     "biaya encode string -> UTF-8 ke memori wasm.\n")
+        if joined3:
+            lines.append("| Fixture | ze_json scanner64 (C++) | ze_json WASM (Node) | JSON.parse (Node) | Rasio WASM÷parse |")
+            lines.append("|---|---|---|---|---|")
+            for sha in joined3:
+                ze = by_sha_ze3[sha]
+                wasm = by_sha_wasm[sha]
+                saq = by_sha_saq3[sha]
+                try:
+                    ratio = float(wasm["p50_real_time"]) / float(saq["p50_real_time"])
+                    ratio_s = f"{ratio:.2f}x"
+                except (TypeError, ValueError, ZeroDivisionError):
+                    ratio_s = "-"
+                lines.append(
+                    f"| {ze['fixture']} | {fmt_ns(ze['p50_real_time'], ze['time_unit'])} "
+                    f"({fmt_gbs(ze['bytes_per_second'])}) | "
+                    f"{fmt_ns(wasm['p50_real_time'], wasm['time_unit'])} "
+                    f"({fmt_gbs(wasm['bytes_per_second'])}) | "
+                    f"{fmt_ns(saq['p50_real_time'], saq['time_unit'])} "
+                    f"({fmt_gbs(saq['bytes_per_second'])}) | {ratio_s} |")
+            lines.append("")
+        else:
+            lines.append("_Belum ada pasangan tiga arah joinable — jalankan "
+                         "research/benchmark_ze_json_js.mjs di korpus terpadu yang sama._ \n")
+
     # Test reports (correctness record).
     if test_runs:
         lines.append("## Test (correctness record)\n")
@@ -445,6 +569,8 @@ def main() -> int:
             rows.extend(benchmark_rows(run))
         elif run["package"] == "saq-report":
             rows.extend(saqreport_rows(run))
+        elif run["package"] == "ze_json_js":
+            rows.extend(zejsonjs_rows(run))
 
     if not rows:
         print("Tidak ada baris benchmark — jalankan audit_raw.py dulu.")

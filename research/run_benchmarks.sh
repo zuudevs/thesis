@@ -12,12 +12,14 @@
 #    ./research/run_benchmarks.sh --quick                  # 3 repetisi (sanity)
 #    ./research/run_benchmarks.sh --skip-ze-json           # hanya saq-report
 #    ./research/run_benchmarks.sh --skip-saq-report        # hanya ze_json
+#    ./research/run_benchmarks.sh --skip-ze-json-js        # tanpa benchmark JS
 # ============================================================================
 set -euo pipefail
 
 REPS=5
 SKIP_ZE_JSON=0
 SKIP_SAQ_REPORT=0
+SKIP_ZE_JSON_JS=0
 SKIP_CORPUS=0
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -25,6 +27,7 @@ while [[ $# -gt 0 ]]; do
         --repetitions) REPS="$2"; shift 2 ;;
         --skip-ze-json) SKIP_ZE_JSON=1; shift ;;
         --skip-saq-report) SKIP_SAQ_REPORT=1; shift ;;
+        --skip-ze-json-js) SKIP_ZE_JSON_JS=1; shift ;;
         --skip-corpus-preflight) SKIP_CORPUS=1; shift ;;
         *) echo "argumen tak dikenal: $1" >&2; exit 2 ;;
     esac
@@ -48,7 +51,7 @@ echo "RAW    = $RAW"
 # ---------------------------------------------------------------------------
 if [[ $SKIP_CORPUS -eq 0 ]]; then
     echo ""
-    echo "=== [1/4] Preflight korpus terpadu ==="
+    echo "=== [1/5] Preflight korpus terpadu ==="
 
     echo "-- corpus install --skip-existing"
     (cd "$ZE_REPO" && python3 scripts/corpus/main.py install --skip-existing)
@@ -60,7 +63,7 @@ if [[ $SKIP_CORPUS -eq 0 ]]; then
     (cd "$ZE_REPO" && python3 scripts/corpus/main.py scan && python3 scripts/corpus/main.py verify)
 else
     echo ""
-    echo "=== [1/4] Preflight korpus DILEWATI (--skip-corpus-preflight) ==="
+    echo "=== [1/5] Preflight korpus DILEWATI (--skip-corpus-preflight) ==="
 fi
 
 # ---------------------------------------------------------------------------
@@ -68,7 +71,7 @@ fi
 # ---------------------------------------------------------------------------
 if [[ $SKIP_ZE_JSON -eq 0 ]]; then
     echo ""
-    echo "=== [2/4] ze_json benchmark (repetisi=$REPS) ==="
+    echo "=== [2/5] ze_json benchmark (repetisi=$REPS) ==="
     (cd "$ZE_REPO" && cmake --preset native-release -DZE_BENCH_REPETITIONS="$REPS")
     for t in parser_benchmark scanner_benchmark session_benchmark span_iso_benchmark corpus_benchmark; do
         echo "-- export_benchmark_$t"
@@ -76,7 +79,7 @@ if [[ $SKIP_ZE_JSON -eq 0 ]]; then
     done
 else
     echo ""
-    echo "=== [2/4] ze_json DILEWATI (--skip-ze-json) ==="
+    echo "=== [2/5] ze_json DILEWATI (--skip-ze-json) ==="
 fi
 
 # ---------------------------------------------------------------------------
@@ -84,22 +87,36 @@ fi
 # ---------------------------------------------------------------------------
 if [[ $SKIP_SAQ_REPORT -eq 0 ]]; then
     echo ""
-    echo "=== [3/4] saq-report benchmark (JSON.parse) ==="
+    echo "=== [3/5] saq-report benchmark (JSON.parse) ==="
     (cd "$SAQ_REPO" && node benchmark/benchmark-json.js \
         --input="$SAMPLE" --out="$RAW/benchmark/saq-report")
 else
     echo ""
-    echo "=== [3/4] saq-report DILEWATI (--skip-saq-report) ==="
+    echo "=== [3/5] saq-report DILEWATI (--skip-saq-report) ==="
 fi
 
 # ---------------------------------------------------------------------------
-# 4. Audit — gerbang integritas artefak
+# 4. ze_json_js — binding WASM vs JSON.parse di runtime Node yang sama
+#    (butuh Node >= 24 / WASM memory64; script memberi pesan jelas bila tidak)
+# ---------------------------------------------------------------------------
+if [[ $SKIP_ZE_JSON_JS -eq 0 ]]; then
+    echo ""
+    echo "=== [4/5] ze_json_js benchmark (WASM vs JSON.parse) ==="
+    node "$WORKSPACE/research/benchmark_ze_json_js.mjs" \
+        --input="$SAMPLE" --out="$RAW/benchmark/ze_json_js"
+else
+    echo ""
+    echo "=== [4/5] ze_json_js DILEWATI (--skip-ze-json-js) ==="
+fi
+
+# ---------------------------------------------------------------------------
+# 5. Audit — gerbang integritas artefak
 # ---------------------------------------------------------------------------
 echo ""
-echo "=== [4/4] Audit artefak ==="
+echo "=== [5/5] Audit artefak ==="
 python3 "$WORKSPACE/research/audit_raw.py" --raw "$RAW"
 
 echo ""
-echo "Selesai. Artefak: $RAW/benchmark/{ze_json,saq-report}/"
+echo "Selesai. Artefak: $RAW/benchmark/{ze_json,saq-report,ze_json_js}/"
 echo "Analisa : python3 research/analyze_benchmarks.py"
 echo "Visual  : python3 research/visualize.py"
