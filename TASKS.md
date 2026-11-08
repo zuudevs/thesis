@@ -141,17 +141,29 @@
 
 ## P3 — Integrasi binding Node ze_json (wasm64)
 
-- [ ] **P3-1** — `bindings/js/ze_json.mjs`: raw wasm64 C-ABI (handshake memory,
-  pointer, view `Uint8Array`) mengikuti kontrak `package.json` (`ze_json.wasm`
-  hasil build wasm64 POST_BUILD).
-- [ ] **P3-2** — Smoke test `bindings/js/tests/main.mjs` + `npm run smoke`:
-  minimal parse & validate menghasilkan output konsisten.
-- [ ] **P3-3** — Sinkronkan `npm-publish.yml` yang stale (target `ze_json_core` →
-  `ze_json`, path `bindings/js/test` → `bindings/js/tests`, CMake 4.4.4 → 4.4.5).
-- [ ] **P3-4** — Engine `ze-wasm64` di node harness — satu runner untuk semua engine
-  (`v8`, `ze-wasm64`; opsi native NAPI mengikuti keputusan `PLANS.md` §7).
-- [ ] **P3-5** — Differential test JS binding: hasil parse/validate identik byte-per-byte
-  dengan C++ native pada korpus yang sama.
+- [x] **P3-1** — `bindings/js/ze_json.mjs`: raw wasm64 C-ABI (memory64 diekspor
+  modul, 64 MiB; bump allocator `ze_alloc`/`ze_reset_heap` dari `__heap_base`
+  linker; `ze_scanner8`/`ze_reference_scan` dengan hasil packed
+  `(error<<32)|count`) — C-ABI shim baru `src/bindings/cabi.cpp`
+  (`EXPORT_NAME`, compile-out di native); linker flags
+  `--export-memory/--export=__heap_base/--initial-memory=67108864`;
+  POST_BUILD tetap menyalin `ze_json.wasm` ke `bindings/js`.
+- [x] **P3-2** — Smoke test `bindings/js/tests/main.mjs` + `npm run smoke`:
+  ABI version, 8 kasus scan (termasuk escape & error), kesepakatan in-module
+  scanner8 ↔ reference_scan, sanity allocator. **PASS**.
+- [x] **P3-3** — Sinkronisasi `npm-publish.yml`: CMake 4.4.4 → 4.4.5 (target &
+  path sudah benar di file terkini; langkah smoke kini berjalan atas test
+  riil).
+- [x] **P3-4** — Engine `ze-wasm64` di node harness: engine registry
+  (`ENGINES`) — satu runner semua engine; konteks `wasm-scan` (batch
+  semantics, sejajar C++/v8); library `ze_json` + `schemaEngine: wasm64_cabi`;
+  run pertama `zuu-20261108220907-ca8f5f4` (dirty) **6/6 PASS validator**,
+  396–648 MB/s (~20% di bawah native scanner8; ~3–4× V8 body-parse) —
+  baseline kanonik menyusul pasca-merge.
+- [x] **P3-5** — Differential test JS binding
+  (`bindings/js/tests/differential.mjs`, `npm run differential`): 71 dokumen
+  (seluruh korpus P0-8 + json_checker) — wasm scanner8 ↔ wasm reference_scan ↔
+  JS reference **sepakat penuh** (outcome, count, indeks).
 
 ## P4 — Loop optimasi (skill cpp-highperf-json)
 
