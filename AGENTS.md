@@ -15,8 +15,9 @@
 - **`ze_json/`** (submodule): library header-first di `include/ze_json/**`
   (`core`, `utils`, `meta`, `ondemand`), semua nama di `namespace zuu`, **tanpa STL di
   core** (typedef `core::*` sendiri, `core::Result`, `Arena`, makro `NOEXCEPT`,
-  `RESTRICT`). `src/` = `stubs/compiler_rt.cpp` + scanner WIP
-  (`src/ondemand/scalar.cpp` masih `// TODO`). API publik belum lengkap.
+  `RESTRICT`). `src/` = `stubs/compiler_rt.cpp` + `ondemand/scalar.cpp`
+  (`scanner8` + reference terimplement & teruji sejak P1-1/P1-2);
+  `scanner32/64/128` dan parser on-demand masih TODO. API publik belum lengkap.
 - **`bindings/js`**: binding Node raw wasm64 C-ABI (`ze_json.mjs` masih kosong).
   Node >= 24; rencana publikasi `@zuudevs/ze-json` di GitHub Packages.
 - **`saq-report/`** (submodule — aplikasi Node.js/Express `saq-whatsapp`). Titik hot
@@ -124,9 +125,10 @@
 
 ## 5. Keadaan repo yang mudah terlewat
 
-- `ze_json/tests/CMakeLists.txt` dan `benchmarks/CMakeLists.txt` **masih kosong** —
-  belum ada target GTest/benchmark; helper export tersedia tapi tidak terpakai.
-  Menambah tes = register target yang memakai helper tersebut.
+- `ze_json/tests/CMakeLists.txt` dan `benchmarks/CMakeLists.txt` terisi sejak
+  P1-3/P1-5: `ze_json_scanner_test` (diferensial + json_checker) dan
+  `ze_json_scanner_benchmark` (korpus P0-8, export sidecar) — keduanya memakai
+  helper export. Benchmark baru = register target yang memakai helper tersebut.
 - `.github/workflows/npm-publish.yml` **STALE**: menyebut target `ze_json_core`
   (tidak eksis), path `bindings/js/test` (seharusnya `tests/`), CMake 4.4.4. Jangan
   jadikan pola referensi. Referensi workflow valid = `ci.yml` (ubuntu+windows,
