@@ -39,6 +39,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { collectHost } from '../host-introspect.mjs';
+import { ZeJson, ZeDocument, ABI_VERSION as ABI_VERSION_BINDING } from '../../ze_json/bindings/js/ze_json.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const CORPUS_ROOT = path.join(ROOT, 'corpus', 'benchmarks');
@@ -54,7 +55,7 @@ function parseArgs(argv) {
     repeats: 5,
     minTimeMs: 200,
     warmupMs: 300,
-    repo: 'saq_report',
+    repo: null,
     outRoot: 'out',
   };
   for (let i = 0; i < argv.length; i += 2) {
@@ -193,6 +194,70 @@ const CONTEXTS = {
   },
 };
 
+// ------------------------------------------------------------- engine registry
+// One runner for all engines (TASKS P3-4): each engine declares its default
+// repo (provenance), library metadata and the contexts it can honestly run.
+
+const V8_CONTEXTS = CONTEXTS;
+
+function makeWasmContexts() {
+  let binding = null;
+  return {
+    'wasm-scan': {
+      purpose: 'ze-wasm64 (P3): structural pre-scan of the corpus documents through the wasm64 C-ABI binding (Mison-style structural index stream)',
+      basisPapers: ['10.48550_arXiv.1902.08318', '10.14778_3115404.3115416', '10.1145_2807591.2807644'],
+      prepare(docs) {
+        if (binding === null) {
+          binding = ZeJson.load();
+        }
+        binding.resetHeap(); // bump allocator: rewind between corpora
+        return docs.map((doc) => new ZeDocument(binding, Buffer.from(doc.utf8, 'utf8')));
+      },
+      run(states) {
+        let sink = 0;
+        for (const document of states) {
+          const result = document.scan8();
+          if (!result.ok) {
+            throw new Error(`wasm scan failed: ${result.error}`);
+          }
+          sink += result.count;
+        }
+        return sink;
+      },
+      bytesPerOp(states) {
+        return states.reduce((sum, d) => sum + d.byteLength, 0);
+      },
+    },
+  };
+}
+
+const ENGINES = {
+  v8: {
+    repo: 'saq_report',
+    schemaEngine: 'v8',
+    library: () => ({
+      name: 'saq_baseline',
+      version: process.versions.node,
+      language_runtime: `node ${process.versions.node} (v8 ${process.versions.v8})`,
+    }),
+    contexts: V8_CONTEXTS,
+  },
+  'ze-wasm64': {
+    repo: 'ze_json',
+    schemaEngine: 'wasm64_cabi',
+    library: () => {
+      const pkg = JSON.parse(fs.readFileSync(
+        path.join(ROOT, 'ze_json', 'bindings', 'js', 'package.json'), 'utf8'));
+      return {
+        name: 'ze_json',
+        version: pkg.version,
+        language_runtime: `node ${process.versions.node} (wasm64 C-ABI, ABI v${ABI_VERSION_BINDING})`,
+      };
+    },
+    contexts: makeWasmContexts(),
+  },
+};
+
 // ------------------------------------------------------------- measurement
 
 function timedRepeat(run, states, minTimeMs) {
@@ -250,13 +315,13 @@ function measureContext(context, states, opts) {
 
 // ----------------------------------------------------------------- assembly
 
-function buildRecord(opts, meta, corpus, results) {
+function buildRecord(opts, meta, corpus, results, engineCfg) {
   const notes = [
     'generator=node_harness',
     `min_time_ms=${opts.minTimeMs}`,
     `warmup_ms=${opts.warmupMs}`,
     `gc_between_repeats=${typeof globalThis.gc === 'function'}`,
-    `repo=${opts.repo}`,
+    `repo=${meta.repo}`,
   ].join('; ');
 
   return {
@@ -265,12 +330,8 @@ function buildRecord(opts, meta, corpus, results) {
     run_id: meta.runId,
     site: opts.site,
     generator: 'node_harness',
-    library: {
-      name: 'saq_baseline',
-      version: process.versions.node,
-      language_runtime: `node ${process.versions.node} (v8 ${process.versions.v8})`,
-    },
-    git_commit: { hash: meta.hash, dirty: meta.dirty, repo: opts.repo },
+    library: engineCfg.library(),
+    git_commit: { hash: meta.hash, dirty: meta.dirty, repo: meta.repo },
     host: meta.host,
     corpus: {
       name: corpus.name,
@@ -295,20 +356,21 @@ function buildRecord(opts, meta, corpus, results) {
 
 function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const engineName = opts.engine;
-  if (engineName !== 'v8') {
-    console.error(`FAIL engine '${engineName}' not registered yet (P2 ships v8; ze-wasm64 lands in P3)`);
+  const engineCfg = ENGINES[opts.engine];
+  if (!engineCfg) {
+    console.error(`FAIL engine '${opts.engine}' not registered (available: ${Object.keys(ENGINES).join(', ')})`);
     process.exit(1);
   }
+  const repo = opts.repo ?? engineCfg.repo;
 
   const corpusNames = opts.corpus === 'all'
     ? ['synthetic_1k', 'synthetic_10k', 'synthetic_100k', 'synthetic_1mb', 'saq_payload_v1', 'checker_batch']
     : [opts.corpus];
   const contextNames = opts.context === 'all'
-    ? Object.keys(CONTEXTS)
+    ? Object.keys(engineCfg.contexts)
     : [opts.context];
 
-  const git = gitMeta(opts.repo);
+  const git = gitMeta(repo);
   const host = collectHost();
   const now = new Date();
   const runId = `${host.hostname}-${now.toISOString().replace(/[-:T]/g, '').slice(0, 14)}-${git.hash}`;
@@ -318,8 +380,8 @@ function main() {
   fs.mkdirSync(measDir, { recursive: true });
 
   console.log(`run_id     : ${runId}`);
-  console.log(`git        : ${git.hash}${git.dirty ? ' (dirty)' : ''} / repo=${opts.repo}`);
-  console.log(`engine     : ${engineName} | site: ${opts.site}`);
+  console.log(`git        : ${git.hash}${git.dirty ? ' (dirty)' : ''} / repo=${repo}`);
+  console.log(`engine     : ${opts.engine} (schema: ${engineCfg.schemaEngine}) | site: ${opts.site}`);
   console.log(`repeats    : ${opts.repeats} x >= ${opts.minTimeMs}ms (warmup ${opts.warmupMs}ms)`);
   console.log(`gc support : ${typeof globalThis.gc === 'function' ? 'yes (--expose-gc)' : 'no (run node --expose-gc for cleaner repeats)'}\n`);
 
@@ -328,14 +390,14 @@ function main() {
     const manifestSha = createHash('sha256')
       .update(fs.readFileSync(path.join(corpus.dir, 'MANIFEST.json')))
       .digest('hex');
-    const meta = { runId, hash: git.hash, dirty: git.dirty, host, corpusSha256: manifestSha };
+    const meta = { runId, hash: git.hash, dirty: git.dirty, host, corpusSha256: manifestSha, repo };
 
     const results = [];
     const rawContexts = {};
     for (const contextName of contextNames) {
-      const context = CONTEXTS[contextName];
+      const context = engineCfg.contexts[contextName];
       if (!context) {
-        console.error(`FAIL unknown context '${contextName}'`);
+        console.error(`FAIL unknown context '${contextName}' for engine '${opts.engine}'`);
         process.exit(1);
       }
       const states = context.prepare(corpus.docs);
@@ -347,8 +409,8 @@ function main() {
       rawContexts[contextName] = stats.repeatsRaw;
 
       results.push({
-        name: `${engineName}/${contextName}/${corpus.name}`,
-        engine: engineName,
+        name: `${opts.engine}/${contextName}/${corpus.name}`,
+        engine: engineCfg.schemaEngine,
         status: 'ok',
         rationale: {
           purpose: context.purpose,
@@ -377,7 +439,7 @@ function main() {
     fs.writeFileSync(exhibitPath, `${JSON.stringify({
       run_id: runId,
       corpus: { name: corpus.name, manifest: corpus.manifest },
-      engine: engineName,
+      engine: opts.engine,
       site: opts.site,
       repeats: opts.repeats,
       min_time_ms: opts.minTimeMs,
@@ -385,7 +447,7 @@ function main() {
       contexts: rawContexts,
     }, null, 2)}\n`, 'utf8');
 
-    const record = buildRecord(opts, meta, corpus, results);
+    const record = buildRecord(opts, meta, corpus, results, engineCfg);
     const recordPath = path.join(measDir, `${runId}_${corpus.name}_record.json`);
     fs.writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
     console.log(`[+] exhibit -> ${path.relative(ROOT, exhibitPath)}`);
