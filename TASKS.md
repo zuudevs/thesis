@@ -58,25 +58,59 @@
 
 ## P1 — Harness & korpus native (ze_json)
 
-- [ ] **P1-1** — Scalar reference scanner (bisa dibandingkan byte-per-byte) di
-  `include/ze_json/ondemand/` — baseline internal fast path.
-- [ ] **P1-2** — Fast path `scanner8` di `src/ondemand/scalar.cpp` memakai tabel
-  `kJsonCharClass` (kodegen sudah aman).
-- [ ] **P1-3** — Differential test scalar ↔ fast-path untuk edge cases (input kosong,
-  <1 SIMD vector, lintas blok, unicode escape, angka batas, string panjang).
-- [ ] **P1-4** — Integrasi `json_checker` ke tests; register via
-  `add_export_test_target` + sidecar metadata.
-- [ ] **P1-5** — Register target google-benchmark di `ze_json/benchmarks/` +
-  export ke `out/benchmarks/` (context `schema_version`, `run_id`, `git_commit`,
-  `build_type`, `library_version` — helper sudah menangani). **Setiap benchmark
-  membawa komentar Doxygen `rationale`:** apa yang diuji + `@cite <DOI>` — teks
-  sama dipakai field `rationale` di record hasil.
-- [ ] **P1-6** — Benchmark semua korpus (parse → validate); hasil record v1 pertama
-  dengan `rationale` per entry.
-- [ ] **P1-7** — Skeleton `ze_json/docs/{architecture,development,requirement}/`
-  (isi penuh di P6).
-- [ ] **P1-8** — Baseline scalar & fast-path tersimpan di `out/measurements/` +
-  exhibit raw `out/raw/`.
+- [x] **P1-1** — Scalar reference scanner di `include/ze_json/ondemand/reference.hpp`
+  (`reference_scan`, header-only, **bebas tabel lookup** — switch karakter eksplisit
+  agar bug codegen tak bisa merusak referensi; kontrak scanner tertulis penuh di
+  Doxygen: indeks struktural `{ } [ ] , :` di luar string, error EmptyJson /
+  InvalidJson / InsufficientBuffer + presedensnya).
+- [x] **P1-2** — Fast path `scanner8` di `src/ondemand/scalar.cpp` memakai tabel
+  `kJsonCharClass` (satu load tabel + dua tes masker per byte); Doxygen `@cite`
+  Mison (10.14778_3115404.3115416) + simdjson (10.48550_arXiv.1902.08318),
+  sinkron dengan rationale test.
+- [x] **P1-3** — Differential test `tests/scanner_test.cpp`: 15 kasus tepi (input
+  kosong, null src/dst, whitespace varian, escape `\"` `\\`, UTF-8 multibyte,
+  struktural di dalam string, angka opaque, string tak tertutup, dangling escape,
+  kapasitas exact/kurang-satu, zero-structural) + fuzz deterministik 500 iterasi
+  (seed 20261108, input 0..4096 B) — **reference vs scanner8 identik 100%**; plus
+  test tabel `kJsonCharClass` 256 byte terhadap set karakter referensi.
+- [x] **P1-4** — Integrasi `json_checker` ke tests + registrasi CMake:
+  `tests/CMakeLists.txt` (target `ze_json_scanner_test`, link GTest, `add_test`,
+  `add_export_test_target`, korpus via macro `ZE_JSON_CORPUS_DIR` dinormalisasi
+  POSIX), `enable_testing()` ditambahkan di CMakeLists root. ctest
+  native-release **100% lulus** (pass1–3: indeks struktural identik; fail1–33:
+  kedua jalur sepakat — fail1/fail18 dikecualikan sebagai legacy RFC 8259;
+  grammar error lain = ranah parser, bukan scanner).
+- [x] **P1-5** — Register target google-benchmark di `ze_json/benchmarks/`
+  (`ze_json_scanner_benchmark` + `add_export_benchmark_target` →
+  `out/benchmarks/ze_json/`): 12 benchmark (4 korpus sintetis + saq batch +
+  checker batch × reference/scanner8), korpus dimuat dari `corpus/benchmarks/`
+  (P0-8), 5 repetisi ter-bake, **sidecar metadata export** (kontrak §4:
+  `export_sidecar.hpp` dipakai benchmark DAN test — test retrofit custom main,
+  link `GTest::gtest` saja).
+- [x] **P1-6** — Record v1 pertama `ze_json` dengan `rationale` per entry:
+  run `zuu-20261109035547-3211b7d` (site dev_device, native-release, commit
+  `3211b7d` + **dirty** — file P1 belum ter-commit saat run; baseline kanonik
+  di-re-run setelah merge). Pipeline penuh: helper export → split per korpus
+  (`split-gbench.py` baru, reusable) → konversi (`convert-gbench.py`,
+  `run_id` bersama, hash manifest P0-8) → **6/6 record PASS validator** →
+  exhibit mentah di `out/raw/<run_id>/`. Hasil baseline (bytes/s,
+  reference → scanner8): 1k 1.01G→932M (−7.5%), 10k 796M→777M (−2.4%),
+  100k 765M→759M (≈noise), 1mb 727M→752M (+3.5%), saq 1.18G→994M (−16%),
+  checker_batch 743M→783M (+5.4%) — observasi: tabel lookup tidak otomatis
+  menang di korpus kecil/whitespace-heavy; SWAR (P4-2) kandidat utama.
+- [x] **P1-7** — Skeleton `ze_json/docs/{architecture,development,requirement}/`
+  (+ `docs/README.md` indeks): English, diagram Mermaid, tabel status implementasi
+  sesuai kondisi P1, alur build/test + pipeline pengukuran (build → export →
+  split → convert → validate → analyze), tabel toolchain & env variables. Isi
+  penuh tetap di P6.
+- [x] **P1-8** — Baseline kanonik tersimpan: run `zuu-20261109042022-ca8f5f4`
+  (ze_json `main` @ `ca8f5f4` pasca-merge PR #2, tree bersih, tanpa dirty) —
+  6/6 record PASS validator, exhibit mentah di `out/raw/zuu-20261109042022-ca8f5f4/`.
+  Sanity check `compare` dirty(3211b7d) vs kanonik(ca8f5f4): *within noise* di
+  kedua jalur (−4.2%/−3.3% vs floor 6.3%/5.2%) — pipeline terverifikasi
+  end-to-end. Hasil kanonik ≈ P1-6: 1k 1.01G→933M, 10k 801M→781M,
+  100k 772M→767M, 1mb 696M→727M, saq 1.16G→985M, checker 712M→706M
+  (MB/s; lihat record untuk angka penuh).
 
 ## P2 — Harness baseline SAQ (Node)
 

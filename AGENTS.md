@@ -134,8 +134,9 @@
   `PROJECT_ROOT_DIR`).
 - `compile_commands.json` di root adalah salinan untuk clangd; sinkronkan setelah
   reconfigure build.
-- `ze_json/docs/{architecture,development,requirement}/` dan `docs/` root masih
-  kosong — isinya dijadwalkan (TASKS P6).
+- `ze_json/docs/{architecture,development,requirement}/` berisi **skeleton
+  English/Mermaid** sejak P1-7 — isi penuh dijadwalkan (TASKS P6); `docs/` root
+  masih kosong.
 - Build aktif sekarang: `ze_json/build/native-release` dan `build/wasm64-release`
   (keduanya gitignored).
 
