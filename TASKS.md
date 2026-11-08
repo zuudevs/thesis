@@ -167,17 +167,33 @@
 
 ## P4 — Loop optimasi (skill cpp-highperf-json)
 
-- [ ] **P4-1** — Profile baseline (perf / VTune / AMD uProf — modul sudah tersedia
-  `HandleProfiler.cmake`): pilih 5 hotspot utama; tulis hipotesis per hotspot
-  (what / evidence / expected effect).
-- [ ] **P4-2** — SIMD runtime dispatch (`simd.hpp` per-ISA + scalar fallback; resolve
-  pointer sekali, bukan per call; tail ditangani eksplisit).
+- [x] **P4-1** — Profil baseline: profiler khusus **tidak tersedia** di device
+  (AMD uProf/VTune tidak terinstal; hanya WPR ETW — analisis ETW di luar jangkauan
+  sesi) → sesuai skill, analisis turun ke **static analysis + bukti terukur**
+  (lower-confidence, dicatat). Hipotesis tercatat di PR P4-2: (H1) SWAR 8-lane
+  klasifikasi; (H2) serial table-load latency tersembunyi via unroll; (H3)
+  prefix-xor string mask ala simdjson; (H4) per-doc overhead di batch kecil;
+  (H5) clock drift antar-sesi (terbukti: scanner8 727→934 MB/s antar run —
+  perbandingan sah hanya dalam-run; cpu_pinning untuk P5).
+- [x] **P4-2** — Dispatch infra + SWAR `scanner64` + **fix correctness
+  `utils/swar.hpp`**: gerbang diferensial menangkap false positive formula
+  `haszero` klasik sebagai mask per-byte (borrow lintas byte; 30/200k acak;
+  diverifikasi 2.000.256 kasus untuk formula pengganti `~(v|((v&0x7F..)+0x7F..))&0x80..`).
+  `structural_scan()` = dispatch statis resolve-sekali; scanner64 teruji
+  (fixtures + fuzz 300×3 varian + korpus). **Hasil ukur: scanner64 kalah dari
+  scanner8 di 5/6 korpus** (compact JSON = quote-dense → SLOW path dominan;
+  6×eq lebih mahal dari 1 load tabel) → **perubahan ditolak**: dispatch default
+  tetap `scanner8`, scanner64 dipertahankan sebagai varian teruji untuk
+  bahasan skripsi. SSE2 `scanner128` (pshufb) = perubahan P4 berikutnya.
 - [ ] **P4-3** — Optimasi scanner/number parser/UTF-8 validator via tabel
   `lookups.hpp` (codegen paper-driven, `@cite` DOI).
 - [ ] **P4-4** — PGO cycle (bila dipilih di `PLANS.md` §7): build `native-pgo` →
   run benchmark → `ninja pgo_merge` → rebuild (preset otomatis USE).
-- [ ] **P4-5** — Satu perubahan per re-measure; tolak kolej perubahan yang tidak
-  memberi gain di luar noise; simpan record lama vs baru.
+- [x] **P4-5** — Disiplin satu-perubahan-per-ukur dijalankan pada P4-2 (SWAR
+  diukur terpisah, ditolak karena regress di luar noise); record lama vs baru
+  tersimpan (`out/measurements/zuu-20261109042022-*` baseline kanonik vs
+  `zuu-20261109053632-*` P4-2); temuan metodologi: clock drift antar-sesi →
+  bandingkan hanya dalam-run.
 - [ ] **P4-6** — Laporan bottleneck (template skill) + checklist optimasi per tahap.
 
 ## P5 — Pengukuran lintas arsitektur (site server ditunda — akses SAQ belum ada)
