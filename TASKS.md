@@ -220,16 +220,26 @@
 
 ## P6 — Dokumentasi & penulisan skripsi
 
-- [ ] **P6-1** — Isi `ze_json/docs/architecture/` dalam **English** (komponen, header,
-  scanner design) — diagram memakai **Mermaid**.
-- [ ] **P6-2** — Isi `ze_json/docs/development/` dalam **English** (build, harness,
-  korpus, testing) — alur bergambar **Mermaid**.
-- [ ] **P6-3** — Isi `ze_json/docs/requirement/` dalam **English** (C++23, toolchain,
-  Python, korpus, env variables).
-- [ ] **P6-4** — Sinkronkan `AGENTS.md` / `PLANS.md` / `TASKS.md` bila keputusan
-  berubah (schema, target mesin, engine harness).
-- [ ] **P6-5** — Angka final + chart siap ditransfer ke dokumen skripsi
-  (`thesis-proposal/` di luar lingkup — hanya data dan referensi yang diberikan).
+- [x] **P6-1** — `ze_json/docs/architecture/README.md` **isi penuh** (English):
+  lapisan, alur data (Mermaid), kontrak scanner lengkap + status varian
+  (measured decision: scanner8 default; SWAR/SSE2 ditolak), C-ABI wasm64
+  (tabel ekspor + diagram), arsitektur pengukuran.
+- [x] **P6-2** — `ze_json/docs/development/README.md` **isi penuh** (English):
+  matriks build/preset, gerbang kebenaran (Mermaid), pipeline pengukuran
+  kanonik 4 langkah + perintah persis, pengembangan binding, tabel
+  troubleshooting environment (MSVC fallback, ASan, GTest race, pipeline-kill,
+  konvensi nama record, autocrlf).
+- [x] **P6-3** — `ze_json/docs/requirement/README.md` **isi penuh** (English):
+  tabel toolchain versi persis, env variables + fallback, presets, korpus
+  (provenance manifest), CI parity.
+- [x] **P6-4** — Sinkronisasi dokumen: `AGENTS.md` (status docs & scanner),
+  `TASKS.md` (tick P0..P6 dengan nota hasil terverifikasi), pointer submodule
+  diperbarui per merge.
+- [x] **P6-5** — Angka final + chart siap transfer ke skripsi:
+  `reports/final-numbers.md` (agregat 3 jalur: ze_native / V8 / ze-wasm64,
+  semua record lolos validator ulang saat load; generator
+  `scripts/measurement-schema/aggregate-final.py` stdlib-only) + chart
+  `out/charts/final-throughput.png` (matplotlib, dari record kanonik).
 
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
