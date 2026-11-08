@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "zuu-20261108090020-31e56e4",
+  "site": "dev_device",
+  "generator": "google_benchmark",
+  "library": {
+    "name": "ze_json",
+    "version": "0.1.0",
+    "language_runtime": "C++23 clang 23.1.5 (native-release)"
+  },
+  "git_commit": {
+    "hash": "31e56e4",
+    "dirty": false,
+    "repo": "ze_json"
+  },
+  "host": {
+    "hostname": "zuu",
+    "os": "Windows_NT",
+    "os_version": "10.0.26200 (Windows 11 Home Single Language)",
+    "arch": "x86_64",
+    "cpu_model": "AMD Ryzen 5 5500U with Radeon Graphics",
+    "cpu_cores": 12,
+    "cpu_freq": "2.10 GHz",
+    "ram_gb": 7.4,
+    "toolchain": "clang 23.1.5 (native-release)"
+  },
+  "corpus": {
+    "name": "synthetic_1mb",
+    "document_count": 1,
+    "total_bytes": 1048576,
+    "max_document_bytes": 1048576,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "config": {
+    "date_utc": "2026-11-08T09:00:20Z",
+    "iterations": 1000,
+    "warmup_runs": 5,
+    "repeats": 5,
+    "cpu_pinning": false,
+    "threads": 1,
+    "notes": "P0-6 hand-composed sample (candidate side), not a measured run; preset=native-release"
+  },
+  "results": [
+    {
+      "name": "BM_Scanner64/parse/synthetic_1mb",
+      "engine": "simd",
+      "status": "ok",
+      "rationale": {
+        "purpose": "analyzer sample (P0-6): SIMD structural scan of a 1 MB synthetic document",
+        "basis_papers": ["10.1145_3448016.3452809"]
+      },
+      "metrics": {
+        "seconds_mean": 0.000912065913,
+        "seconds_stddev": 0.000015,
+        "bytes_per_second": 1150000000.0,
+        "items_per_second": 147200.0,
+        "cpu_seconds": 0.000905000
+      },
+      "extras": {}
+    },
+    {
+      "name": "BM_Scanner8_scalar/parse/synthetic_1mb",
+      "engine": "scalar",
+      "status": "ok",
+      "rationale": {
+        "purpose": "analyzer sample (P0-6): scalar reference scan so the SIMD gain is verifiable",
+        "basis_papers": ["10.1002_spe.3313"]
+      },
+      "metrics": {
+        "seconds_mean": 0.002833989,
+        "seconds_stddev": 0.00007,
+        "bytes_per_second": 370000000.0,
+        "items_per_second": 47360.0,
+        "cpu_seconds": 0.002820000
+      },
+      "extras": {
+        "peak_rss_kb": 2304
+      }
+    }
+  ]
+}
