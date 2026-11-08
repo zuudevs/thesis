@@ -114,18 +114,30 @@
 
 ## P2 — Harness baseline SAQ (Node)
 
-- [ ] **P2-1** — `scripts/node-benchmark/harness.mjs` (root workspace): runner
-  multi-engine (`v8` dulu) menulis record v1 + exhibit raw terstruktur; runner
-  juga mengirim konten `rationale` per benchmark (purpose + basis papers) —
-  konsisten dengan `@cite` di kode.
-- [ ] **P2-2** — Konteks kerja SAQ: body-parse (`JSON.parse` dari buffer),
-  store-read (mirip `JsonRepository.read`), export-stringify (mirip
-  `exportService`: `JSON.stringify(data, null, 2)`).
-- [ ] **P2-3** — Integrasi korpus SAQ (`saq_payload_v1` + `synthetic_N`) dari P0-8.
-- [ ] **P2-4** — Warmup + repeats + host introspection (metadata lengkap di setiap
-  record).
-- [ ] **P2-5** — Baseline dev (situs dev) dijalankan; exhibit raw tersimpan di
-  `out/raw/<run_id>/`.
+- [x] **P2-1** — `scripts/node-benchmark/harness.mjs` (root workspace): runner
+  multi-engine (`v8` dulu; registry siap untuk `ze-wasm64` di P3) menulis
+  record v1 + exhibit raw per korpus (`out/raw/<run_id>/node_harness_*.json`);
+  `rationale` per benchmark (purpose + basis papers) tertanam di kode runner —
+  sinkron dengan `@cite` di header JSDoc; host metadata di-import dari
+  `scripts/host-introspect.mjs` (direfaktor: `collectHost()` + CLI guard).
+- [x] **P2-2** — Tiga konteks kerja SAQ: `body-parse` (`JSON.parse(utf8)` ala
+  `express.json()`), `store-read` (parse + rootKey unwrap ala
+  `JsonRepository.read`, I/O disk disengaja dikecualikan — identik antar
+  engine), `export-stringify` (`JSON.stringify(data, null, 2)` ala
+  `exportService`).
+- [x] **P2-3** — Korpus SAQ terintegrasi: `saq_payload_v1` (6 store, rootKey
+  mapping dari `repositories/index.js`) + `synthetic_N` + `checker_batch`,
+  manifest sha256 P0-8 diverifikasi ulang saat load (bytes on disk == manifest).
+- [x] **P2-4** — Warmup (400 ms) + 5 repetisi × ≥300 ms + `--expose-gc` antar
+  repetisi + host introspection lengkap di setiap record; `config.iterations`
+  = median ops/repeat.
+- [x] **P2-5** — Baseline dev dijalankan: run `zuu-20261108214228-0340a72`
+  (saq-report `main` @ `0340a72`, site dev_device) — **6/6 record PASS
+  validator**. Hasil V8 (median, MB/s): body-parse 137–391, store-read
+  135–427, export-stringify 186–526 (per korpus; cv mayoritas < 8%, GC jitter
+  pada stringify dokumen besar). Perbandingan sejenis dengan ze_json menunggu
+  parser on-demand penuh (P4) — scan-only ze (≈0,7–1,2 GB/s) bukan
+  apples-to-apples dengan V8 full-parse.
 
 ## P3 — Integrasi binding Node ze_json (wasm64)
 
