@@ -1,0 +1,175 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/zuudevs/ze_json/schemas/measurement.schema.json",
+  "title": "Measurement Record v1",
+  "description": "Uniform measurement record for test and benchmark runs across ze_json (C++23 native/wasm64) and saq-report (Node.js V8 baseline). Every entry in results[] MUST carry a rationale = what was tested (purpose) and which paper(s) justify the action (basis_papers, DOI of out/rag/<DOI>.chunks.json). Raw tool outputs (google-benchmark, gtest, node harness) remain as exhibits under out/raw/<run_id>/; this record is the normalized, validated representation used for all analysis.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "kind",
+    "run_id",
+    "site",
+    "generator",
+    "library",
+    "git_commit",
+    "host",
+    "corpus",
+    "config",
+    "results"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "kind": {
+      "enum": ["benchmark", "test"]
+    },
+    "run_id": {
+      "description": "hostname-<YYYYMMDDHHMMSS>-<git-short-hash>; mirrors RUN_ID from cmake/modules/MeasurementRegistry.cmake.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+-[0-9]{14}-[a-f0-9]{7,40}$"
+    },
+    "site": {
+      "enum": ["dev_device", "saq_server"]
+    },
+    "generator": {
+      "enum": ["google_benchmark", "gtest", "node_harness"]
+    },
+    "library": {
+      "type": "object",
+      "required": ["name", "version", "language_runtime"],
+      "properties": {
+        "name": {
+          "description": "library identity: ze_json or the V8 parser used by saq-report.",
+          "enum": ["ze_json", "saq_baseline"]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language_runtime": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "git_commit": {
+      "type": "object",
+      "required": ["hash", "dirty", "repo"],
+      "properties": {
+        "hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{7,40}(-dirty)?$"
+        },
+        "dirty": {
+          "type": "boolean"
+        },
+        "repo": {
+          "enum": ["v5", "ze_json", "saq_report"]
+        }
+      }
+    },
+    "host": {
+      "type": "object",
+      "required": ["hostname", "os", "arch", "cpu_model", "toolchain"],
+      "properties": {
+        "hostname": { "type": "string", "minLength": 1 },
+        "os": { "type": "string", "minLength": 1 },
+        "os_version": { "type": "string" },
+        "arch": { "type": "string", "minLength": 1 },
+        "cpu_model": { "type": "string", "minLength": 1 },
+        "cpu_cores": { "type": "integer", "minimum": 1 },
+        "cpu_freq": { "type": "string" },
+        "ram_gb": { "type": "number", "minimum": 1 },
+        "toolchain": {
+          "type": "string",
+          "minLength": 1,
+          "description": "compiler/runtime identity for the measurement (e.g. clang 23.1.5, node 24, v8 13.x)."
+        }
+      }
+    },
+    "corpus": {
+      "type": "object",
+      "required": ["name", "document_count", "total_bytes", "sha256"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "document_count": { "type": "integer", "minimum": 0 },
+        "total_bytes": { "type": "integer", "minimum": 0 },
+        "max_document_bytes": { "type": "integer", "minimum": 0 },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "hash of the corpus MANIFEST.json so corpus provenance is reconstructible."
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "required": ["date_utc", "repeats"],
+      "properties": {
+        "date_utc": {
+          "type": "string",
+          "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z"
+        },
+        "iterations": { "type": "integer", "minimum": 1 },
+        "warmup_runs": { "type": "integer", "minimum": 0 },
+        "repeats": { "type": "integer", "minimum": 1 },
+        "cpu_pinning": { "type": "boolean" },
+        "threads": { "type": "integer", "minimum": 1 },
+        "notes": { "type": "string" }
+      }
+    },
+    "results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "engine", "status", "rationale", "metrics"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "engine": {
+            "enum": ["scalar", "simd", "v8", "wasm64_cabi"]
+          },
+          "status": {
+            "enum": ["ok", "skip", "fail"]
+          },
+          "rationale": {
+            "description": "The rationale text MUST be synchronized with the Doxygen @cite comment of the benchmark/test code that produced it.",
+            "type": "object",
+            "required": ["purpose", "basis_papers"],
+            "properties": {
+              "purpose": {
+                "type": "string",
+                "minLength": 12
+              },
+              "basis_papers": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9._/-]+$",
+                  "description": "DOI (or DOI-chunk filename form) present under out/rag/."
+                }
+              }
+            }
+          },
+          "metrics": {
+            "type": "object",
+            "required": ["seconds_mean"],
+            "properties": {
+              "bytes_per_second": { "type": "number", "minimum": 0 },
+              "seconds_mean": { "type": "number", "minimum": 0 },
+              "seconds_stddev": { "type": "number", "minimum": 0 },
+              "cpu_seconds": { "type": "number", "minimum": 0 },
+              "documents_per_second": { "type": "number", "minimum": 0 },
+              "items_per_second": { "type": "number" },
+              "peak_rss_bytes": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "extras": { "type": "object" }
+        }
+      }
+    }
+  }
+}

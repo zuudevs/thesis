@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "DESKTOP-RZI-20261108090000-1a2b3c4",
+  "site": "dev_device",
+  "generator": "google_benchmark",
+  "library": {
+    "name": "ze_json",
+    "version": "0.1.0",
+    "language_runtime": "C++23 clang 23.1.5 (native-release)"
+  },
+  "git_commit": {
+    "hash": "1a2b3c4",
+    "dirty": false,
+    "repo": "ze_json"
+  },
+  "host": {
+    "hostname": "DESKTOP-RZI",
+    "os": "Windows",
+    "os_version": "11 build 26100",
+    "arch": "x86_64",
+    "cpu_model": "AMD Ryzen 7 5800H",
+    "cpu_cores": 8,
+    "cpu_freq": "3.2-4.4 GHz",
+    "ram_gb": 16,
+    "toolchain": "clang 23.1.5 (native-release)"
+  },
+  "corpus": {
+    "name": "synthetic_1mb",
+    "document_count": 1,
+    "total_bytes": 1048576,
+    "max_document_bytes": 1048576,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "config": {
+    "date_utc": "2026-11-08T09:00:00Z",
+    "iterations": 1000,
+    "warmup_runs": 5,
+    "repeats": 5,
+    "cpu_pinning": false,
+    "threads": 1,
+    "notes": "P0-3 example: a fully-compliant valid record. Values are illustrative placeholders, not measured data."
+  },
+  "results": [
+    {
+      "name": "scanner64/parse/synthetic_1mb.json",
+      "engine": "simd",
+      "status": "ok",
+      "rationale": {
+        "purpose": "measures structural scanning throughput on a 1 MB synthetic document (stress whole-document parse)",
+        "basis_papers": ["10.1145_3448016.3452809", "10.1002_spe.3313"]
+      },
+      "metrics": {
+        "seconds_mean": 0.00085211,
+        "seconds_stddev": 0.00002045,
+        "bytes_per_second": 1229567000.0,
+        "cpu_seconds": 0.00084988,
+        "documents_per_second": 1173.4,
+        "peak_rss_bytes": 2359296
+      },
+      "extras": {}
+    },
+    {
+      "name": "scanner8/parse/synthetic_1mb.json",
+      "engine": "scalar",
+      "status": "ok",
+      "rationale": {
+        "purpose": "scalar reference path on the same corpus so the SIMD gain can be validated byte-identically",
+        "basis_papers": ["10.1002_spe.3313"]
+      },
+      "metrics": {
+        "seconds_mean": 0.00251000,
+        "seconds_stddev": 0.00006120,
+        "bytes_per_second": 417600000.0,
+        "cpu_seconds": 0.00249000,
+        "documents_per_second": 398.4,
+        "peak_rss_bytes": 2359296
+      },
+      "extras": {}
+    }
+  ]
+}
