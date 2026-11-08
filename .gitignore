@@ -1,9 +1,7 @@
 .temp/
 .toolchains/
 .cache/
-out/rag/
-out/charts/
-assets/papers/
+out/
 
 compile_commands.json
 
