@@ -175,16 +175,19 @@
   prefix-xor string mask ala simdjson; (H4) per-doc overhead di batch kecil;
   (H5) clock drift antar-sesi (terbukti: scanner8 727→934 MB/s antar run —
   perbandingan sah hanya dalam-run; cpu_pinning untuk P5).
-- [x] **P4-2** — Dispatch infra + SWAR `scanner64` + **fix correctness
-  `utils/swar.hpp`**: gerbang diferensial menangkap false positive formula
-  `haszero` klasik sebagai mask per-byte (borrow lintas byte; 30/200k acak;
-  diverifikasi 2.000.256 kasus untuk formula pengganti `~(v|((v&0x7F..)+0x7F..))&0x80..`).
-  `structural_scan()` = dispatch statis resolve-sekali; scanner64 teruji
-  (fixtures + fuzz 300×3 varian + korpus). **Hasil ukur: scanner64 kalah dari
-  scanner8 di 5/6 korpus** (compact JSON = quote-dense → SLOW path dominan;
-  6×eq lebih mahal dari 1 load tabel) → **perubahan ditolak**: dispatch default
-  tetap `scanner8`, scanner64 dipertahankan sebagai varian teruji untuk
-  bahasan skripsi. SSE2 `scanner128` (pshufb) = perubahan P4 berikutnya.
+- [x] **P4-2** — Dispatch infra + SWAR `scanner64` + SSE2 `scanner128` + **fix
+  correctness `utils/swar.hpp`**: gerbang diferensial menangkap false positive
+  formula `haszero` klasik sebagai mask per-byte (borrow lintas byte; 30/200k
+  acak; diverifikasi 2.000.256 kasus untuk formula pengganti
+  `~(v|((v&0x7F..)+0x7F..))&0x80..`). `structural_scan()` = dispatch statis
+  resolve-sekali; scanner64 & scanner128 teruji (fixtures + fuzz + korpus;
+  ctest 100%). **Hasil ukur (dua eksperimen): kedua varian vektor kalah dari
+  scanner8 di 5/6 korpus** (compact JSON quote-dense → jalur serial dominan;
+  klasifikasi vektor lebih mahal dari 1 load tabel) → **keduanya ditolak**;
+  dispatch default tetap `scanner8`; varian dipertahankan teruji untuk
+  bahasan skripsi. Laporan lengkap: `reports/P4-bottleneck-report.md`.
+  Perbaikan kecil tambahan: rekaman `InsufficientBuffer` di jalur serial
+  kini diteruskan (sebelumnya diabaikan diam-diam).
 - [ ] **P4-3** — Optimasi scanner/number parser/UTF-8 validator via tabel
   `lookups.hpp` (codegen paper-driven, `@cite` DOI).
 - [ ] **P4-4** — PGO cycle (bila dipilih di `PLANS.md` §7): build `native-pgo` →
@@ -194,7 +197,11 @@
   tersimpan (`out/measurements/zuu-20261109042022-*` baseline kanonik vs
   `zuu-20261109053632-*` P4-2); temuan metodologi: clock drift antar-sesi →
   bandingkan hanya dalam-run.
-- [ ] **P4-6** — Laporan bottleneck (template skill) + checklist optimasi per tahap.
+- [x] **P4-6** — Laporan bottleneck + checklist: `reports/P4-bottleneck-report.md`
+  (limitasi pengukuran: profiler tak tersedia + clock drift antar-sesi; dua
+  eksperimen vektor ditolak dengan tabel angka dalam-run; fix correctness
+  swar.hpp diterima; future work: pipeline simdjson-style penuh, unroll
+  scanner8, number parser & UTF-8 validator, PGO menunggu keputusan pemilik).
 
 ## P5 — Pengukuran lintas arsitektur (site server ditunda — akses SAQ belum ada)
 
