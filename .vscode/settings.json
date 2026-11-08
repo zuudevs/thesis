@@ -1,0 +1,37 @@
+{
+    "terminal.integrated.profiles.windows": {
+        "PowerShell (ze_json)": {
+            "source": "PowerShell",
+            "args": [
+                "-NoExit",
+                "-Command",
+                "if (Test-Path '${workspaceFolder}/scripts/env/activate.ps1') { . '${workspaceFolder}/scripts/env/activate.ps1' }"
+            ]
+        },
+        "Command Prompt (ze_json)": {
+            "path": [
+                "${env:windir}\\Sysnative\\cmd.exe",
+                "${env:windir}\\System32\\cmd.exe"
+            ],
+            "args": [
+                "/k",
+                "if exist \"${workspaceFolder}\\scripts\\env\\activate.bat\" \"${workspaceFolder}\\scripts\\env\\activate.bat\""
+            ]
+        }
+    },
+    "cmake.cmakePath": "${workspaceFolder}/.toolchains/cmake/bin/cmake.exe",
+    "cmake.cpackPath": "${workspaceFolder}/.toolchains/cmake/bin/cpack.exe",
+    "cmake.ctestPath": "${workspaceFolder}/.toolchains/cmake/bin/ctest.exe",
+    "cmake.additionalCompilerSearchDirs": [
+        "${workspaceFolder}/.toolchains/llvm/bin"
+    ],
+    "cmake.environment": {
+        "PROJECT_ROOT_DIR": "${workspaceFolder}",
+        "TOOLCHAINS_DIR": "${workspaceFolder}/.toolchains",
+        "CORPUS_DIR": "${workspaceFolder}/corpus",
+        "OUT_DIR": "${workspaceFolder}/out",
+        "CACHE_DIR": "${workspaceFolder}/.cache",
+        "VCPKG_VISUAL_STUDIO_PATH": "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools"
+    },
+    "cmake.sourceDirectory": "${workspaceFolder}/ze_json"
+}

@@ -1,0 +1,14 @@
+.temp/
+.toolchains/
+.cache/
+out/rag/
+out/charts/
+assets/papers/
+
+compile_commands.json
+
+__pycache__/
+*.pyc
+
+*.png
+*.pdf

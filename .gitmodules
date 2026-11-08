@@ -1,0 +1,15 @@
+[submodule "ze_json"]
+	path = "ze_json"
+	url = "https://github.com/zuudevs/ze_json.git"
+
+[submodule "saq-report"]
+	path = "saq-report"
+	url = "https://github.com/zuudevs/saq-report.git"
+
+[submodule "submission-thesis-supervisor"]
+	path = "submission-thesis-supervisor"
+	url = "https://github.com/zuudevs/submission-thesis-supervisor.git"
+
+[submodule "thesis-proposal"]
+	path = "thesis-proposal"
+	url = "https://github.com/zuudevs/thesis-proposal.git"
