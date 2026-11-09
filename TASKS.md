@@ -274,6 +274,20 @@
   **baseline wasm pengganti** untuk analisis berikutnya (yang lama `85afad7`
   diarsip apa adanya, tidak sebanding lintas-flag).
 
+## P7 — Implementasi parser on-demand (sampai tuntas; keputusan pemilik 2026-11-09)
+
+- [x] **P7-1** — **Validator UTF-8** (ze_json PR #9 → `27e3218`): method
+  Niagara dua-tabel (`10.1002_spe.2920`) + referensi scalar table-free.
+  **Tabel `kUtf8Byte*` lama terbukti salah** lewat sweep diferensial
+  ekshaustif vs oracle RFC 3629 ketat (surrogate ED A0-BF diterima, overlong
+  `F0 8x` diterima, `F0 9x`/`F4 8x` valid ditolak) → generator diperbaiki
+  dengan derivasi + nota provenance. Verifikasi: 1-byte & 2-byte penuh,
+  3-byte lead ≥ C0 penuh (4.194.304), 4-byte terstruktur — 0 mismatch.
+  Gerbang permanen `tests/utf8_test.cpp`: truth Tabel 8 hard-coded, sweep
+  ekshaustif 1/2-byte + **3-byte penuh 16.777.216**, 4-byte terstruktur,
+  truncation, json_checker pass, fuzz 200k — ctest **100% (2/2)**; wasm
+  fresh build + smoke (abi=2) + differential 71×5 sepakat.
+
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
 - [x] **PW-1** — Buat `.github/PULL_REQUEST_TEMPLATE.md` di ketiga repo (root v5,
