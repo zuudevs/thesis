@@ -317,6 +317,26 @@
   **fuzz 120k** (generatif + korup) vs referensi scalar terpisah;
   wasm smoke (abi=2) + differential 71×5 sepakat (string belum
   terekspos ABI — v3 di P7-5).
+- [x] **P7-4** — **Value/Document API on-demand** (ze_json PR #12 →
+  `a12d361`): `Value` (klasifikasi launcher satu load via tabel
+  `kOndemandNodeType` tergenerate; materialisasi skalar malas memakai
+  layer P7-2/P7-3; `StringSpan` zero-copy + flag `escaped`),
+  `Document::open` (scan + staging), `get_root` (framing akar eager:
+  scalar wajib tail whitespace, kontainer wajib pemilik seluruh
+  indeks), `ArrayIter`/`ObjectIter` (skip kontainer anak hanya via
+  indeks — latitude on-demand `10.1002_spe.3313`; framing skalar
+  eksak; sticky error; empty container done-at-begin), `Field`.
+  **Tabel match bracket LIFO** di-stage saat open (depth satu-counter
+  tidak sound untuk cross-type `[ { ] }`; `kNoBracket` = pelanggaran
+  framing). Perbaikan bersama: `utils/alloc.hpp` placement-new
+  freestanding dibegi guard `__has_include(<new>)` (bentrok dengan
+  TU hosted gtest). Gerbang `tests/value_test.cpp`: root framing +
+  penolakan baseline-V8 (`[1 2]`, koma ekor, `:` hilang, `,` liar,
+  literal rusak, root ganda), klasifikasi launcher, skip latitude
+  (subtree rusak tak-tersentuh vs tersentuh→error), skip iteratif
+  5000-level (tanpa rekursi), detached value, decode span lewat
+  P7-3 — ctest **100% (5/5)**; wasm64 build hijau + harness smoke
+  5 mode + record validator PASS; ABI tetap v2 (P7-5 = v3).
 
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
