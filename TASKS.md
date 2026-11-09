@@ -287,6 +287,19 @@
   ekshaustif 1/2-byte + **3-byte penuh 16.777.216**, 4-byte terstruktur,
   truncation, json_checker pass, fuzz 200k — ctest **100% (2/2)**; wasm
   fresh build + smoke (abi=2) + differential 71×5 sepakat.
+- [x] **P7-2** — **Number parser** (ze_json PR #10 → `55571fa`): grammar
+  RFC 8259 + dekomposisi, lalu 4 jalur **satu kali pembulatan** masing-masing:
+  ±0; integer ≤ 19 digit (u64→double tunggal); region eksak 128-bit
+  (m < 2^53, |q| ≤ 22 — divisi bit-serial tanpa `__udivti3`, wasm tetap
+  `-nostdlib`-clean); slow path bigint kapasitas-tetap (cap 768 digit dengan
+  lipat LSD→eksponen, power-of-five scaling, divisor-shift untuk skala
+  negatif). Semantik V8 (±Infinity/±0, "-0"). **Oracle `std::strtod`**:
+  kurasi batas + sweep 1–19 digit × ±30 + string 20–800 digit +
+  **fuzz 300k** + **200k round-trip %.17g** + tie subnormal eksak
+  (2^-1075, 1.5/2.5 × 2^-1074 ties-to-even) — ctest **100% (3/3)**; wasm
+  smoke (abi=2) + differential 71×5 sepakat. Bug tertangkap gerbang:
+  digits_len memuat '.'; `is_zero` uji `n` bukan nilai; skala s2 negatif
+  butuh divisor-shift; lipat LSD cap.
 
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
