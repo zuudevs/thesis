@@ -241,6 +241,39 @@
   `scripts/measurement-schema/aggregate-final.py` stdlib-only) + chart
   `out/charts/final-throughput.png` (matplotlib, dari record kanonik).
 
+## R — Fondasi & scanner-mode surface (pra-parser; keputusan pemilik 2026-11-09)
+
+- [x] **R1** — Refactor fondasi (ze_json PR #7 → `25645e6`): kontrak C-ABI jadi
+  header tunggal `include/ze_json/abi/cabi.hpp` (v1, dimirror `ze_json.mjs`);
+  `src/bindings/cabi.cpp` → `src/abi/cabi.cpp` (konvensi sisi core = **`abi`**;
+  `bindings/` khusus adaptor bahasa; `ffi` dibatalkan); `swar_eq` pindah ke
+  `utils/swar.hpp` (constexpr, API `repeat_byte_v`, migrasi `kOnes`/`kHigh`
+  milik pemilik diteruskan) + gerbang serial 12 pola adversarial & 200k sweep
+  (`TEST(SwarUtil)`); `core/simd.hpp` diperluas 5 op inline multi-ISA
+  (wasm-simd128 ↔ SSE2, makro dihapus); `scanner128` kini dapat dibangun di
+  wasm64 (`-msimd128` pada target wasm — **flag baru, baseline wasm lama tidak
+  sebanding langsung**); doc stale `scanner.hpp` diperbaiki. Gerbang: ctest
+  100%, npm smoke+differential 71/71.
+- [x] **R2** — Scanner-mode surface (ze_json PR #8 → `ed2ffa1`): ABI v2 dengan
+  ekspor additive `ze_scanner64` / `ze_scanner128` / `ze_structural_scan`;
+  JS dapat memilih mode (`SCANNER_MODES`: structural | scanner8 | scanner64 |
+  scanner128 | reference) via `binding.scan(mode)` + `ZeDocument({scanner})`
+  (+ `hasScanner`/`assertScanner`, alias `scan8`/`referenceScan` dipertahankan);
+  harness `--scanner` (default `scanner8` = kontinuitas kanonik; `all` = 5
+  mode satu `run_id`); schema +`config.scanner_mode`. Gerbang: smoke PASS
+  (abi=2), differential **71 × 5 mode**. Matriks in-run (dirty-run
+  `zuu-20261109012207-25645e6`, 6/6 PASS, disebut sesuai AGENTS §4): di wasm
+  pemenang **berbeda dari native** — scanner128 menang `saq_payload_v1`
+  (1022 vs scanner8 721 MB/s) & `synthetic_1k` (889 vs 609); scanner8 tetap
+  menang compact besar (10k/100k/1mb); dispatch default **tetap scanner8**
+  (komentar "change ONLY this line" di parallel.cpp berlaku bila kelak
+  diperlukan).
+- [x] **R3** — Re-baseline kanonik wasm pada hash bersih pasca-`-msimd128`:
+  `zuu-20261109015052-ed2ffa1` (scanner8 default, 6/6 PASS, tree bersih) —
+  615 / 611 / 617 / 632 / 732 / 395 MB/s (1k/10k/100k/1mb/saq/checker);
+  **baseline wasm pengganti** untuk analisis berikutnya (yang lama `85afad7`
+  diarsip apa adanya, tidak sebanding lintas-flag).
+
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
 - [x] **PW-1** — Buat `.github/PULL_REQUEST_TEMPLATE.md` di ketiga repo (root v5,
