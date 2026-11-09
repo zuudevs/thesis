@@ -300,6 +300,23 @@
   smoke (abi=2) + differential 71×5 sepakat. Bug tertangkap gerbang:
   digits_len memuat '.'; `is_zero` uji `n` bukan nilai; skala s2 negatif
   butuh divisor-shift; lipat LSD cap.
+- [x] **P7-3** — **String token scan + unescape** (ze_json PR #11 →
+  `8edcc8f`): `scan_string` (grammar RFC 8259 + `StringParts`
+  {total_len, inner_len = batas atas decode, escape_count}) dengan
+  validasi raw multibyte pakai anchor scalar P7-1 (encoded surrogate /
+  overlong / truncation → `InvalidUtf8`; raw ctrl → `InvalidJson`).
+  `unescape_string` walker **dua pass** (panjang → tulis) sehingga error
+  grammar dan `InsufficientBuffer` tak menyentuh `dst`. Semantik V8
+  diprobe empiris dan dikunci pemilik: pasangan surrogate → 4-byte UTF-8
+  astral; **lone surrogate escape → pass-through verbatim 6 byte
+  (kasus-preserve)**; `\u0000` → 0x00. Gerbang ctest **100% (4/4)**
+  (simdjson `10.48550_arXiv.1902.08318` + Mison `10.14778_3115404.3115416`):
+  sweep ekshaustif `\uXXXX` 65.536 × dua kasus, matriks pair 256×256,
+  sweep raw ctrl 0x00–0x7F, tabel UTF-8 raw, prefix truncation,
+  paritas kelas error, kontrak cap, span prefix-consumption, dan
+  **fuzz 120k** (generatif + korup) vs referensi scalar terpisah;
+  wasm smoke (abi=2) + differential 71×5 sepakat (string belum
+  terekspos ABI — v3 di P7-5).
 
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
