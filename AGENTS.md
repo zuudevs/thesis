@@ -18,7 +18,9 @@
   `RESTRICT`). `src/` = `stubs/compiler_rt.cpp` + `ondemand/scalar.cpp`
   (`scanner8` + reference terimplement & teruji sejak P1-1/P1-2);
   `scanner32/64/128` dan parser on-demand masih TODO. API publik belum lengkap.
-- **`bindings/js`**: binding Node raw wasm64 C-ABI (`ze_json.mjs` masih kosong).
+- **`bindings/js`**: binding Node raw wasm64 C-ABI (`ze_json.mjs`: `ZeJson`/
+  `ZeDocument`, ABI v2 — `SCANNER_MODES` untuk memilih varian scanner dari JS;
+  kontrak di `include/ze_json/abi/cabi.hpp`).
   Node >= 24; rencana publikasi `@zuudevs/ze-json` di GitHub Packages.
 - **`saq-report/`** (submodule — aplikasi Node.js/Express `saq-whatsapp`). Titik hot
   JSON di server SAQ: `express.json()` (middleware body parser),
@@ -110,7 +112,9 @@
   sebelum dipakai analisis.
 - **Dilarang membandingkan** angka lintas: mesin, preset/build type, git hash, atau
   korpus yang berbeda. Working tree dirty → hash suffix `-dirty` dan disebut di
-  laporan.
+  laporan. Bandingkan mode scanner antar-varian hanya **dalam satu run**
+  (`harness.mjs --scanner all` mengukur 5 mode dengan satu `run_id`); record
+  membawa `config.scanner_mode` (`multi` bila >1 mode dalam run).
 - Penempatan output:
   - `out/measurements/` — record tervalidasi final (satu schema untuk semua sisi).
   - `out/raw/` — exhibit mentah dari tools + sidecar metadata.
@@ -125,6 +129,16 @@
 
 ## 5. Keadaan repo yang mudah terlewat
 
+- **ABI v2 sejak R2 (PR zuudevs/ze_json#8)**: kontrak C-ABI = header
+  `include/ze_json/abi/cabi.hpp` (sumber tunggal, dimirror `ze_json.mjs`);
+  implementasi `src/abi/cabi.cpp` (pindahan dari `src/bindings/` — konvensi
+  sisi core = **`abi`**, `bindings/` khusus adaptor bahasa, `ffi` dibatalkan).
+  Ekspor: scanner8, reference_scan **+ scanner64, scanner128, structural_scan**
+  (pemilihan mode dari JS via `SCANNER_MODES`).
+- Target wasm memakai **`-msimd128`** sejak R1 (PR zuudevs/ze_json#7) untuk
+  `core::simd_*` — baseline wasm kanonik lama (`85afad7`, artefak tanpa
+  simd128) **tidak sebanding langsung**; baseline kanonik wasm diukur ulang
+  pada hash bersih pasca-R2 (TASKS R3).
 - `ze_json/tests/CMakeLists.txt` dan `benchmarks/CMakeLists.txt` terisi sejak
   P1-3/P1-5: `ze_json_scanner_test` (diferensial + json_checker) dan
   `ze_json_scanner_benchmark` (korpus P0-8, export sidecar) — keduanya memakai
@@ -177,6 +191,7 @@
 | Literatur (paper) | `out/rag/<DOI>.chunks.json` |
 | Bibliografi | `assets/bib/cites.bib`; validasi tahun `scripts/eval-cite/` |
 | Baseline Node | `saq-report/` (`JsonRepository.js`, `exportService.js`, `express.json()`) |
+| Kontrak C-ABI | `ze_json/include/ze_json/abi/cabi.hpp` (+ `src/abi/cabi.cpp`) |
 | Schema pengukuran | `schemas/`, `scripts/measurement-schema/` (dibuat di fase P0) |
 
 ## 8. Alur kerja Git (berlaku di semua repo)

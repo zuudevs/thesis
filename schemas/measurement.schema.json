@@ -117,6 +117,11 @@
         "repeats": { "type": "integer", "minimum": 1 },
         "cpu_pinning": { "type": "boolean" },
         "threads": { "type": "integer", "minimum": 1 },
+        "scanner_mode": {
+          "type": "string",
+          "enum": ["structural", "scanner8", "scanner64", "scanner128", "reference", "multi"],
+          "description": "wasm scanner variant selection (R2); 'multi' when several modes are measured inside one run_id. Absent for engines without a scanner axis (v8)."
+        },
         "notes": { "type": "string" }
       }
     },

@@ -25,8 +25,12 @@
  *
  * Usage:
  *   node scripts/node-benchmark/harness.mjs [--corpus <name>|all] [--context <name>|all]
- *       [--engine v8] [--site dev_device|saq_server] [--repeats 5]
+ *       [--engine v8|ze-wasm64] [--site dev_device|saq_server] [--repeats 5]
  *       [--min-time-ms 200] [--warmup-ms 300] [--repo saq_report] [--out-root out]
+ *       [--scanner structural|scanner8|scanner64|scanner128|reference|all]
+ *         (ze-wasm64 only; default scanner8 = canonical continuity. 'all'
+ *          measures every mode inside ONE run_id, keeping cross-mode
+ *          comparisons within-run per AGENTS.md §4)
  *
  * Outputs per corpus:
  *   out/raw/<run_id>/node_harness_<corpus>.json       — raw exhibit (per-repeat data)
@@ -39,7 +43,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { collectHost } from '../host-introspect.mjs';
-import { ZeJson, ZeDocument, ABI_VERSION as ABI_VERSION_BINDING } from '../../ze_json/bindings/js/ze_json.mjs';
+import { ZeJson, ZeDocument, ABI_VERSION as ABI_VERSION_BINDING, SCANNER_MODES } from '../../ze_json/bindings/js/ze_json.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const CORPUS_ROOT = path.join(ROOT, 'corpus', 'benchmarks');
@@ -57,6 +61,7 @@ function parseArgs(argv) {
     warmupMs: 300,
     repo: null,
     outRoot: 'out',
+    scanner: null,
   };
   for (let i = 0; i < argv.length; i += 2) {
     const key = argv[i]?.replace(/^--/, '').replace(/-([a-z])/g, (_, c) => c.toUpperCase());
@@ -200,25 +205,29 @@ const CONTEXTS = {
 
 const V8_CONTEXTS = CONTEXTS;
 
-function makeWasmContexts() {
+function makeWasmContexts(scannerMode) {
   let binding = null;
   return {
     'wasm-scan': {
-      purpose: 'ze-wasm64 (P3): structural pre-scan of the corpus documents through the wasm64 C-ABI binding (Mison-style structural index stream)',
+      purpose: `ze-wasm64 (P3/R2): structural pre-scan of the corpus documents through the wasm64 C-ABI binding, scanner mode '${scannerMode}' (Mison-style structural index stream)`,
       basisPapers: ['10.48550_arXiv.1902.08318', '10.14778_3115404.3115416', '10.1145_2807591.2807644'],
       prepare(docs) {
         if (binding === null) {
           binding = ZeJson.load();
+          if (!binding.hasScanner(scannerMode)) {
+            throw new Error(`scanner mode '${scannerMode}' not available in the wasm artifact (rebuild ze_json.wasm)`);
+          }
         }
         binding.resetHeap(); // bump allocator: rewind between corpora
-        return docs.map((doc) => new ZeDocument(binding, Buffer.from(doc.utf8, 'utf8')));
+        return docs.map((doc) => new ZeDocument(
+          binding, Buffer.from(doc.utf8, 'utf8'), { scanner: scannerMode }));
       },
       run(states) {
         let sink = 0;
         for (const document of states) {
-          const result = document.scan8();
+          const result = document.scan();
           if (!result.ok) {
-            throw new Error(`wasm scan failed: ${result.error}`);
+            throw new Error(`wasm scan failed (${scannerMode}): ${result.error}`);
           }
           sink += result.count;
         }
@@ -240,7 +249,8 @@ const ENGINES = {
       version: process.versions.node,
       language_runtime: `node ${process.versions.node} (v8 ${process.versions.v8})`,
     }),
-    contexts: V8_CONTEXTS,
+    makeContexts: () => CONTEXTS,
+    contextList: () => Object.keys(CONTEXTS),
   },
   'ze-wasm64': {
     repo: 'ze_json',
@@ -254,7 +264,8 @@ const ENGINES = {
         language_runtime: `node ${process.versions.node} (wasm64 C-ABI, ABI v${ABI_VERSION_BINDING})`,
       };
     },
-    contexts: makeWasmContexts(),
+    makeContexts: (scannerMode) => makeWasmContexts(scannerMode),
+    contextList: () => ['wasm-scan'],
   },
 };
 
@@ -315,7 +326,7 @@ function measureContext(context, states, opts) {
 
 // ----------------------------------------------------------------- assembly
 
-function buildRecord(opts, meta, corpus, results, engineCfg) {
+function buildRecord(opts, meta, corpus, results, engineCfg, scannerModes) {
   const notes = [
     'generator=node_harness',
     `min_time_ms=${opts.minTimeMs}`,
@@ -348,6 +359,9 @@ function buildRecord(opts, meta, corpus, results, engineCfg) {
       repeats: opts.repeats,
       cpu_pinning: false,
       threads: 1,
+      ...(scannerModes
+        ? { scanner_mode: scannerModes.length > 1 ? 'multi' : scannerModes[0] }
+        : {}),
       notes,
     },
     results,
@@ -363,11 +377,32 @@ function main() {
   }
   const repo = opts.repo ?? engineCfg.repo;
 
+  // --- scanner-mode resolution (R2; ze-wasm64 only) ---------------------------
+  let scannerModes = null; // null = engine has no scanner axis (v8)
+  if (opts.engine === 'ze-wasm64') {
+    const modeArg = opts.scanner ?? 'scanner8'; // canonical continuity default
+    if (modeArg === 'all') {
+      scannerModes = Object.keys(SCANNER_MODES);
+    } else {
+      if (!(modeArg in SCANNER_MODES)) {
+        console.error(`FAIL unknown scanner mode '${modeArg}' (available: ${Object.keys(SCANNER_MODES).join(', ')}, all)`);
+        process.exit(1);
+      }
+      scannerModes = [modeArg];
+    }
+  } else if (opts.scanner) {
+    console.error(`FAIL --scanner only applies to engine 'ze-wasm64'`);
+    process.exit(1);
+  }
+  // Suffix the result name only for explicit mode selections, so runs without
+  // --scanner keep the canonical record names of the existing baselines.
+  const nameSuffix = opts.scanner ? (mode) => `@${mode}` : () => '';
+
   const corpusNames = opts.corpus === 'all'
     ? ['synthetic_1k', 'synthetic_10k', 'synthetic_100k', 'synthetic_1mb', 'saq_payload_v1', 'checker_batch']
     : [opts.corpus];
   const contextNames = opts.context === 'all'
-    ? Object.keys(engineCfg.contexts)
+    ? engineCfg.contextList()
     : [opts.context];
 
   const git = gitMeta(repo);
@@ -382,6 +417,9 @@ function main() {
   console.log(`run_id     : ${runId}`);
   console.log(`git        : ${git.hash}${git.dirty ? ' (dirty)' : ''} / repo=${repo}`);
   console.log(`engine     : ${opts.engine} (schema: ${engineCfg.schemaEngine}) | site: ${opts.site}`);
+  if (scannerModes) {
+    console.log(`scanner    : ${scannerModes.join(', ')}`);
+  }
   console.log(`repeats    : ${opts.repeats} x >= ${opts.minTimeMs}ms (warmup ${opts.warmupMs}ms)`);
   console.log(`gc support : ${typeof globalThis.gc === 'function' ? 'yes (--expose-gc)' : 'no (run node --expose-gc for cleaner repeats)'}\n`);
 
@@ -395,43 +433,46 @@ function main() {
     const results = [];
     const rawContexts = {};
     for (const contextName of contextNames) {
-      const context = engineCfg.contexts[contextName];
-      if (!context) {
-        console.error(`FAIL unknown context '${contextName}' for engine '${opts.engine}'`);
-        process.exit(1);
-      }
-      const states = context.prepare(corpus.docs);
-      const sample = context.run(states); // one untimed call: fail fast + prime caches
-      if (sample === undefined) {
-        throw new Error(`context ${contextName} returned undefined on ${corpusName}`);
-      }
-      const stats = measureContext(context, states, opts);
-      rawContexts[contextName] = stats.repeatsRaw;
+      for (const scannerMode of scannerModes ?? [null]) {
+        const context = engineCfg.makeContexts(scannerMode)[contextName];
+        if (!context) {
+          console.error(`FAIL unknown context '${contextName}' for engine '${opts.engine}'`);
+          process.exit(1);
+        }
+        const states = context.prepare(corpus.docs);
+        const sample = context.run(states); // one untimed call: fail fast + prime caches
+        if (sample === undefined) {
+          throw new Error(`context ${contextName} returned undefined on ${corpusName}`);
+        }
+        const stats = measureContext(context, states, opts);
+        const contextKey = `${contextName}${nameSuffix(scannerMode)}`;
+        rawContexts[contextKey] = stats.repeatsRaw;
 
-      results.push({
-        name: `${opts.engine}/${contextName}/${corpus.name}`,
-        engine: engineCfg.schemaEngine,
-        status: 'ok',
-        rationale: {
-          purpose: context.purpose,
-          basis_papers: context.basisPapers,
-        },
-        metrics: {
-          seconds_mean: stats.secondsMean,
-          seconds_stddev: stats.secondsStddev,
-          bytes_per_second: stats.bytesPerSecond,
-          documents_per_second: stats.documentsPerSecond,
-          cpu_seconds: stats.cpuSecondsMean,
-        },
-        extras: {
-          bytes_per_op: stats.bytesPerOp,
-          iterations_median: stats.iterationsMedian,
-          rss_bytes_snapshot: process.memoryUsage().rss,
-        },
-      });
-      console.log(`[${corpus.name}] ${contextName.padEnd(16)} `
-        + `${(stats.bytesPerSecond / 1e6).toFixed(1).padStart(9)} MB/s `
-        + `cv=${((stats.secondsStddev / stats.secondsMean) * 100).toFixed(1)}%`);
+        results.push({
+          name: `${opts.engine}/${contextKey}/${corpus.name}`,
+          engine: engineCfg.schemaEngine,
+          status: 'ok',
+          rationale: {
+            purpose: context.purpose,
+            basis_papers: context.basisPapers,
+          },
+          metrics: {
+            seconds_mean: stats.secondsMean,
+            seconds_stddev: stats.secondsStddev,
+            bytes_per_second: stats.bytesPerSecond,
+            documents_per_second: stats.documentsPerSecond,
+            cpu_seconds: stats.cpuSecondsMean,
+          },
+          extras: {
+            bytes_per_op: stats.bytesPerOp,
+            iterations_median: stats.iterationsMedian,
+            rss_bytes_snapshot: process.memoryUsage().rss,
+          },
+        });
+        console.log(`[${corpus.name}] ${contextKey.padEnd(16)} `
+          + `${(stats.bytesPerSecond / 1e6).toFixed(1).padStart(9)} MB/s `
+          + `cv=${((stats.secondsStddev / stats.secondsMean) * 100).toFixed(1)}%`);
+      }
     }
 
     // Raw exhibit first (never lose raw data because a later step failed).
@@ -447,7 +488,7 @@ function main() {
       contexts: rawContexts,
     }, null, 2)}\n`, 'utf8');
 
-    const record = buildRecord(opts, meta, corpus, results, engineCfg);
+    const record = buildRecord(opts, meta, corpus, results, engineCfg, scannerModes);
     const recordPath = path.join(measDir, `${runId}_${corpus.name}_record.json`);
     fs.writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
     console.log(`[+] exhibit -> ${path.relative(ROOT, exhibitPath)}`);
