@@ -210,6 +210,27 @@
   - Kandidat lanjutan: C2 reciprocal fast path number q<0
     (`kPowerOfFiveReciprocal`, tabel sudah codegen, gain diperkirakan
     kecil — frac token hanya 5.9k/1MB) → C3 UTF-8 SIMD pshufb (deferred).
+  - **C2 (reciprocal fast path q<0) DITERIMA dengan bukti sandwich**
+    (2026-11-10): `region_exact` q<0 kini membagi via reziprokal 128-bit
+    codegen (`kPowerOfFiveReciprocal`, paper §9.1, `@cite
+    10.1002_spe.2984`) — n×c satu produk u128 + koreksi eksak satu
+    compare; pembagian bit-serial P7-2 dipertahankan sebagai
+    `region_div_ref` (oracle) dan di-pin bit-exact oleh
+    `NumberRegionFastPath.MatchesBitSerialReference` (corner + 150k fuzz,
+    k=1..22, kedua tanda). Native sandwich satu window (baseline `0f56997`
+    bersih `zuu-20261110093601-0f56997` vs dua run kandidat
+    `zuu-20261110090821-0f56997` + `zuu-20261110100531-0f56997`, keduanya
+    reproduksi): FullWalk ladder **+19.6..+33.2%** (frac q<0), checker
+    +0.0% / saq +6.7% (dalam noise — kontrol mekanisme), ParseOpen
+    +2.2..+10% (efek layout, tidak menyentuh parse_number); tanpa
+    regresi di mana pun. Wasm64 dalam-window (baseline
+    `zuu-20261110042040/042041` vs kandidat `...042923/042925`): checker
+    +4.7%, synth100k +3.3% — paritas-ke-baik; run wasm C2 berdiri sendiri
+    (`zuu-20261110035226`) −11..−40% vs baseline malam P7-7 adalah drift
+    lintas-sesi (H5) — korpus tanpa frac ikut turun. Gerbang: ctest 6/6,
+    smoke wasm PASS, differential 71×5 agree. Catatan skema: field
+    `run_id` record dari convert-gbench kini diisi `--run-id` sinkron
+    sidecar (run C2 ke atas; record lama memakai stamp konversi).
 - [ ] **P4-4** — PGO cycle (bila dipilih di `PLANS.md` §7): build `native-pgo` →
   run benchmark → `ninja pgo_merge` → rebuild (preset otomatis USE).
 - [x] **P4-5** — Disiplin satu-perubahan-per-ukur dijalankan pada P4-2 (SWAR
