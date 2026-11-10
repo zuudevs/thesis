@@ -25,7 +25,7 @@
  *
  * Usage:
  *   node scripts/node-benchmark/harness.mjs [--corpus <name>|all] [--context <name>|all]
- *       [--engine v8|ze-wasm64] [--site dev_device|saq_server] [--repeats 5]
+ *       [--engine v8|ze-wasm64|ze-parser] [--site dev_device|saq_server] [--repeats 5]
  *       [--min-time-ms 200] [--warmup-ms 300] [--repo saq_report] [--out-root out]
  *       [--scanner structural|scanner8|scanner64|scanner128|reference|all]
  *         (ze-wasm64 only; default scanner8 = canonical continuity. 'all'
@@ -43,7 +43,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { collectHost } from '../host-introspect.mjs';
-import { ZeJson, ZeDocument, ABI_VERSION as ABI_VERSION_BINDING, SCANNER_MODES } from '../../ze_json/bindings/js/ze_json.mjs';
+import { ZeJson, ZeDocument, ZeParser, ABI_VERSION as ABI_VERSION_BINDING, SCANNER_MODES } from '../../ze_json/bindings/js/ze_json.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const CORPUS_ROOT = path.join(ROOT, 'corpus', 'benchmarks');
@@ -203,8 +203,6 @@ const CONTEXTS = {
 // One runner for all engines (TASKS P3-4): each engine declares its default
 // repo (provenance), library metadata and the contexts it can honestly run.
 
-const V8_CONTEXTS = CONTEXTS;
-
 function makeWasmContexts(scannerMode) {
   let binding = null;
   return {
@@ -240,6 +238,51 @@ function makeWasmContexts(scannerMode) {
   };
 }
 
+// ze-parser engine context (P7-7): every document is parsed through the
+// wasm64 C-ABI parser into a V8-shaped JS value tree (ZeParser.parse()),
+// the ze_json counterpart of the v8 body-parse baseline. The tree is fully
+// materialized on purpose — the lazy on-demand layer must visit every
+// value for this measurement to stay honest.
+function makeZeParserFullContext() {
+  let binding = null;
+  return {
+    purpose: 'ze-wasm64 parser (P7-7): full V8-shaped materialization of every corpus document through the wasm64 C-ABI parser (ZeParser.parse), tree fully built — the ze_json counterpart of the v8 body-parse baseline',
+    basisPapers: ['10.1002_spe.3313', '10.14778_3115404.3115416', '10.1145_2807591.2807644'],
+    prepare(docs) {
+      if (binding === null) {
+        binding = ZeJson.load();
+      }
+      binding.resetHeap(); // bump heap + slot pool rewind between corpora
+      return docs.map((doc) => Buffer.from(doc.utf8, 'utf8'));
+    },
+    run(states) {
+      let sink = 0;
+      for (const bytes of states) {
+        const parser = ZeParser.open(binding, bytes);
+        let parsed;
+        try {
+          parsed = parser.parse();
+        } finally {
+          parser.close(); // slot returns to the pool between documents
+        }
+        // Bump-heap rewind per document (the differential test's pattern —
+        // differential.mjs rewinds after every parser journey): each open
+        // carves src/num/dst + the arena slice from the shared bump heap
+        // with no individual free, so the repeat loop must rewind or it
+        // exhausts the module's initial memory (trap: OOB in Document::open).
+        binding.resetHeap();
+        sink += typeof parsed === 'object' && parsed !== null
+          ? (Array.isArray(parsed) ? parsed.length : Object.keys(parsed).length)
+          : 1;
+      }
+      return sink;
+    },
+    bytesPerOp(states) {
+      return states.reduce((sum, bytes) => sum + bytes.length, 0);
+    },
+  };
+}
+
 const ENGINES = {
   v8: {
     repo: 'saq_report',
@@ -266,6 +309,23 @@ const ENGINES = {
     },
     makeContexts: (scannerMode) => makeWasmContexts(scannerMode),
     contextList: () => ['wasm-scan'],
+  },
+  'ze-parser': {
+    repo: 'ze_json',
+    schemaEngine: 'wasm64_cabi',
+    library: () => {
+      const pkg = JSON.parse(fs.readFileSync(
+        path.join(ROOT, 'ze_json', 'bindings', 'js', 'package.json'), 'utf8'));
+      return {
+        name: 'ze_json',
+        version: pkg.version,
+        language_runtime: `node ${process.versions.node} (wasm64 C-ABI parser, ABI v${ABI_VERSION_BINDING})`,
+      };
+    },
+    makeContexts: () => ({
+      'wasm-parse-full': makeZeParserFullContext(),
+    }),
+    contextList: () => ['wasm-parse-full'],
   },
 };
 
