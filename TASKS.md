@@ -231,8 +231,35 @@
     smoke wasm PASS, differential 71×5 agree. Catatan skema: field
     `run_id` record dari convert-gbench kini diisi `--run-id` sinkron
     sidecar (run C2 ke atas; record lama memakai stamp konversi).
-- [ ] **P4-4** — PGO cycle (bila dipilih di `PLANS.md` §7): build `native-pgo` →
-  run benchmark → `ninja pgo_merge` → rebuild (preset otomatis USE).
+- [x] **P4-4** — PGO cycle (bila dipilih di `PLANS.md` §7): build `native-pgo` →
+  run benchmark → `ninja pgo_merge` → rebuild (preset otomatis USE). **SIKLUS
+  DIEKSEKUSI 2026-11-11 — hasil CAMPUR, PGO tidak diadopsi sebagai preset
+  default** (lihat rincian di bawah).
+  - **Bug infrastruktur ditemukan & diperbaiki**: `add_optimizations_target`
+    tidak pernah dipanggil — flag PGO tidak pernah diterapkan (GENERATE
+    menghasilkan binary tanpa instrumentasi, nol `.profraw`). Fix: fungsi baru
+    `add_pgo_flags(<target>)` (Optimization.cmake) yang HANYA memuat flag
+    GENERATE/USE — tanpa `-march=native` milik fungsi lama (jaga baseline
+    `native-release` tetap canonical); dipasang pada `ze_json` + dua driver
+    benchmark. Training: parser benchmark (6 korpus) + scanner benchmark,
+    CWD `build/native-pgo/benchmarks` → 2 `.profraw` → `pgo_merge` →
+    reconfigure auto-USE → rebuild → ctest 6/6.
+  - **Bukti sandwich** (baseline `native-release` vs kandidat `native-pgo`
+    USE, 70 detik apart, kontrol baseline stabil ±1-2% lintas 28 menit;
+    record tervalidasi): `zuu-20261111001542-8b281f6_*` (PGO) vs
+    `zuu-20261111004055-8b281f6_*` (baseline):
+    **FullWalk +20.9..+24.6%** di ladder (1mb 158.6→191.8 MB/s; 100k +24.4%,
+    10k +24.6%), 1k +12.8%, checker +5.9%, saq −0.8% (flat) — TEREPRODUKSI
+    dua run PGO independen (00:43 & 01:11, angka identik ±0.6%).
+    **TAPI ParseOpen (staging) −23..−31% seragam di semua korpus**
+    (saq 1303.7→896.6 MB/s) dan ParseReference +10..+47% — PGO
+    mendistribusikan ulang performa antar komponen (layout/inlining).
+  - **Keputusan**: FullWalk (jalur utama on-demand) menang jelas, tetapi
+    regresi staging −27% tidak dapat dibawa ("jangan bawa hasil setengah
+    jadi", PLANS §8) — PGO **tidak** dijadikan preset pengukuran skripsi;
+    hasil dicatat sebagai temuan tesis (redistribusi komponen oleh PGO).
+    Kandidat lanjutan opsional (P4-4b, deferred): retraining berimbang /
+    `-fprofile-use` layout-only untuk memulihkan staging.
 - [x] **P4-5** — Disiplin satu-perubahan-per-ukur dijalankan pada P4-2 (SWAR
   diukur terpisah, ditolak karena regress di luar noise); record lama vs baru
   tersimpan (`out/measurements/zuu-20261109042022-*` baseline kanonik vs
@@ -243,6 +270,13 @@
   eksperimen vektor ditolak dengan tabel angka dalam-run; fix correctness
   swar.hpp diterima; future work: pipeline simdjson-style penuh, unroll
   scanner8, number parser & UTF-8 validator, PGO menunggu keputusan pemilik).
+  **Update 2026-11-11**: limitasi "profiler tak tersedia" DICABUT — AMD uProf
+  5.3.521.0 terpasang & PMU counter berfungsi (host di bawah Hyper-V; tetap
+  terbaca). Analisa hotspot: `reports/P4-uprof-hotspots.md` — `scanner8`
+  22-35% + `scan_string` 9-30% = dominan; IPC 1.84, mispredict hanya 0.82%
+  (branch-dense tapi well-predicted) → gain berikutnya harus dari penghapusan
+  branch (SIMD), bukan prediksi; iterator walk ~17-20% = kandidat struktural
+  baru. Raw exhibit: `out/raw/uprof-20261110/`.
 
 ## P5 — Pengukuran lintas arsitektur (site server ditunda — akses SAQ belum ada)
 
