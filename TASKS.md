@@ -370,6 +370,28 @@
   verdict-only), ctest native **100% (5/5)**, wasm64 hijau,
   record `zuu-20261110001242-fdad44d_checker_batch_record.json`
   validator PASS (bukti instansiasi, bukan perbandingan).
+- [x] **P7-6** — **Reference parser full-walk + gerbang json_checker**
+  (ze_json PR #14 → merge `a5610d9`):
+  `include/ze_json/ondemand/reference_parser.hpp` — walker rekursif
+  byte-murni TANPA indeks struktural & TANPA tabel tergenerate:
+  `ref_value_kind` klasifikasi 8-kasus branchy (bug tabel tergenerate
+  tak bisa lolos gerbang diferensial), `ref_parse_document(src,size)`
+  verdict `Result<size,JsonErrc>` + consumed; grammar token
+  DI-REUSE dari P7-2/P7-3 (`scan_string`/`scan_number` — sumber
+  kebenaran tunggal, header hanya menyumbang frame walk); semantik
+  framing mirror document.cpp (EmptyJson ws-only; scalar root tail
+  ws-only; object key wajib `"string"`+`:`+value — `{"a"}` reject;
+  cross-type closer / `[1 2]` / `[1,]` reject). Gerbang
+  `tests/reference_parser_test.cpp`: json_checker **31 fail REJECT
+  dua sisi + fail1 (root string) & fail18 (nesting 20) ACCEPT dua
+  sisi (paritas V8, exceptions legacy checker) + pass1-3 ACCEPT**,
+  6 korpus benchmarks verdict-equality, ~94 fixture adversarial
+  framing (kedua sisi sepakat DAN ekspektasi terkunci), invariants
+  event (root pertama ts=0 input tanpa ws, ts monotonik non-berkurang,
+  VALUES saja — keys bukan event), tally manual event count
+  (`[1,2,3]`=4, `{"a":1}`=2, `"lonely"`=1, `{"a":{"b":null}}`=3).
+  ctest native **100% (6/6)**, wasm64 hijau, smoke PASS, differential
+  **71×5 sepakat** (reference parser tidak menyentuh ABI — tetap v3).
 
 
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
