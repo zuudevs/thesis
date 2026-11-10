@@ -337,6 +337,40 @@
   5000-level (tanpa rekursi), detached value, decode span lewat
   P7-3 — ctest **100% (5/5)**; wasm64 build hijau + harness smoke
   5 mode + record validator PASS; ABI tetap v2 (P7-5 = v3).
+- [x] **P7-5** — **C-ABI v3 + wrapper JS parser** (ze_json PR #13 →
+  `9479c08`): kontrak v3 di `cabi.hpp` (append-only; `kAbiVersion=3`)
+  — pool slot statis `kParserSlotMax=64` (handle = slot id), Arena +
+  Document placement-new per slot, arena kerja ter-carve dari bump
+  heap bersama (`src_size*8*3+64`), `ze_reset_heap` menutup semua
+  slot dulu; 11 ekspor parser (`ze_parser_open/root/close`,
+  `ze_container_begin`, `ze_array_next`, `ze_object_next`,
+  `ze_object_field`, `ze_value_kind`, `ze_get_string`,
+  `ze_get_number`, `ze_get_bool`, `ze_is_null`,
+  `ze_count_elements`) dengan packing scalar (ok = low-32; error =
+  `JsonErrc<<32`) + step (`(cursor<<32)|ts`, done =
+  `kStepSentinel<<32`) — traversal merekonstruksi iterator C++
+  eksak dari frame lalu operator++/** ASLI dipetakankan (paper
+  `10.1002_spe.3313`, Mison `10.14778_3115404.3115416`); angka via
+  buffer dst 8 byte LE (`-0.0`/subnormal tidak bisa lewat packing);
+  string lewat P7-3 (semantik V8 terkunci). Binding: `ABI_VERSION=3`
+  + `NODE_KINDS`/`STEP_SENTINEL`/`PARSER_SLOT_MAX`, normalisasi
+  `BigInt.asUintN(64)` (sentinel wasm i64 tiba bertanda — tanpa ini
+  done terbaca `code -1`), kelas `ZeParser`: `parse()` materialisasi
+  pohon berbentuk V8 (object null-prototype, `defineProperty`
+  source-order/`__proto__` own-key/dup last-wins, dst tumbuh-
+  gandakan, retry aman). Fix bersama: stubs i128 — `__ashlti3`/
+  `__lshrti3` ditambah (clang-lowering shift variabel fast path
+  P7-2) dan `__multi3` di-reimplement limb-32 murni (u64 promotion
+  lama re-enter `__multi3` → rekursi tak hingga); terverifikasi
+  driver sweep i128 ALL OK (boundary 0/63/64/127/128+). Gerbang:
+  smoke main.mjs PARITAS (paritas tree 24 + divergensi `-0`/
+  lone-surrogate + `__proto__` + 24 reject + frame walk + pool
+  penuh + resetHeap), differential `compareParser` verdict + tree
+  parity **71 dokumen × 5 mode sepakat** (escape-surrogate =
+  verdict-only), ctest native **100% (5/5)**, wasm64 hijau,
+  record `zuu-20261110001242-fdad44d_checker_batch_record.json`
+  validator PASS (bukti instansiasi, bukan perbandingan).
+
 
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
