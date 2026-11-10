@@ -394,6 +394,52 @@
   **71×5 sepakat** (reference parser tidak menyentuh ABI — tetap v3).
 
 
+- [x] **P7-7** — **Benchmark komponen parser: native google-benchmark +
+  harness engine `ze-parser`** (ze_json PR #15 → merge `d21304c`;
+  root PR harness → merge `<P7-7-ROOT-MERGE>`, dirapati saat merge):
+  **Bentuk "Native + binding JS"** (keputusan pemilik).
+  (a) `ze_json/benchmarks/parser_benchmark.cpp` — target
+  `ze_json_parser_benchmark` (helper `add_export_benchmark_target` +
+  sidecar `METADATA_OUT`), 3 level × 6 korpus P0-8, Repetitions(5):
+  `BM_ParseReference` (`ref_parse_document` anchor P7-6 — lantai
+  grammar tanpa indeks), `BM_ParseOpen` (`Document::open` — staging
+  scan+indeks+match ke arena), `BM_ParseOnDemandFullWalk` (open +
+  `get_root` + visit SEMUA nilai + promote semua skalar via accessor
+  asli); `Arena::reset()` rewind per dokumen (buffer tetap hot);
+  korpus loader static-cache pola scanner_benchmark (P1-5/P1-6).
+  (b) Baseline native run `zuu-20261110082340-a5610d9` — 6 record
+  validator PASS (`out/measurements/zuu-20261110082340-a5610d9_*`,
+  engine `scalar`, generator `google_benchmark`) + exhibit raw
+  `out/raw/zuu-20261110082340-a5610d9/`: staging 743–1267 MB/s,
+  full-walk 59–360 MB/s (saq 360, synthetic 122–177, checker_batch
+  59), reference floor 522–1126 MB/s → **walk layer 3–4× lebih mahal
+  dari staging** (target P4-3). Run sanity pertama (RUN_ID kosong)
+  dibuang — tak digunakan analisis.
+  (c) Harness `scripts/node-benchmark/harness.mjs` engine baru
+  `ze-parser` — context `wasm-parse-full` (`ZeParser.parse()`
+  materialisasi V8-shaped penuh, pasangan side JS
+  `BM_ParseOnDemandFullWalk`; context basisPapers
+  `10.1002_spe.3313`/`10.14778_3115404.3115416`/
+  `10.1145_2807591.2807644`) + **kontrak rewind: `resetHeap()` per
+  DOKUMEN di `run()`** (pattern differential.mjs — awal rewind
+  sekali per korpus → carve mengakumulasi → trap OOB
+  `Document::open`; fix = rewind sesudah tiap close).
+  Baseline wasm run `zuu-20261110012919-a5610d9` — 6 record validator
+  PASS (engine `wasm64_cabi`, generator `node_harness`):
+  materialisasi 2.2–16.1 MB/s (saq 16.1, ladder 5.9–9.9,
+  checker_batch 6.6, 1mb 2.2) → **biaya traverse ABI per-call
+  mendominasi** (walk native 360 MB/s vs wasm 16 MB/s di saq).
+  Smoke eksplorasi `zuu-20261110012913-a5610d9` (checker_batch saja)
+  bukan run analisis.
+  (d) Wiring CMake P0 yang lupa exhaust-kan: `MeasurementRegistry.cmake`
+  baru di-include dari root `CMakeLists.txt` (sebelumnya tak pernah
+  wired → `RUN_ID` kosong di nama file export; run pertama produksi
+  `*_ze_json_parser_benchmark_.json` → dibuang); fix
+  `HandleGit.cmake` `${GIT_EXECUTABLE}` → `${GIT_EXE}` (variabel
+  `find_program` sebenarnya; hash kosong → rev-parse gagal quiet).
+  Baseline loop P4-3: satu perubahan per pengukuran, re-run kedua
+  target export pada hash sama, banding in-situ.
+
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
 - [x] **PW-1** — Buat `.github/PULL_REQUEST_TEMPLATE.md` di ketiga repo (root v5,
