@@ -396,7 +396,7 @@
 
 - [x] **P7-7** — **Benchmark komponen parser: native google-benchmark +
   harness engine `ze-parser`** (ze_json PR #15 → merge `d21304c`;
-  root PR harness → merge `<P7-7-ROOT-MERGE>`, dirapati saat merge):
+  root PR harness → merge `33bbf76`):
   **Bentuk "Native + binding JS"** (keputusan pemilik).
   (a) `ze_json/benchmarks/parser_benchmark.cpp` — target
   `ze_json_parser_benchmark` (helper `add_export_benchmark_target` +
