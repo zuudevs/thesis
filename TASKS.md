@@ -190,6 +190,26 @@
   kini diteruskan (sebelumnya diabaikan diam-diam).
 - [ ] **P4-3** — Optimasi scanner/number parser/UTF-8 validator via tabel
   `lookups.hpp` (codegen paper-driven, `@cite` DOI).
+  - **C1 (string-class table) DITOLAK dengan bukti sandwich** (2026-11-10):
+    dispatch `kJsonStringClass` di `scan_string`/`decode_interior` kalah —
+    load-tabel melawan chain 4-branch terprediksi. Back-to-back satu window
+    mesin: baseline `d21304c` bersih (`zuu-20261110085449-d21304c`) vs
+    kandidat (`zuu-20261110085656-d21304c`): regress seragam −12..−48%
+    (ParseOpen staging ikut −12..−25% walau tak menyentuh scan_string →
+    efek layout-kode; ParseRef saq −48%). Kontrol bisection B1 (tabel
+    ada, string.cpp pre-C1, exhibit `out/raw/zuu-20261110085656-d21304c`
+    gbench overwrote alias RUN_ID; angka run B1 = out/benchmarks
+    `...85656....json` 09:02) ≈ baseline → penyebab = loop baru, bukan
+    kehadiran tabel. Implementasi penuh C1 diarsip: temp c1bak; tidak
+    masuk repo. Dasar riset hipotesis: Mison/simdjson klasifikasi tabel
+    (cheaper) TIDAK berlaku untuk interior-string 1-load vs branch
+    terprediksi di Zen 2 — konsisten P4-2 (vektor/SWAR kalah).
+  - Sisa C1 yang LAYAK: repairs `@cite` Mison/simdjson di
+    `gen_json_char_classes`/`gen_ondemand_node_types` + fix encoding
+    generator (utf-8, LF) — di-commit terpisah.
+  - Kandidat lanjutan: C2 reciprocal fast path number q<0
+    (`kPowerOfFiveReciprocal`, tabel sudah codegen, gain diperkirakan
+    kecil — frac token hanya 5.9k/1MB) → C3 UTF-8 SIMD pshufb (deferred).
 - [ ] **P4-4** — PGO cycle (bila dipilih di `PLANS.md` §7): build `native-pgo` →
   run benchmark → `ninja pgo_merge` → rebuild (preset otomatis USE).
 - [x] **P4-5** — Disiplin satu-perubahan-per-ukur dijalankan pada P4-2 (SWAR
