@@ -367,7 +367,7 @@
   `bindings/js/ze_json.wasm.sha256`, gate differential + smoke — menutup
   tindak lanjut P5-4 (artefak ke server kini terprovenance; hash dev saat
   ini `7e26044f…`, byte-identik sebelum/sesudah fix number).
-- [ ] **P5-7 (R5)** — Re-build wasm DI SERVER SAQ via `scripts/build-wasm.ps1`
+- [x] **P5-7 (R5)** — Re-build wasm DI SERVER SAQ via `scripts/build-wasm.ps1`
   (salin `ze_json` submodule @`ab09adb` + script ke server, jalankan, catat
   sha256, bandingkan vs `7e26044f…`), lalu re-run harness dengan konteks fase
   baru (`wasm-open` / `wasm-walk-full` / `wasm-parse-full`, root PR #29;
@@ -380,9 +380,12 @@
   **materialisasi JS mendominasi 58–92% waktu full**; scanner128 ranking
   bersih #1 di server (1.5–2.2x atas scanner8, semua korpus), dev campur.
   Prioritas: (1) jalur materialisasi JS, (2) batching walk ABI, (3) staging
-  cukup konfigurasi (default scanner128). **Tertinggal provenance**: sha256
-  output `build-wasm.ps1` di server belum dilaporkan pemilik — bandingkan
-  vs `7e26044f…` lalu centang task ini.
+  cukup konfigurasi (default scanner128). **Provenance artifact ditutup
+  2026-11-11**: sha256 `ze_json.wasm` di server dilaporkan pemilik
+  `7e26044fd61ea16af81a57630ab1e594b54ecf767cbb0126592b1f1c26928499` ==
+  sidecar dev `bindings/js/ze_json.wasm.sha256` == re-hash independen
+  (`certutil`) file build dev @`ab09adb` — artifact server byte-identik
+  dengan build dev (provenance run server `123444`/`123516` penuh).
 
 ## P6 — Dokumentasi & penulisan skripsi
 

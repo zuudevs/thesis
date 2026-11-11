@@ -22,11 +22,15 @@ Semua record **validator PASS (34/34)**.
   (`gc_between_repeats=false`, berbeda dari P5-2 yang `true`). Pembanding
   **in-situ satu batch** (123614 V8 vs 123444/123516 ze) tetap valid;
   perbandingan dengan record P5-2 lama bersifat kualitatif.
-- **Provenance artifact**: `dirty=true` pada record (untracked artifact),
-  konten tracked bersih. **Menunggu sha256 output `build-wasm.ps1` dari
-  server** untuk menutup rantai provenance artifact wasm (vs dev
-  `7e26044f…`); sel `b8deda6`-vs-`ab09adb` di §5 sengaja tidak
-  diinterpretasi sebagai efek kode.
+- **Provenance artifact (DITUTUP 2026-11-11)**: `dirty=true` pada record
+  (untracked artifact), konten tracked bersih. sha256 `ze_json.wasm`
+  dilaporkan pemilik dari server
+  `7e26044fd61ea16af81a57630ab1e594b54ecf767cbb0126592b1f1c26928499` ==
+  sidecar dev `bindings/js/ze_json.wasm.sha256` == re-hash independen
+  (`certutil`) file build dev @`ab09adb` → artifact yang dieksekusi di
+  server byte-identik dengan build dev. Sel `b8deda6`-vs-`ab09adb` di §5
+  tetap tidak diinterpretasi sebagai efek kode (window berbeda; jalur
+  wasm library identik antar hash).
 
 ## 2. Dekomposisi fase (ze-parser @`ab09adb`, MB/s; share % dari waktu full)
 
@@ -113,12 +117,12 @@ di korpus besar (1mb server 92%).
 ## 5. Sanity artifact lama vs baru (server, TIDAK untuk disimpulkan)
 
 parse-full `b8deda6` (pagi) vs `ab09adb` (siang): 1.10–1.34× lebih cepat.
-Window berbeda (pagi vs siang, cv sampai 10%) dan status artifact (rebuild
-atau reuse) belum terkonfirmasi tanpa sha256 → **dibiarkan tanpa
-interpretasi** sampai hash build-wasm dilaporkan pemilik. Library code
-antara kedua hash identik pada jalur wasm (fix number `6258d43` terbukti
-byte-identik; PR #22/#23 hanya preset/benchmark), sehingga delta ini
-diduga window — bukan kode.
+Provenance artifact `ab09adb` kini terkonfirmasi byte-identik dengan build
+dev (sha256 `7e26044f…`, lihat §1); artifact pagi `b8deda6` tidak ikut
+di-hash, dan window-nya berbeda (pagi vs siang, cv sampai 10%) → delta ini
+**tetap dibiarkan tanpa interpretasi**. Library code antara kedua hash
+identik pada jalur wasm (fix number `6258d43` terbukti byte-identik; PR
+#22/#23 hanya preset/benchmark), sehingga delta diduga window — bukan kode.
 
 ## 6. Verdict & prioritas optimasi berikutnya
 
@@ -134,8 +138,9 @@ Urutan kerja yang didukung matriks ini:
 3. **Staging (fase 1)** — sudah parity; cukup keputusan konfigurasi
    (mode default `scanner128` untuk wasm), tanpa riset baru.
 
-Provenance artifact wasm server: menunggu sha256 dari pemilik untuk
-menutup P5-7.
+Provenance artifact wasm server: **tertutup 2026-11-11** — sha256 server ==
+sidecar dev == re-hash independen (`7e26044fd61ea16af81a57630ab1e594b54ecf767cbb0126592b1f1c26928499`).
+P5-7 selesai.
 
 ## 7. Bukti
 
