@@ -399,10 +399,21 @@
   100k 1.086, 1mb 1.132, saq 1.022, checker 1.109), tanpa regresi;
   differential 71 dokumen + smoke (5 test semantik baru) hijau. Report:
   `reports/R5-1-materialize-assign.md`.
-- [ ] **O1-2 (H2)** — Decode string: `Buffer.from(bytes).toString('utf8')`
+- [x] **O1-2 (H2)** — Decode string: `Buffer.from(bytes).toString('utf8')`
   → `TextDecoder` cached + `decode(view)` (buang satu copy per string;
   profil: `utf8Slice`+`toString`+`fromArrayLike` ≈ 6.4%). Gate: paritas
   UTF-8 invalid-byte (differential + fixture).
+  **Diterima** (ze_json PR #26, `b0fdd11`, merged `3e10e47`): satu
+  `TextDecoder('utf8', { ignoreBOM: true })` module-level menggantikan
+  Buffer di 3 situs (`getString`, `#materialize` string, key object) —
+  zero-copy dari backing store wasm; wasm byte-identik (`7e26044f…`).
+  Gate baru: 2 fixture parity BOM (default TextDecoder meng-strip
+  U+FEFF — divergensi vs JSON.parse) + guard paritas replacement-char
+  decoder-vs-Buffer pada 6 input malformed (semua SAME; unreachable
+  dari decode C++). Sandwich satu-window dev 3 pasang, 6 korpus,
+  36 record PASS: **median cand/base 1k 1.096, 10k 1.109, 100k 1.090,
+  1mb 1.103, saq 1.125, checker 1.067** — naik semua, tanpa regresi.
+  Report: `reports/R5-3-text-decoder-decode.md`.
 - [ ] **O1-3 (H3)** — Cache `DataView` untuk `getDouble` (profil
   `getDouble` 4.7%; wasm memory tidak pernah grow → cache aman;
   dokumentasikan kontrak no-growth).
