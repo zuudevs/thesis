@@ -493,6 +493,21 @@
   = panggilan ABI + boxing BigInt (dieksekusi di O1-10). Record tracing
   (4) dihapus setelah analisis. Report:
   `reports/R5-6-frame-shape-tracing.md`.
+- [x] **O1-10 (rencana pemilik #5)** — Batch ABI Opsi A: fused
+  step+kind — tiga export langkah hot menerbitkan `classify(token_start)`
+  via out-pointer u32 (ABI v4 append-only), menghapus 1 panggilan
+  `ze_value_kind` + boxing BigInt per value materialisasi. **DITOLAK**
+  — hasil netral (aturan "terima hanya jika menang", pola O1-9):
+  sandwich 3 pasang swap 2 file (binding+wasm), 36 record PASS, median
+  cand/base 1k 0.989, 10k 0.989, 100k 0.979, 1mb 1.004, saq 0.994,
+  checker 1.027 (per-pair 0.942–1.057 dua arah = noise); semua gerbang
+  lulus (ctest 6/6 release+sanitize, differential 71×5, smoke v4).
+  Interpretasi: biaya per-panggilan ABI wasm64 kecil vs pekerjaan
+  materialisasi JS — menghapus 1 panggilan tidak berdampak; O1-7
+  (thin-call/Opsi B) tetap open. Commit kandidat `ce255cc` di-revert
+  sebelum push (reflog); 36 record rerun dipertahankan sebagai exhibit
+  (window pertama dengan verifikasi hash rusak dihapus). Report:
+  `reports/R5-8-step-kind-fused.md`.
 
 ## P6 — Dokumentasi & penulisan skripsi
 
