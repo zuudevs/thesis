@@ -172,11 +172,11 @@ memory-bound) kurang diuntungkan clock desktop dibanding JIT native.
 
 ## 7. Figur analisis (P5-5)
 
-Dibangun murni dari record tervalidasi (matplotlib 3.11), tersimpan
-di `out/charts/` dengan arsip permanen `reports/charts/`:
+Dibangun murni dari record tervalidasi (matplotlib 3.11): master PNG di
+`out/charts/` (gitignored), arsip vektor ter-commit di `reports/charts/`:
 
 | figur | isi |
 |---|---|
-| `p5_server_v8_contexts.png` | Baseline V8@server — 3 konteks × 6 korpus (median-of-repeats) |
-| `p5_server_insitu_ratio.png` | Rasio in-situ V8/ze-parser per korpus (32.9x → 164.2x) |
-| `p5_crosssite_v8_bodyparse.png` | V8 body-parse dev vs server (provenance saq-report identik `0340a72`) |
+| `p5_server_v8_contexts.svg` | Baseline V8@server — 3 konteks × 6 korpus (median-of-repeats) |
+| `p5_server_insitu_ratio.svg` | Rasio in-situ V8/ze-parser per korpus (32.9x → 164.2x) |
+| `p5_crosssite_v8_bodyparse.svg` | V8 body-parse dev vs server (provenance saq-report identik `0340a72`) |
