@@ -411,13 +411,33 @@
   `ze_value_kind` (semua byte × korpus).
 - [ ] **O1-5 (H6)** — `#frame`/`#plain`: hoist konstanta BigInt sentinel,
   dekode lebih ramping (profil 9.1% gabungan).
-- [ ] **O1-6 (H4)** — Drop presize `countElements` untuk array (2×
+- [x] **O1-6 (H4)** — Drop presize `countElements` untuk array (2×
   `begin_array` per array; `begin_array` 15.8% self terpanas) — ukur,
   terima hanya jika menang (kehilangan invariant check).
+  **Diterima** (ze_json PR #25, `480de7c` + comment fix `2f00bf3`,
+  merged `07b452e`): buang panggilan `countElements` dari `#readArray`,
+  materialisasi dengan `push()` dinamis; wasm byte-identik
+  (`7e26044f…`). Temuan besar: pass itu **kuadratik** —
+  `ze_count_elements` mem-frames Value dengan cursor=0 (`cabi.cpp:453`)
+  → `begin_array` → `first_index_at_or_after` berjalan linear dari
+  index 0 ke posisi array **per array** = O(#arrays × #indexes); profil
+  BASE @1mb: `begin_array` 66.9% self-time, lenyap di CAND. Sandwich
+  satu-window dev 3 pasang, 6 korpus, 36 record PASS: **median
+  cand/base 1k 1.030, 10k 1.049, 100k 1.299, 1mb 3.947, saq 1.040,
+  checker 1.015** — naik semua, tanpa regresi. Kehilangan cakupan
+  minimal (assert internal mismatch saja; mesin framing sama).
+  Report: `reports/R5-2-array-count-drop.md`.
 - [ ] **O1-7 (H7)** — ABI v4 thin-call (i32 ts/cursor, kurangi boxing
   BigInt per re-entry) — **keputusan pemilik** (ABI visible outside
   module); jadwalkan setelah O1-2..O1-6 bila overhead re-entry masih
   dominan (prioritas #2 R5: walk 7.5–12.7× vs V8).
+- [ ] **O1-8** — Perbaiki kuadratik `ze_count_elements` di sisi C++
+  (temuan O1-6): `first_index_at_or_after` binary search pada index
+  sorted (O(log n), jawaban identik) atau `ze_count_elements` menerima
+  cursor (perubahan ABI). Kandidat measured-core → gerbang native penuh
+  (ctest, sanitize, differential C++) — **keputusan pemilik**. API
+  publik `countElements()`/`ze_count_elements` tetap terpasang (dipakai
+  tooling) — bug ini tetap hidup untuk pemanggil lain sampai diperbaiki.
 
 ## P6 — Dokumentasi & penulisan skripsi
 
