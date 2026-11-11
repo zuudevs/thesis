@@ -452,6 +452,18 @@
   BigInt per re-entry) — **keputusan pemilik** (ABI visible outside
   module); jadwalkan setelah O1-2..O1-6 bila overhead re-entry masih
   dominan (prioritas #2 R5: walk 7.5–12.7× vs V8).
+- [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
+  count `decode_interior` saat `cap >= inner_len` (invariant output
+  decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%
+  (codegen shift); korpus terukur nyaris tanpa string escaped
+  (saq 0, synthetic ≈0.17% bytes) sehingga sumber gain tak tersedia;
+  aturan "terima hanya jika menang". Pass ganda terkonfirmasi dari
+  source; fusi kandidat adopsi ulang saat workload escape-heavy atau
+  rider eksperimen #5 (batch ABI). Bonus gerbang: `native-sanitize`
+  kini jalan di device dev (annotation STL off + copy runtime DLL ke
+  test targets) — ze_json PR #28 (`2727fb0`, merged `55aa893`), ctest
+  6/6 di release & sanitize; build wasm reproducible terverifikasi 3×
+  (`7e26044f…`). Report: `reports/R5-5-string-fuse.md`.
 - [ ] **O1-8** — Perbaiki kuadratik `ze_count_elements` di sisi C++
   (temuan O1-6): `first_index_at_or_after` binary search pada index
   sorted (O(log n), jawaban identik) atau `ze_count_elements` menerima
