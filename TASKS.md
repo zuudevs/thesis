@@ -464,13 +464,25 @@
   test targets) — ze_json PR #28 (`2727fb0`, merged `55aa893`), ctest
   6/6 di release & sanitize; build wasm reproducible terverifikasi 3×
   (`7e26044f…`). Report: `reports/R5-5-string-fuse.md`.
-- [ ] **O1-8** — Perbaiki kuadratik `ze_count_elements` di sisi C++
+- [x] **O1-8** — Perbaiki kuadratik `ze_count_elements` di sisi C++
   (temuan O1-6): `first_index_at_or_after` binary search pada index
   sorted (O(log n), jawaban identik) atau `ze_count_elements` menerima
   cursor (perubahan ABI). Kandidat measured-core → gerbang native penuh
   (ctest, sanitize, differential C++) — **keputusan pemilik**. API
   publik `countElements()`/`ze_count_elements` tetap terpasang (dipakai
   tooling) — bug ini tetap hidup untuk pemanggil lain sampai diperbaiki.
+  **Diterima** (keputusan pemilik: varian gallop/exponential probe, tanpa
+  perubahan ABI; ze_json PR #29, `a6e1d5c`, merged `c1c91ce`):
+  `first_index_at_or_after` dua rezim — step O(1) identik dengan while
+  lama, gap>0 gallop+binary O(log distance); ctest 6/6 di release &
+  sanitize; differential 71 doc × 5 mode; wasm baru `35b7f773…`.
+  Probe informal countElements @1mb (19.448 kontainer): **684.7 → 11.6
+  ms/pass = 59.2×**, counts identik. Sandwich 2 window, 6 pasang, 72
+  record PASS: median cand/base 1k 0.986, 10k 0.993, 100k 0.993, 1mb
+  0.998, saq 0.984, checker 0.995 — per-pair 0.950–1.023 melintasi 1.0
+  dua arah = noise; tanpa regresi bermakna (jalur parse tak memanggil
+  `count_elements` sejak O1-6). Report:
+  `reports/R5-7-count-elements-gallop.md`.
 - [x] **O1-11 (rencana pemilik #6)** — Investigasi wrong-map `#frame`
   dengan tracing terpisah dari throughput (`--trace-deopt` 1mb + saq;
   `--log-ic` 10k + saq). **Hipotesis tidak terkonfirmasi**: 0 deopt
