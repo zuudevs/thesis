@@ -373,7 +373,16 @@
   baru (`wasm-open` / `wasm-walk-full` / `wasm-parse-full`, root PR #29;
   pasangan native `BM_ParseOnDemandWalkOnly` — ze_json PR #23) +
   `--scanner all` → matriks fase × jalur × situs untuk menentukan prioritas
-  optimasi berikutnya (walk iterator vs staging).
+  optimasi berikutnya (walk iterator vs staging). — **MATRIKS SELESAI
+  2026-11-11** (`reports/R5-server-phase-matrix.md`, 34 record validator
+  PASS): staging parity V8 di kedua situs (open/V8 0.4–1.4x), walk tanpa
+  materialisasi 7.5–12.7x vs V8 (overhead per-step C-ABI), full 27–155x —
+  **materialisasi JS mendominasi 58–92% waktu full**; scanner128 ranking
+  bersih #1 di server (1.5–2.2x atas scanner8, semua korpus), dev campur.
+  Prioritas: (1) jalur materialisasi JS, (2) batching walk ABI, (3) staging
+  cukup konfigurasi (default scanner128). **Tertinggal provenance**: sha256
+  output `build-wasm.ps1` di server belum dilaporkan pemilik — bandingkan
+  vs `7e26044f…` lalu centang task ini.
 
 ## P6 — Dokumentasi & penulisan skripsi
 
