@@ -260,6 +260,37 @@
     hasil dicatat sebagai temuan tesis (redistribusi komponen oleh PGO).
     Kandidat lanjutan opsional (P4-4b, deferred): retraining berimbang /
     `-fprofile-use` layout-only untuk memulihkan staging.
+  - **P4-4b DIEKSEKUSI 2026-11-11 (setelah eksplorasi cmake perintah pemilik
+    — "pakai optimization target")**: infrastruktur dikonsolidasikan —
+    `add_pgo_flags` dihapus, logika GENERATE/USE pindah ke
+    `add_optimizations_target`, seluruh flag set di-gate `ENABLE_TARGET_
+    OPTIMIZATIONS` (default OFF → `native-release` canonical tetap no-op
+    semantik, terverifikasi 0 flag baru di build.ninja + angka baseline
+    ≡ kemarin), `-march=native` di-gate ganda `ENABLE_MARCH_NATIVE`
+    (default OFF), `ENABLE_IPO` kini dideklarasikan (OFF), preset baru
+    **`native-release-march`**, dan `add_profiling_target` (uProf per-config
+    `ninja hotspots_ze_json_parser_benchmark` dsb.) diperbaiki
+    (`EXPORT_OUT_DIR`→`OUT_DIR`, `report -i` direktori sesi) + di-wire ke
+    kedua driver benchmark. Runbook server SAQ:
+    `reports/P5-saq-server-runbook.md` (PR root terpisah).
+    - **E1 — `native-release-march` (flag set + march) DITOLAK**: sandwich
+      vs canonical (`zuu-20261111090544` vs `zuu-20261111090519`,
+      window ~3.5 menit, kontrol stabil): FullWalk ladder flat
+      (−0.4..−1.8%), saq −8.1%, **ParseOpen −6.5..−22.4%** (sections/
+      ICF/linker-layout merugikan staging), ParseReference ±3%.
+      march=native tidak memberi apa-apa di Zen 2 untuk jalur ini.
+    - **E2 — `native-pgo` full-set (profil retrain atas flag set baru)
+      DITOLAK sebagai default**: sandwich vs canonical
+      (`zuu-20261111092425` vs `zuu-20261111090519`): FullWalk ladder
+      **+11.9..+23.2%** (1mb 156.5→192.8 MB/s) — TAPI **ParseOpen
+      −12.5..−25.1%** — PGO TIDAK memulihkan regresi staging dari flag
+      set; pola campur P4-4 berulang.
+    - **Keputusan P4-4b**: `native-release` tetap satu-satunya preset
+      pengukuran skripsi; infrastruktur opt-in (preset march + target
+      uProf + gate flag) masuk repo sebagai tooling eksperimen.
+      Kesimpulan tesis: staging (scanner8+pairing) sangat sensitif
+      layout — flag optimasi tambahan maupun PGO konsisten
+      mendistribusikan performa DARI staging KE jalur walk.
 - [x] **P4-5** — Disiplin satu-perubahan-per-ukur dijalankan pada P4-2 (SWAR
   diukur terpisah, ditolak karena regress di luar noise); record lama vs baru
   tersimpan (`out/measurements/zuu-20261109042022-*` baseline kanonik vs
