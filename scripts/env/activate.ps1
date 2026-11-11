@@ -17,7 +17,7 @@ if (Test-Path $MsvcToolsBase) {
 }
 
 if (-not [string]::IsNullOrWhiteSpace($env:TOOLCHAINS_DIR)) {
-    $env:PATH = "$env:TOOLCHAINS_DIR;$env:TOOLCHAINS_DIR\cmake-4.4.5-windows-x86_64\bin;$env:TOOLCHAINS_DIR\clang+llvm-23.1.5-x86_64-pc-windows-msvc\bin;$env:TOOLCHAINS_DIR\vcpkg-2026.10.16;$MsvcBinDir;$env:PATH"
+    $env:PATH = "$env:TOOLCHAINS_DIR;$env:TOOLCHAINS_DIR\cmake\bin;$env:TOOLCHAINS_DIR\clang\bin;$env:TOOLCHAINS_DIR\vcpkg;$env:TOOLCHAINS_DIR\ninja;$MsvcBinDir;$env:PATH"
 }
 
 Write-Host "[+] Environment variables injected to current terminal session!" -ForegroundColor Green

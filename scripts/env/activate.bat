@@ -16,7 +16,7 @@ if exist "%TOOLCHAINS_DIR%\MSVC\VC\Tools\MSVC\" (
 )
 
 if defined TOOLCHAINS_DIR (
-    set "PATH=%TOOLCHAINS_DIR%;%TOOLCHAINS_DIR%\cmake-4.4.5-windows-x86_64\bin;%TOOLCHAINS_DIR%\clang+llvm-23.1.5-x86_64-pc-windows-msvc\bin;%TOOLCHAINS_DIR%\vcpkg-2026.10.16;%MSVC_BIN_DIR%;%PATH%"
+    set "PATH=%TOOLCHAINS_DIR%;%TOOLCHAINS_DIR%\cmake\bin;%TOOLCHAINS_DIR%\llvm\bin;%TOOLCHAINS_DIR%\vcpkg;%TOOLCHAINS_DIR%\ninja;%MSVC_BIN_DIR%;%PATH%"
 )
 
 echo [+] Environment variables injected!
