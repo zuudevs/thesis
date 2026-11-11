@@ -414,9 +414,19 @@
   36 record PASS: **median cand/base 1k 1.096, 10k 1.109, 100k 1.090,
   1mb 1.103, saq 1.125, checker 1.067** — naik semua, tanpa regresi.
   Report: `reports/R5-3-text-decoder-decode.md`.
-- [ ] **O1-3 (H3)** — Cache `DataView` untuk `getDouble` (profil
+- [x] **O1-3 (H3)** — Cache `DataView` untuk `getDouble` (profil
   `getDouble` 4.7%; wasm memory tidak pernah grow → cache aman;
   dokumentasikan kontrak no-growth).
+  **Diterima** (ze_json PR #27, `2fb661f`, merged `a4ae62d`): view
+  dicache per (backing-buffer identity, `dstPtr`) — parser membaca
+  lewat satu `numPtr` (bump heap di-rewind per dokumen → alamat sama,
+  hit 100%); kontrak no-growth didokumentasikan; wasm byte-identik
+  (`7e26044f…`). Sandwich 2 window dev, 6 pasang, 6 korpus, 72 record
+  PASS: median cand/base 1k **1.055**, 10k 1.047, 100k 1.022,
+  1mb 1.021, checker **1.035**; saq 0.967 — dianalisis noise mesin
+  (korpus nyaris tanpa angka: 3.1 num/KB vs 34.8 @1mb; drift mesin
+  +7% antar window; `elapsedMs` per repeat identik). Report:
+  `reports/R5-4-dv-cache.md`.
 - [ ] **O1-4 (H5)** — Mirror JS `valueKind` dari launcher byte (hapus 1
   re-entry wasm per value; profil 3.8%). Wajib differential ekshaustif vs
   `ze_value_kind` (semua byte × korpus).
