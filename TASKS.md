@@ -311,17 +311,33 @@
 
 ## P5 — Pengukuran lintas arsitektur (site server ditunda — akses SAQ belum ada)
 
-- [ ] **P5-1** — Paket runner untuk server SAQ: instruksi deploy konsisten
+- [x] **P5-1** — Paket runner untuk server SAQ: instruksi deploy konsisten
   (`node scripts/host-introspect.mjs` + `node scripts/node-benchmark/harness.mjs
-  --site=saq_server`); hasil dipindah ke `out/measurements/`. — **disiapkan sekarang,
-  eksekusi ditunda sampai akses server SAQ dapat.**
-- [ ] **P5-2** — Baseline V8 di server SAQ → record v1. — **ditunda** (akses belom
-  tersedia; runner site-aware siap).
-- [ ] **P5-3** — (opsional, bila izin tersedia) ze-wasm64 di server SAQ → record v1. —
-  **ditunda**.
-- [ ] **P5-4** — Perbandingan lintas mesin — **fase awal dalam satu site dev**:
-  `v8@dev` vs `ze-native@dev` vs `ze-wasm64@dev` (semua validated + introspeksi host
-  lengkap); kolom `@server` ditambah begitu akses SAQ ada.
+  --site=saq_server`); hasil dipindah ke `out/measurements/`. — **SELESAI
+  2026-11-11**: runbook `reports/P5-saq-server-runbook.md` (root PR #23),
+  dieksekusi pemilik via SSH tanpa perubahan harness.
+- [x] **P5-2** — Baseline V8 di server SAQ → record v1. — **SELESAI
+  2026-11-11**: `server-lanjut-20261111040248-0340a72` (saq-report `0340a72`,
+  Node 26.13.0/V8 14.6, i5-9400; repeats 5, cv ≤ 8%): 6 korpus × 3 konteks
+  (body-parse 206.6–571.8 MB/s, store-read ≈ body-parse, export-stringify
+  +19..+55%) — 6 record validator PASS; laporan `reports/P5-saq-server-baseline.md`.
+- [x] **P5-3** — (opsional) ze-wasm64 di server SAQ → record v1. — **SELESAI
+  2026-11-11**: `server-lanjut-20261111041314-b8deda6` (ze_json `b8deda6`,
+  wasm64 C-ABI): 6.28–17.37 MB/s (korpus mikro..saq) turun ke 1.58 MB/s
+  (1mb); **rasio in-situ V8/ze = 30–165x** (membuka di korpus besar) —
+  garis bawah jalur full-walk wasm, bukan potensi ze_json.
+- [x] **P5-4** — Perbandingan lintas mesin — **kolom @server terisi
+  2026-11-11** (provenance saq-report `0340a72` identik antara situs;
+  run dev ber-flag identik `zuu-20261111073103-0340a72` V8 +
+  `zuu-20261111073127-79a41bd` ze-parser, diff cmake-only): **V8
+  srv/dev 1.19–1.94x** (desktop 2.9 GHz + Node 26 vs laptop 2.1 GHz +
+  Node 24; gap body-parse membuka di korpus besar 1.42→1.94), **ze
+  wasm srv/dev 0.92–1.67x** (gap lebih kecil → profil memory-bound
+  kurang diuntungkan clock). Kualitas run: server cv ≤ 8%, dev hingga
+  18.7%. Keterbatasan tercatat: `ze_json.wasm` tidak ter-track git →
+  artefak disalin manual, sidecar tanpa sha256 — interpretasi wasm
+  dibatasi in-situ per situs; tindak lanjut: catat sha256 saat salin.
+  (Fase awal dalam satu site dev tetap sumber komparatif utama.)
 - [ ] **P5-5** — Analisis & chart ke `out/charts/` (murni dari record validated).
 
 ## P6 — Dokumentasi & penulisan skripsi
