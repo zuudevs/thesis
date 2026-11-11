@@ -387,6 +387,38 @@
   (`certutil`) file build dev @`ab09adb` — artifact server byte-identik
   dengan build dev (provenance run server `123444`/`123516` penuh).
 
+## O1 — Optimasi jalur Node (lanjutan R5; prioritas verdict PR thesis #31)
+
+- [x] **O1-1 (H1)** — Materialisasi JS: `Object.defineProperty` per key →
+  assignment biasa pada receiver null-proto (semantik `JSON.parse`
+  DefineOwnProperty tetap: `__proto__` own key, dup last-wins, urutan
+  OrdinaryOwnPropertyKeys). ze_json PR #24 (`207b2bf` + comment fix
+  `f82e09d`); wasm tak berubah (sha256 `7e26044f…` tetap). Sandwich
+  satu-window dev 3 pasang, konteks `wasm-parse-full`, 6 korpus:
+  **median cand/base 1.09–1.25× semua korpus** (1k 1.252, 10k 1.151,
+  100k 1.086, 1mb 1.132, saq 1.022, checker 1.109), tanpa regresi;
+  differential 71 dokumen + smoke (5 test semantik baru) hijau. Report:
+  `reports/R5-1-materialize-assign.md`.
+- [ ] **O1-2 (H2)** — Decode string: `Buffer.from(bytes).toString('utf8')`
+  → `TextDecoder` cached + `decode(view)` (buang satu copy per string;
+  profil: `utf8Slice`+`toString`+`fromArrayLike` ≈ 6.4%). Gate: paritas
+  UTF-8 invalid-byte (differential + fixture).
+- [ ] **O1-3 (H3)** — Cache `DataView` untuk `getDouble` (profil
+  `getDouble` 4.7%; wasm memory tidak pernah grow → cache aman;
+  dokumentasikan kontrak no-growth).
+- [ ] **O1-4 (H5)** — Mirror JS `valueKind` dari launcher byte (hapus 1
+  re-entry wasm per value; profil 3.8%). Wajib differential ekshaustif vs
+  `ze_value_kind` (semua byte × korpus).
+- [ ] **O1-5 (H6)** — `#frame`/`#plain`: hoist konstanta BigInt sentinel,
+  dekode lebih ramping (profil 9.1% gabungan).
+- [ ] **O1-6 (H4)** — Drop presize `countElements` untuk array (2×
+  `begin_array` per array; `begin_array` 15.8% self terpanas) — ukur,
+  terima hanya jika menang (kehilangan invariant check).
+- [ ] **O1-7 (H7)** — ABI v4 thin-call (i32 ts/cursor, kurangi boxing
+  BigInt per re-entry) — **keputusan pemilik** (ABI visible outside
+  module); jadwalkan setelah O1-2..O1-6 bila overhead re-entry masih
+  dominan (prioritas #2 R5: walk 7.5–12.7× vs V8).
+
 ## P6 — Dokumentasi & penulisan skripsi
 
 - [x] **P6-1** — `ze_json/docs/architecture/README.md` **isi penuh** (English):
