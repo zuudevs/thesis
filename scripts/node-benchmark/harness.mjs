@@ -238,6 +238,112 @@ function makeWasmContexts(scannerMode) {
   };
 }
 
+// ze-parser engine contexts (P7-7, R5 phase split): the four-phase
+// decomposition of a parse (AGENTS.md measurement phases) lives at the
+// parser level too — open / full on-demand walk / full V8-shaped
+// materialization. `wasm-open` isolates document open (slot + root
+// launcher + root classification); `wasm-walk-full` consumes every token
+// through the on-demand frame re-entry API WITHOUT building a JS value
+// tree; `wasm-parse-full` keeps the V8-shaped materialization baseline.
+
+/** Fase 2 — document open only (slot + root launcher + root kind). */
+function makeZeParserOpenContext() {
+  let binding = null;
+  return {
+    purpose: 'ze-wasm64 parser (R5 phase split): document open only — alloc + ze_parser_open + ze_parser_root + root kind classification, no traversal, no JS materialization',
+    basisPapers: ['10.1002_spe.3313', '10.14778_3115404.3115416', '10.1145_2807591.2807644'],
+    prepare(docs) {
+      if (binding === null) {
+        binding = ZeJson.load();
+      }
+      binding.resetHeap();
+      return docs.map((doc) => Buffer.from(doc.utf8, 'utf8'));
+    },
+    run(states) {
+      let sink = 0;
+      for (const bytes of states) {
+        const parser = ZeParser.open(binding, bytes);
+        try {
+          sink += parser.kind(parser.rootTs);
+        } finally {
+          parser.close();
+          binding.resetHeap(); // per-document rewind, same contract as parse-full
+        }
+      }
+      return sink;
+    },
+    bytesPerOp(states) {
+      return states.reduce((sum, bytes) => sum + bytes.length, 0);
+    },
+  };
+}
+
+/**
+ * Fase 3 — full on-demand traversal without JS materialization. Every value
+ * token of the document is consumed through the frame re-entry API
+ * (containerBegin / arrayNext / objectField / objectNext + a kind check per
+ * leaf), mirroring the native BM_ParseOnDemandWalkOnly contract: structural
+ * consumption only — no string decode, no number materialization, no JS
+ * containers are built.
+ */
+function makeZeParserWalkContext() {
+  let binding = null;
+  /** Recursive structural walk; returns the number of values visited. */
+  const walk = (parser, ts, cursor) => {
+    let visited = 0;
+    const kind = parser.kind(ts);
+    switch (kind) { // NODE_KINDS index (see ze_json.mjs #materialize)
+      case 1: { // object: iterate key frames via objectField/objectNext
+        let keyFrame = parser.containerBegin(ts, cursor);
+        while (keyFrame !== null) {
+          const valueFrame = parser.objectField(keyFrame.ts, keyFrame.cursor);
+          visited += walk(parser, valueFrame.ts, valueFrame.cursor);
+          keyFrame = parser.objectNext(valueFrame.ts, valueFrame.cursor);
+        }
+        break;
+      }
+      case 2: { // array: iterate child frames via containerBegin/arrayNext
+        let frame = parser.containerBegin(ts, cursor);
+        while (frame !== null) {
+          visited += walk(parser, frame.ts, frame.cursor);
+          frame = parser.arrayNext(frame.ts, frame.cursor);
+        }
+        break;
+      }
+      default:
+        break; // scalar leaf: the kind check above was the consumption
+    }
+    return visited + 1;
+  };
+  return {
+    purpose: 'ze-wasm64 parser (R5 phase split): full on-demand traversal — every value token consumed through the wasm64 C-ABI frame re-entry (open + structural walk), NO JS value materialization',
+    basisPapers: ['10.1002_spe.3313', '10.14778_3115404.3115416', '10.1145_2807591.2807644'],
+    prepare(docs) {
+      if (binding === null) {
+        binding = ZeJson.load();
+      }
+      binding.resetHeap();
+      return docs.map((doc) => Buffer.from(doc.utf8, 'utf8'));
+    },
+    run(states) {
+      let sink = 0;
+      for (const bytes of states) {
+        const parser = ZeParser.open(binding, bytes);
+        try {
+          sink += walk(parser, parser.rootTs, 0);
+        } finally {
+          parser.close();
+          binding.resetHeap();
+        }
+      }
+      return sink;
+    },
+    bytesPerOp(states) {
+      return states.reduce((sum, bytes) => sum + bytes.length, 0);
+    },
+  };
+}
+
 // ze-parser engine context (P7-7): every document is parsed through the
 // wasm64 C-ABI parser into a V8-shaped JS value tree (ZeParser.parse()),
 // the ze_json counterpart of the v8 body-parse baseline. The tree is fully
@@ -323,9 +429,11 @@ const ENGINES = {
       };
     },
     makeContexts: () => ({
+      'wasm-open': makeZeParserOpenContext(),
+      'wasm-walk-full': makeZeParserWalkContext(),
       'wasm-parse-full': makeZeParserFullContext(),
     }),
-    contextList: () => ['wasm-parse-full'],
+    contextList: () => ['wasm-open', 'wasm-walk-full', 'wasm-parse-full'],
   },
 };
 
