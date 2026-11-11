@@ -36,9 +36,25 @@ Tiga konteks jalur panas JSON server SAQ (bytes/s, mean; cv):
 | synthetic_1mb | 259.2 (0.8%) | 259.8 (1.1%) | 336.6 (1.9%) |
 
 Pola konsisten dengan situs dev: body-parse ≈ store-read (payload JSON
-sama dikonsumsi dua jalur), export-stringify +25..+55% (V8 serializer
-lebih murah dari parser). cv < 8% di seluruh sel; korpus mikro
-(checker_batch) paling berisik — sesuai ekspektasi runbook §7.
+sama dikonsumsi dua jalur). **Catatan akuntansi**: body-parse,
+store-read, dan wasm-parse-full diakuntansi atas **byte input**
+(total bytes korpus per op); export-stringify atas **byte output**
+(restringify ident-2, konvensi harness P2) — jangan dibandingkan
+langsung lintas konteks: di korpus ident-2 output ≈ input
+(saq 604 vs parse 572 — setara), di synthetic_1mb output 1.93x input
+(record 336.6 MB/s output ≈ 174.8 MB/s input, yaitu stringify lebih
+lambat dari parse per byte input). cv < 8% di seluruh sel; korpus
+mikro (checker_batch) paling berisik — sesuai ekspektasi runbook §7.
+
+### Verifikasi satuan (audit 2026-11-11)
+
+Dikonstruksi ulang dari exhibit mentah: `bytes/s = ops × bytesPerOp /
+elapsed_s`, record memakai **median-of-repeats** — cocok persis untuk
+semua sel yang diaudit (ze saq 17.37, V8 saq body-parse 571.80, 1mb
+body-parse 259.2, 1mb export 336.6-as-output). Satu op = satu pass
+penuh atas seluruh korpus di semua konteks (batch semantics, sama
+dengan pola benchmark C++ P1-5/P1-6). Rasio V8/ze §3 memakai body-parse
+(input bytes) vs wasm-parse-full (input bytes) — apples-to-apples.
 
 ## 3. ze_json wasm64 in-situ di server (P5-3) & rasio V8/ze
 
@@ -152,4 +168,15 @@ memory-bound) kurang diuntungkan clock desktop dibanding JIT native.
 - **P5-4** ✓ kolom `@server` terisi (tabel §4): V8 server/dev
   1.19–1.94x, ze wasm server/dev 0.92–1.67x, gap V8 membuka di korpus
   besar, gap ze lebih kecil. Fase awal RQ2 (in-situ per situs + rasio
-  antar-situs ber-provenance) tercukupi; P5-5 (chart) menyusul.
+  antar-situs ber-provenance) tercukupi.
+
+## 7. Figur analisis (P5-5)
+
+Dibangun murni dari record tervalidasi (matplotlib 3.11), tersimpan
+di `out/charts/` dengan arsip permanen `reports/charts/`:
+
+| figur | isi |
+|---|---|
+| `p5_server_v8_contexts.png` | Baseline V8@server — 3 konteks × 6 korpus (median-of-repeats) |
+| `p5_server_insitu_ratio.png` | Rasio in-situ V8/ze-parser per korpus (32.9x → 164.2x) |
+| `p5_crosssite_v8_bodyparse.png` | V8 body-parse dev vs server (provenance saq-report identik `0340a72`) |

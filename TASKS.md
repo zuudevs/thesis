@@ -338,7 +338,17 @@
   artefak disalin manual, sidecar tanpa sha256 — interpretasi wasm
   dibatasi in-situ per situs; tindak lanjut: catat sha256 saat salin.
   (Fase awal dalam satu site dev tetap sumber komparatif utama.)
-- [ ] **P5-5** — Analisis & chart ke `out/charts/` (murni dari record validated).
+- [x] **P5-5** — Analisis & chart ke `out/charts/` (murni dari record validated). —
+  **SELESAI 2026-11-11**: 3 figur matplotlib (arsip `reports/charts/`,
+  master `out/charts/`): `p5_server_v8_contexts.png` (V8@server 3 konteks × 6
+  korpus), `p5_server_insitu_ratio.png` (rasio V8/ze 32.9→164.2x),
+  `p5_crosssite_v8_bodyparse.png` (dev vs server, provenance identik).
+  Audit satuan P5-5: formula record terkonstruksi ulang dari raw exhibit
+  (`bytes/s = ops × bytesPerOp / elapsed`, median-of-repeats) — cocok persis;
+  konteks parse/walk memakai byte input korpus (apples-to-apples), sedangkan
+  export-stringify memakai **byte output** restringify ident-2 (konvensi
+  harness P2; di saq output≈input, di 1mb output 1.93x input) — dicatat
+  eksplisit di laporan P5 agar tidak salah baca.
 
 ## P6 — Dokumentasi & penulisan skripsi
 
