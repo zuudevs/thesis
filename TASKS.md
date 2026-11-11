@@ -471,6 +471,16 @@
   (ctest, sanitize, differential C++) — **keputusan pemilik**. API
   publik `countElements()`/`ze_count_elements` tetap terpasang (dipakai
   tooling) — bug ini tetap hidup untuk pemanggil lain sampai diperbaiki.
+- [x] **O1-11 (rencana pemilik #6)** — Investigasi wrong-map `#frame`
+  dengan tracing terpisah dari throughput (`--trace-deopt` 1mb + saq;
+  `--log-ic` 10k + saq). **Hipotesis tidak terkonfirmasi**: 0 deopt
+  "Wrong map" di kedua korpus; seluruh event deopt berpemicu GC
+  (tenuring + weak objects, klaster pasca-pengukuran); IC keluarga
+  frame settle monomorphic/polymorphic-2 (`M_step`+`M_done`) tanpa
+  megamorphic; map error-frame tak pernah dibuat. Sisa overhead `#frame`
+  = panggilan ABI + boxing BigInt (dieksekusi di O1-10). Record tracing
+  (4) dihapus setelah analisis. Report:
+  `reports/R5-6-frame-shape-tracing.md`.
 
 ## P6 — Dokumentasi & penulisan skripsi
 
