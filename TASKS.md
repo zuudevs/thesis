@@ -291,6 +291,18 @@
       Kesimpulan tesis: staging (scanner8+pairing) sangat sensitif
       layout — flag optimasi tambahan maupun PGO konsisten
       mendistribusikan performa DARI staging KE jalur walk.
+    - **E3 — `native-release-ipo` (target-opts + LTO) KEEP sebagai
+      preset opt-in berlabel, TIDAK dijadikan preset pengukuran**
+      (ze_json PR #22 `df00ad9`): sandwich satu-window vs baseline
+      `native-release` (`zuu-20261111175828`) dan kontrol
+      `native-release-march` (`zuu-20261111180305`), kandidat
+      `zuu-20261111180226`, semua `47bb543`, 36 record validator PASS.
+      `ipo/base`: **ParseOpen 0.72–0.87x ✓**, FullWalk 0.88–0.98x ✓,
+      tapi ReferenceScan **1.34–1.56x ✗**, ParseReference 1.10–1.19x ✗,
+      Scanner64/128 1.01–1.14x ✗; `ipo/march` membuktikan LTO murni
+      menguntung jalur parser & memulihkan regresi march pada
+      Scanner8/Structural (0.66–0.83) namun merugikan jalur oracle.
+      Laporan: `reports/E3-lto-sandwich.md` (root PR #29).
 - [x] **P4-5** — Disiplin satu-perubahan-per-ukur dijalankan pada P4-2 (SWAR
   diukur terpisah, ditolak karena regress di luar noise); record lama vs baru
   tersimpan (`out/measurements/zuu-20261109042022-*` baseline kanonik vs
@@ -349,6 +361,19 @@
   export-stringify memakai **byte output** restringify ident-2 (konvensi
   harness P2; di saq output≈input, di 1mb output 1.93x input) — dicatat
   eksplisit di laporan P5 agar tidak salah baca.
+- [x] **P5-6** — Script build+verify wasm terstandar (`scripts/build-wasm.ps1`,
+  root PR #27 `8fd14fe`): memaksa preset `wasm64-release`, verifikasi wajib
+  build type / 9 export ABI / SIMD v128 / sidecar sha256
+  `bindings/js/ze_json.wasm.sha256`, gate differential + smoke — menutup
+  tindak lanjut P5-4 (artefak ke server kini terprovenance; hash dev saat
+  ini `7e26044f…`, byte-identik sebelum/sesudah fix number).
+- [ ] **P5-7 (R5)** — Re-build wasm DI SERVER SAQ via `scripts/build-wasm.ps1`
+  (salin `ze_json` submodule @`ab09adb` + script ke server, jalankan, catat
+  sha256, bandingkan vs `7e26044f…`), lalu re-run harness dengan konteks fase
+  baru (`wasm-open` / `wasm-walk-full` / `wasm-parse-full`, root PR #29;
+  pasangan native `BM_ParseOnDemandWalkOnly` — ze_json PR #23) +
+  `--scanner all` → matriks fase × jalur × situs untuk menentukan prioritas
+  optimasi berikutnya (walk iterator vs staging).
 
 ## P6 — Dokumentasi & penulisan skripsi
 
