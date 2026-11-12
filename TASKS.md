@@ -776,9 +776,19 @@
   14–25× di bawah V8 (premis direktif terkonfirmasi); selective menang pada
   dokumen ≥10 KB (1.57–2.52×), overhead per-panggilan ABI (~0.4–0.8 µs,
   boxing BigInt) = target profil ND-6 pada ukuran SAQ.
-- [ ] **ND-5** — Integrasi call-site SAQ read-only (dashboard/rekap/enrichment)
-  dengan baseline dipertahankan; semantik aplikasi identik (missing-key, null,
-  boolean/numeric, decode string, urutan array, duplicate-key, error).
+- [x] **ND-5** — Integrasi call-site SAQ read-only: **GET `/rekap`** (satu
+  call-site dulu, disepakati pemilik) di saq-report PR #3 (`7930009`) —
+  `readCount()` pada `JsonRepository`/`MongoJsonRepository` via loader
+  `repositories/zeJsonBinding.js` (wasm64 C-ABI v3, sole-owner slot,
+  `require(esm)` Node ≥ 24); opt-in env `SAQ_JSON_ENGINE=ze`, baseline V8
+  tidak diubah. Parity gate `scripts/check-json-lazy-parity.js` 26/26 hijau
+  (file store korpus `saq_payload_v1` P0-8, cache Mongo disimulasikan, file
+  hilang, 12 edge semantik: nilai + jenis & lokasi error identik — TypeError
+  call-site vs dalam-`read()`→AppError). Semantik aplikasi identik terkunci
+  (missing-key → default, null field → `?? default`, string decode, urutan
+  array, error); duplicate-key sudah terkunci di level binding (lazy.mjs T2).
+  Call-site lain (dashboard/enrichment) menyusul setelah benchmark ND-6.
+  Deviasi as-built tercatat di `docs/architecture/lazy-access-api.md` §14.
 - [ ] **ND-6** — Matriks benchmark 4 fase A–D (A penuh / B parsial / C deep
   selective / **D workload SAQ asli = acceptance utama, in-situ dev device**) +
   skema metrik v2 (median, P95, alloc, index count, consumed/skipped) + korpus
