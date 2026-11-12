@@ -731,6 +731,46 @@
   Baseline loop P4-3: satu perubahan per pengukuran, re-run kedua
   target export pada hash sama, banding in-situ.
 
+## ND — Reorientasi on-demand (direktif pemilik 2026-11-12)
+
+> "Scan the structure once. Access only what is needed." Target: Speedup =
+> T_baseline / T_ze_json ≥ 1.5× pada **workload SAQ asli** (acceptance
+> benchmark = fase D), dibuktikan eksperimen tanpa mengubah workload/benchmark.
+> Deliverable stage: `docs/research/ondemand-direction-audit.md` (ND-1),
+> `docs/architecture/lazy-access-api.md` (ND-3), `reports/ondemand-saq-evaluation.md`
+> (ND-7). Satu PR per stage; laporan §13 di tiap stage. Larangan §11 direktif
+> berlaku (materialisasi DOM penuh sebagai jalur utama, hash index serampangan,
+> SIMD tanpa ukur, manipulasi boundary ukur, fabrikasi hasil).
+
+- [x] **ND-1** — Audit berbasis bukti source ketiga repo + consumption map SAQ +
+  sintesis bottleneck + hipotesis H1–H5 + inventaris dokumen usang →
+  `docs/research/ondemand-direction-audit.md` (Stage 1). Ledger minimal ini
+  ditambahkan di stage yang sama.
+- [ ] **ND-2** — Koreksi dokumentasi usang (AGENTS.md §1/§5/§7, ze_json/docs
+  architecture TODO parser, referensi ABI v2) sesuai inventaris audit §8;
+  pastikan agent berikutnya paham on-demand lazy = arsitektur primer.
+- [ ] **ND-3** — Desain API lazy JS: `docs/architecture/lazy-access-api.md`
+  (semantik handle Document/Value/iterasi, key lookup — tanpa klaim O(1) tanpa
+  bukti, skip subtree, lifetime slot/bump-heap untuk server, error model,
+  proyeksi termaterialisasi untuk EJS). Full-materialization API tetap ada
+  sebagai pembanding, bukan jalur utama.
+- [ ] **ND-4** — Implementasi minimal sesuai consumption map audit §5 (kandidat
+  lapisan JS di atas ABI + proyeksi + bila terukur perlu ekspor ABI skip/span).
+  Eksperimen satu-per-satu: hipotesis → ukur → terima/tolak; varian ditolak
+  dipertahankan.
+- [ ] **ND-5** — Integrasi call-site SAQ read-only (dashboard/rekap/enrichment)
+  dengan baseline dipertahankan; semantik aplikasi identik (missing-key, null,
+  boolean/numeric, decode string, urutan array, duplicate-key, error).
+- [ ] **ND-6** — Matriks benchmark 4 fase A–D (A penuh / B parsial / C deep
+  selective / **D workload SAQ asli = acceptance utama, in-situ dev device**) +
+  skema metrik v2 (median, P95, alloc, index count, consumed/skipped) + korpus
+  `saq_payload_v2` fidelity (keputusan pemilik) + kontrol eksperimen
+  (warmup, ronde independen, alternating, tanpa buang outlier).
+- [ ] **ND-7** — Kesimpulan riset: `reports/ondemand-saq-evaluation.md`
+  (hipotesis, implementasi, setup, hasil, speedup, memori/alokasi, bukti
+  korektness, limitasi, verdict ≥1.5× atau bukti bottleneck — tidak pernah
+  manufacture hasil).
+
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
 - [x] **PW-1** — Buat `.github/PULL_REQUEST_TEMPLATE.md` di ketiga repo (root v5,
