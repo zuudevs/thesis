@@ -15,11 +15,17 @@
 - **`ze_json/`** (submodule): library header-first di `include/ze_json/**`
   (`core`, `utils`, `meta`, `ondemand`), semua nama di `namespace zuu`, **tanpa STL di
   core** (typedef `core::*` sendiri, `core::Result`, `Arena`, makro `NOEXCEPT`,
-  `RESTRICT`). `src/` = `stubs/compiler_rt.cpp` + `ondemand/scalar.cpp`
-  (`scanner8` + reference terimplement & teruji sejak P1-1/P1-2);
-  `scanner32/64/128` dan parser on-demand masih TODO. API publik belum lengkap.
+  `RESTRICT`). `src/` = `stubs/compiler_rt.cpp`, `ondemand/scalar.cpp`
+  (`scanner8` + reference, sejak P1-1/P1-2), `ondemand/parallel.cpp`
+  (`scanner64` SWAR + `scanner128` SIMD — terukur & ditolak P4-2; `scanner32`
+  stub 32-bit), `ondemand/{string,number}.cpp` (promosi scalar lazy),
+  `abi/cabi.cpp`. **Parser on-demand (`Document`/`Value`/`ArrayIter`/
+  `ObjectIter`) terimplement & teruji sejak P7** (75 TEST gtest, 6 target) —
+  bukan TODO; status as-built: `docs/research/ondemand-direction-audit.md` §3.
 - **`bindings/js`**: binding Node raw wasm64 C-ABI (`ze_json.mjs`: `ZeJson`/
-  `ZeDocument`, ABI v2 — `SCANNER_MODES` untuk memilih varian scanner dari JS;
+  `ZeDocument`/`ZeParser`, ABI v3 — `SCANNER_MODES` untuk memilih varian
+  scanner + surface parser on-demand pada slot pool 64; `ZeParser` = jalur
+  lazy frame `(ts, cursor)`, `ZeParser.parse()` = materialisasi penuh;
   kontrak di `include/ze_json/abi/cabi.hpp`).
   Node >= 24; rencana publikasi `@zuudevs/ze-json` di GitHub Packages.
 - **`saq-report/`** (submodule — aplikasi Node.js/Express `saq-whatsapp`). Titik hot
@@ -124,17 +130,20 @@
   - `out/rag/` — corpus paper (read-only).
   - `.cache/json_checker` = paket JSON_checker hasil unduhan (`InstallJsonChecker.py`,
     dari json.org) — tidak di-commit; korpusnya di `corpus/test/json_checker`.
-- Tree `corpus/benchmarks/` masih kosong — pengisiannya dijadwalkan (TASKS P0) dengan
-  manifest sha256 agar provenance korpus terbukti.
+- Tree `corpus/benchmarks/` terisi sejak P0-8 (`synthetic_{1k,10k,100k,1mb}`,
+  `saq_payload_v1`, `checker_batch`) dengan `MANIFEST.json` sha256 per korpus
+  (generator `scripts/corpus/make_corpus.py`) — provenance korpus terbukti.
 
 ## 5. Keadaan repo yang mudah terlewat
 
-- **ABI v2 sejak R2 (PR zuudevs/ze_json#8)**: kontrak C-ABI = header
+- **ABI v3 sejak P7-5**: kontrak C-ABI = header
   `include/ze_json/abi/cabi.hpp` (sumber tunggal, dimirror `ze_json.mjs`);
   implementasi `src/abi/cabi.cpp` (pindahan dari `src/bindings/` — konvensi
   sisi core = **`abi`**, `bindings/` khusus adaptor bahasa, `ffi` dibatalkan).
-  Ekspor: scanner8, reference_scan **+ scanner64, scanner128, structural_scan**
-  (pemilihan mode dari JS via `SCANNER_MODES`).
+  Ekspor scanner (v2): scanner8, reference_scan, scanner64, scanner128,
+  structural_scan (pemilihan mode dari JS via `SCANNER_MODES`) **+ ekspor
+  parser on-demand (v3): 13 fungsi** pada slot pool statis 64
+  (`kParserSlotMax`; traversal stateless via frame `(cursor, token_start)`).
 - Target wasm memakai **`-msimd128`** sejak R1 (PR zuudevs/ze_json#7) untuk
   `core::simd_*` — baseline wasm kanonik lama (`85afad7`, artefak tanpa
   simd128) **tidak sebanding langsung**; baseline kanonik wasm diukur ulang
@@ -143,16 +152,17 @@
   P1-3/P1-5: `ze_json_scanner_test` (diferensial + json_checker) dan
   `ze_json_scanner_benchmark` (korpus P0-8, export sidecar) — keduanya memakai
   helper export. Benchmark baru = register target yang memakai helper tersebut.
-- `.github/workflows/npm-publish.yml` **STALE**: menyebut target `ze_json_core`
-  (tidak eksis), path `bindings/js/test` (seharusnya `tests/`), CMake 4.4.4. Jangan
-  jadikan pola referensi. Referensi workflow valid = `ci.yml` (ubuntu+windows,
-  `native-debug`/`native-release`, env `CORPUS_DIR`/`TOOLCHAINS_DIR`/`CACHE_DIR`/
-  `PROJECT_ROOT_DIR`).
+- Referensi workflow valid = `ci.yml` (ubuntu+windows, `native-debug`/
+  `native-release`, env `CORPUS_DIR`/`TOOLCHAINS_DIR`/`CACHE_DIR`/
+  `PROJECT_ROOT_DIR`) dan `npm-publish.yml` (build `wasm64-release` + smoke
+  `bindings/js/tests/main.mjs` sebelum publish — telah disinkronkan; catatan
+  "STALE" lama tidak berlaku lagi, diverifikasi Stage 2 2026-11-12).
 - `compile_commands.json` di root adalah salinan untuk clangd; sinkronkan setelah
   reconfigure build.
 - `ze_json/docs/{architecture,development,requirement}/` berisi **isi penuh
-  English/Mermaid** sejak P6 (P6-1..P6-3) — status implementasi & hasil P4
-  tercakup; `docs/` root masih kosong.
+  English/Mermaid** sejak P6, dikoreksi Stage 2 (parser on-demand as-built +
+  ABI v3 tercakup); `docs/` root = `research/ondemand-direction-audit.md`
+  (audit Stage 1, Bahasa Indonesia).
 - Build aktif sekarang: `ze_json/build/native-release` dan `build/wasm64-release`
   (keduanya gitignored).
 
@@ -190,7 +200,10 @@
 | Korpus JSON_checker | `corpus/test/json_checker/` + `InstallJsonChecker.py` |
 | Literatur (paper) | `out/rag/<DOI>.chunks.json` |
 | Bibliografi | `assets/bib/cites.bib`; validasi tahun `scripts/eval-cite/` |
-| Baseline Node | `saq-report/` (`JsonRepository.js`, `exportService.js`, `express.json()`) |
+| Lapisan on-demand ze_json | `ze_json/include/ze_json/ondemand/{document,value}.hpp`, `ze_json/src/ondemand/document.cpp` |
+| Binding JS | `ze_json/bindings/js/ze_json.mjs` (`ZeJson`/`ZeDocument`/`ZeParser`) |
+| Audit arah on-demand | `docs/research/ondemand-direction-audit.md` (root; feed Stage 2–7) |
+| Baseline Node | `saq-report/` (`MongoJsonRepository.js` clone hot path, `JsonRepository.js`, `exportService.js`, `express.json()`) |
 | Kontrak C-ABI | `ze_json/include/ze_json/abi/cabi.hpp` (+ `src/abi/cabi.cpp`) |
 | Schema pengukuran | `schemas/`, `scripts/measurement-schema/` (dibuat di fase P0) |
 

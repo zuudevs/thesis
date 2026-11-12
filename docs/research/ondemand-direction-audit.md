@@ -16,6 +16,13 @@ State yang diaudit (semua bersih kecuali file milik pemilik yang tidak disentuh)
 | `ze_json` | `c1c91ce` | `main` (PR #29 gallop merged) |
 | `saq-report` | `0340a72` | `main` |
 
+> **Revisi Stage 2 (2026-11-12)**: klaim "`scanner32` tak pernah eksis" pada
+> §3.4, §6, dan §8 di bawah **keliru** — stub 32-bit eksis (deklarasi
+> `scanner.hpp:28-32`, stub `parallel.cpp:135-147` return `InvalidJson`).
+> Ditambah temuan baru: catatan "`npm-publish.yml` STALE" di AGENTS.md sendiri
+> usang (workflow sudah disinkronkan — §8). Koreksi bersumber verifikasi
+> source pada HEAD `c1c91ce` sebelum edit dokumen Stage 2.
+
 ---
 
 ## 1. Ringkasan eksekutif
@@ -88,7 +95,7 @@ File kunci (semua di `ze_json/`):
 |---|---|---|
 | Kontrak ABI | `include/ze_json/abi/cabi.hpp` | v3 (line 126); tabel ekspor scanner (v2) + 13 ekspor parser (v3, line 45–108); `kParserSlotMax=64` (131); packing ok/step/error (110–124) |
 | ABI impl | `src/abi/cabi.cpp` | slot pool statis Arena+Document di bss (42–57), `frame_value` rekonstruksi C++ iterator dari pasangan `(cursor, ts)` (71–79), bump allocator tanpa free (95–104) |
-| Scanner | `src/ondemand/scalar.cpp` (scanner8), `src/ondemand/parallel.cpp` (scanner64 SWAR line 33, scanner128 simd) | scanner8 pemenang terukur (P4-2); `structural_scan` = dispatch statis |
+| Scanner | `src/ondemand/scalar.cpp` (scanner8), `src/ondemand/parallel.cpp` (scanner64 SWAR line 33, scanner128 simd, scanner32 stub line 138) | scanner8 pemenang terukur (P4-2); `structural_scan` = dispatch statis; scanner32 = stub 32-bit (return `InvalidJson`) |
 | On-demand | `include/ze_json/ondemand/{document,value}.hpp`, `src/ondemand/document.cpp` | lihat §3.2–3.3 |
 | Scalar | `src/ondemand/{string,number}.cpp` | P7-3 unescape (V8-locked lone-surrogate passthrough), P7-2 double (V8-parity) |
 | Binding | `bindings/js/ze_json.mjs` | `ZeJson` low-level + `ZeDocument` (scan) + `ZeParser` (lazy frame + `parse()` penuh) |
@@ -138,8 +145,10 @@ File kunci (semua di `ze_json/`):
 5. **Slot pool 64 + bump heap tanpa free** — server jangka panjang butuh rencana
    lifetime per-request (`ze_reset_heap` menutup SEMUA slot — `ze_json.mjs:154-157`,
    `cabi.cpp:118-120`). Kontraknya cocok untuk benchmark batch, belum untuk server.
-6. **`parallel.cpp` hanya scanner64/128** — tidak ada scanner32 (nama lama di
-   AGENTS.md usang).
+6. **`parallel.cpp` = scanner64/128 terukur + scanner32 stub** — stub 32-bit
+   (`parallel.cpp:135-147`, return `InvalidJson`, deklarasi
+   `scanner.hpp:28-32`); bukan varian terukur, hanya symbol 32-bit.
+   (Revisi Stage 2: kalimat awal "scanner32 tidak ada" keliru.)
 7. **Koreksi referensi direktif**: kelas `Document/Value/ArrayIter/ObjectIter`
    adalah nama aktual; `reference_parser.hpp` = reference implementation
    (diferensial), bukan API konsumen.
@@ -359,7 +368,7 @@ receivedAt), `dosen.ejs` (title/email/phone/department), `matakuliah.ejs`
 | # | Pertanyaan | Jawaban + bukti utama |
 |---|---|---|
 | 1 | Kapabilitas on-demand C++ yang ada | Lengkap untuk single-forward-iterator on-demand: open+index+match table, Value lazy scalar, ArrayIter/ObjectIter, count_elements, gallop, error sticky (§3.3, 75 TEST) |
-| 2 | Yang belum lengkap | Key-lookup by name, skip-murni via ABI, akses acak array, cache akses berulang, lifetime server untuk slot pool/bump heap, scanner32 tidak eksis (§3.4) |
+| 2 | Yang belum lengkap | Key-lookup by name, skip-murni via ABI, akses acak array, cache akses berulang, lifetime server untuk slot pool/bump heap; scanner32 = stub 32-bit (bukan varian terukur) (§3.4) |
 | 3 | Materialisasi tidak perlu di JS | `parse()` penuh memang materialisasi (by design, jalur pembanding); objek frame `{ok,ts,cursor}` per step; view `Uint8Array` per string; **tidak ada** materialisasi tersembunyi di jalur lazy — tapi jalur lazy belum punya API kenyamanan (§3.6–3.7) |
 | 4 | C-ABI call per value/field/elemen | ≈3–4/field + 2/elemen + 1/scalar; boxing BigInt per call; O1-11 membuktikan fusi per-call netral; walk/re-entry + boxing yang dominan (§3.5) |
 | 5 | Alokasi traversal | C++: 24 B/byte sekali per dokumen; JS: 1 objek per node + 2 Number/step + string per decode; peak_rss belum diinstrumentasi (§3.6) |
@@ -406,11 +415,12 @@ biaya clone+join memang ≥ ~33% waktu handler; pengukuran profil per request
 
 | Dokumen | Klaim usang | Realitas source |
 |---|---|---|
-| AGENTS.md §1 | "src/ = stubs + ondemand/scalar.cpp; scanner32/64/128 dan parser on-demand masih TODO" | scanner64/128 di `src/ondemand/parallel.cpp`; parser on-demand terimplement + 75 TEST; scanner32 tidak pernah eksis |
+| AGENTS.md §1 | "src/ = stubs + ondemand/scalar.cpp; scanner32/64/128 dan parser on-demand masih TODO" | scanner64/128 terimplement & terukur di `src/ondemand/parallel.cpp`; parser on-demand terimplement + 75 TEST; scanner32 = stub 32-bit (`parallel.cpp:135-147`) |
+| AGENTS.md §5 (catatan npm-publish.yml STALE) | "menyebut target `ze_json_core`, path `bindings/js/test`, CMake 4.4.4" | workflow sudah diperbaiki (CMake 4.4.5, build `wasm64-release`, test `bindings/js/tests/main.mjs`) — catatan STALE itu sendiri usang (revisi Stage 2) |
 | AGENTS.md §5 | "ABI v2 sejak R2 (PR #8)" | ABI v3 sejak P7-5 (`cabi.hpp:126`); kontrak v3 + slot pool |
 | AGENTS.md §5/§7 | binding = `ZeJson`/`ZeDocument` saja | `ZeParser` (lazy) + `parse()` ada; peta file kunci tidak memuat parser/binding barunya |
 | `ze_json/docs/architecture/README.md:25-26,96,115` | "on-demand parser (TODO: components pending)", "typed value access (TODO)", diagram binding tanpa `ZeParser`, "TODO(P6+): parser/validator design" | parser terimplement; perlu seksi parser + koreksi diagram |
-| `ze_json/docs/{development,requirement}/README.md` | belum diaudit baris-per-baris di Stage 1 | ditandai untuk Stage 2 |
+| `ze_json/docs/{development,requirement}/README.md` | (audit Stage 2): `development` path ABI `src/bindings/cabi.cpp` usang → `src/abi/cabi.cpp`; klaim "71 documents" differential snapshot usang; `requirement` terverifikasi akurat (`scanner32 currently a stub` ✔, deskripsi `npm-publish.yml` ✔) | dikoreksi PR ze_json docs/stage2-ondemand-docs (#30) |
 | TASKS.md | open P4-3 (cache akses berulang), O1-4/O1-5/O1-7 — masih relevan; belum ada seksi arah baru | Stage 1 menambah ledger ND-1..ND-7 |
 
 ## 9. Kapabilitas hilang → proposal API lazy minimal (feed Stage 3)
