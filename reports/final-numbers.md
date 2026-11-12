@@ -7,63 +7,43 @@ throughput in MB/s (1 MB = 1e6 bytes). Cross-engine comparison of
 *different workloads* (scan vs full parse) is NOT apples-to-apples —
 comparability notes live in the P4 bottleneck report.
 
-## ze_native
-
-- runs: zuu-20261109042022-ca8f5f4
-- git: ca8f5f4 — library: ze_json 0.1.0 (C++23 clang 23.1.5 (native-release))
-
-| corpus | result | MB/s | cv |
-|---|---|---:|---:|
-| checker_batch | `BM_ReferenceScan/checker_batch/repeats:5` | 700.8 | 6.4% |
-| checker_batch | `BM_Scanner8/checker_batch/repeats:5` | 739.8 | 4.9% |
-| saq_payload_v1 | `BM_ReferenceScan/saq/repeats:5` | 1,055.9 | 3.4% |
-| saq_payload_v1 | `BM_Scanner8/saq/repeats:5` | 938.6 | 1.8% |
-| synthetic_100k | `BM_ReferenceScan/synthetic_100k/repeats:5` | 734.0 | 3.6% |
-| synthetic_100k | `BM_Scanner8/synthetic_100k/repeats:5` | 734.0 | 2.4% |
-| synthetic_10k | `BM_ReferenceScan/synthetic_10k/repeats:5` | 758.7 | 1.3% |
-| synthetic_10k | `BM_Scanner8/synthetic_10k/repeats:5` | 741.4 | 1.5% |
-| synthetic_1k | `BM_ReferenceScan/synthetic_1k/repeats:5` | 998.6 | 4.9% |
-| synthetic_1k | `BM_Scanner8/synthetic_1k/repeats:5` | 892.4 | 1.0% |
-| synthetic_1mb | `BM_ReferenceScan/synthetic_1mb/repeats:5` | 696.3 | 3.1% |
-| synthetic_1mb | `BM_Scanner8/synthetic_1mb/repeats:5` | 726.5 | 1.1% |
-
 ## v8
 
-- runs: zuu-20261108214228-0340a72
+- runs: zuu-20261112010521-0340a72
 - git: 0340a72 — library: saq_baseline 24.19.0 (node 24.19.0 (v8 13.6.233.17-node.51))
 
 | corpus | result | MB/s | cv |
 |---|---|---:|---:|
-| checker_batch | `v8/body-parse/checker_batch` | 144.3 | 1.7% |
-| checker_batch | `v8/store-read/checker_batch` | 135.2 | 2.8% |
-| checker_batch | `v8/export-stringify/checker_batch` | 267.6 | 1.6% |
-| saq_payload_v1 | `v8/body-parse/saq_payload_v1` | 391.1 | 11.8% |
-| saq_payload_v1 | `v8/store-read/saq_payload_v1` | 427.1 | 1.6% |
-| saq_payload_v1 | `v8/export-stringify/saq_payload_v1` | 526.0 | 1.7% |
-| synthetic_100k | `v8/body-parse/synthetic_100k` | 163.8 | 13.2% |
-| synthetic_100k | `v8/store-read/synthetic_100k` | 166.7 | 7.6% |
-| synthetic_100k | `v8/export-stringify/synthetic_100k` | 289.2 | 2.2% |
-| synthetic_10k | `v8/body-parse/synthetic_10k` | 169.3 | 2.7% |
-| synthetic_10k | `v8/store-read/synthetic_10k` | 167.8 | 8.6% |
-| synthetic_10k | `v8/export-stringify/synthetic_10k` | 355.9 | 1.4% |
-| synthetic_1k | `v8/body-parse/synthetic_1k` | 226.0 | 8.7% |
-| synthetic_1k | `v8/store-read/synthetic_1k` | 228.3 | 7.0% |
-| synthetic_1k | `v8/export-stringify/synthetic_1k` | 393.2 | 5.4% |
-| synthetic_1mb | `v8/body-parse/synthetic_1mb` | 168.6 | 11.2% |
-| synthetic_1mb | `v8/store-read/synthetic_1mb` | 174.5 | 1.0% |
-| synthetic_1mb | `v8/export-stringify/synthetic_1mb` | 261.5 | 3.5% |
+| checker_batch | `v8/body-parse/checker_batch` | 150.7 | 0.6% |
+| checker_batch | `v8/store-read/checker_batch` | 149.2 | 0.7% |
+| checker_batch | `v8/export-stringify/checker_batch` | 274.1 | 0.7% |
+| saq_payload_v1 | `v8/body-parse/saq_payload_v1` | 455.6 | 1.2% |
+| saq_payload_v1 | `v8/store-read/saq_payload_v1` | 458.3 | 0.5% |
+| saq_payload_v1 | `v8/export-stringify/saq_payload_v1` | 535.7 | 0.4% |
+| synthetic_100k | `v8/body-parse/synthetic_100k` | 180.3 | 1.4% |
+| synthetic_100k | `v8/store-read/synthetic_100k` | 177.4 | 1.6% |
+| synthetic_100k | `v8/export-stringify/synthetic_100k` | 326.7 | 3.4% |
+| synthetic_10k | `v8/body-parse/synthetic_10k` | 185.3 | 0.5% |
+| synthetic_10k | `v8/store-read/synthetic_10k` | 187.6 | 0.5% |
+| synthetic_10k | `v8/export-stringify/synthetic_10k` | 387.0 | 0.4% |
+| synthetic_1k | `v8/body-parse/synthetic_1k` | 237.6 | 1.1% |
+| synthetic_1k | `v8/store-read/synthetic_1k` | 241.2 | 0.5% |
+| synthetic_1k | `v8/export-stringify/synthetic_1k` | 420.1 | 0.7% |
+| synthetic_1mb | `v8/body-parse/synthetic_1mb` | 179.0 | 2.1% |
+| synthetic_1mb | `v8/store-read/synthetic_1mb` | 181.7 | 0.5% |
+| synthetic_1mb | `v8/export-stringify/synthetic_1mb` | 301.2 | 2.2% |
 
 ## ze_wasm64
 
-- runs: zuu-20261108221414-85afad7
-- git: 85afad7 — library: ze_json 0.1.0 (node 24.19.0 (wasm64 C-ABI, ABI v1))
+- runs: zuu-20261112010545-c1c91ce
+- git: c1c91ce* — library: ze_json 0.1.0 (node 24.19.0 (wasm64 C-ABI parser, ABI v3))
 
 | corpus | result | MB/s | cv |
 |---|---|---:|---:|
-| checker_batch | `ze-wasm64/wasm-scan/checker_batch` | 405.2 | 1.2% |
-| saq_payload_v1 | `ze-wasm64/wasm-scan/saq_payload_v1` | 688.0 | 2.0% |
-| synthetic_100k | `ze-wasm64/wasm-scan/synthetic_100k` | 592.7 | 1.4% |
-| synthetic_10k | `ze-wasm64/wasm-scan/synthetic_10k` | 590.5 | 4.4% |
-| synthetic_1k | `ze-wasm64/wasm-scan/synthetic_1k` | 603.6 | 1.9% |
-| synthetic_1mb | `ze-wasm64/wasm-scan/synthetic_1mb` | 599.5 | 1.5% |
+| checker_batch | `ze-parser/wasm-parse-full/checker_batch` | 8.2 | 4.5% |
+| saq_payload_v1 | `ze-parser/wasm-parse-full/saq_payload_v1` | 21.4 | 0.7% |
+| synthetic_100k | `ze-parser/wasm-parse-full/synthetic_100k` | 10.1 | 0.8% |
+| synthetic_10k | `ze-parser/wasm-parse-full/synthetic_10k` | 10.2 | 2.1% |
+| synthetic_1k | `ze-parser/wasm-parse-full/synthetic_1k` | 15.2 | 1.9% |
+| synthetic_1mb | `ze-parser/wasm-parse-full/synthetic_1mb` | 9.8 | 4.9% |
 

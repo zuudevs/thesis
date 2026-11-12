@@ -136,6 +136,8 @@ def main(argv) -> int:
             if group_label == "ze_wasm64":
                 if "wasm-scan" in res_name:
                     return "ze wasm64 — structural scan (C-ABI)"
+                if "wasm-parse-full" in res_name:
+                    return "ze wasm64 — full parse (C-ABI)"
                 return None
             return None
 
@@ -167,7 +169,8 @@ def main(argv) -> int:
             values = [(v if v is not None else 0) for v in data[name]]
             ax.bar(xs + idx * width, values, width, label=name)
         ax.set_xticks(xs)
-        ax.set_xticklabels([c.replace("synthetic_", "").replace("payload_v1", "") for c in corpora_order])
+        ax.set_xticklabels([c.replace("synthetic_", "").replace("saq_payload_v1", "saq")
+                            for c in corpora_order])
         ax.set_ylabel("throughput (MB/s)")
         ax.set_title("JSON processing throughput — validated records, site dev_device")
         ax.legend(fontsize=8, loc="upper left")
