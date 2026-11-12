@@ -1,9 +1,11 @@
-# P5 — Runbook Benchmark Server SAQ (baseline V8 saq-report)
+# Runbook Benchmark Server SAQ (P5 baseline V8 + ND-6 on-demand)
 
-Tujuan: baseline V8 (`JSON.parse`/`JSON.stringify` — jalur panas saq-report)
-di server produksi SAQ (`site=saq_server`) sebagai data komparatif RQ2
-(P5-2), dieksekusi owner via SSH. Runner sudah site-aware (AGENTS §6) —
-prosedur identik dengan situs dev, tanpa mengubah harness.
+Tujuan: (a) baseline V8 (`JSON.parse`/`JSON.stringify` — jalur panas
+saq-report) di server produksi SAQ (`site=saq_server`) sebagai data
+komparatif RQ2 (P5-2), dan (b) matriks jalur on-demand ze_json 4 fase
+A–D (ND-6, Stage 6) di situs yang sama. Keduanya dieksekusi owner via
+SSH. Runner sudah site-aware (AGENTS §6) — prosedur identik dengan situs
+dev, tanpa mengubah harness.
 
 ## 0. Prasyarat server
 
@@ -60,24 +62,62 @@ node --expose-gc scripts/node-benchmark/harness.mjs \
 
  ze_json (wasm64) vs V8 **di mesin yang sama (server)** — sisi server dari
 perbandingan lintas-arsitektur. Catatan: bila `bindings/js/ze_json.wasm`
-di submodule belum commit-update, rebuild dulu (butuh toolchain) atau salin
-artefakt dari dev.
+di submodule belum commit-update, rebuild dulu via `scripts/build-wasm.ps1`
+(membangun + memverifikasi artefakt: build type, 21 ekspor ABI v3, SIMD,
+sha256 sidecar; mode `-VerifyOnly` untuk artefakt yang sudah ada) atau
+salin artefakt dari dev.
 
-## 5. Transfer hasil balik ke dev
+## 5. ND-6 — matriks on-demand 4 fase (Stage 6)
+
+Protokol eksperimen: `docs/measurement/nd6-benchmark-plan.md` (disetujui
+pemilik). Kontrol: warmup untimed, ronde independen, alternating (urutan
+jalur dirotasi), tanpa buang outlier — semua ronde dilaporkan. Jalankan
+**satu fase per eksekusi** (satu `run_id` per fase; perbandingan
+baseline↔ze hanya dalam satu run_id — AGENTS §4):
+
+```sh
+node --expose-gc scripts/bench/nd6_bench.mjs --phase A --rounds 15 --warmup 3 --site saq_server
+node --expose-gc scripts/bench/nd6_bench.mjs --phase B --rounds 15 --warmup 3 --site saq_server
+node --expose-gc scripts/bench/nd6_bench.mjs --phase C --rounds 15 --warmup 3 --site saq_server
+node --expose-gc scripts/bench/nd6_bench.mjs --phase D --rounds 15 --warmup 3 --site saq_server
+```
+
+| Fase | Jalur yang diukur | Isolasi mekanisme |
+|---|---|---|
+| A | `v8-parse` (JSON.parse) · `v8-clone` (klon `MongoJsonRepository.read()` H1) · `ze-parse` (full materialize) | biaya full materialization vs baseline |
+| B | `v8-selective` (JSON.parse + subset `id`) · `ze-project-selective` (L2 `project(shape)`) | L2 vs konsumen V8 identik |
+| C | `v8-selective` (identik dengan B) · `ze-l1-traversal` (L1 frame walk, early-exit) | L1 vs konsumen V8 identik (biaya ABI per panggilan terlihat) |
+| D | jalur repositori saq-report (`D-rekap-request`, 4 repo: courses/assistants/schedules/reports) | pembanding in-situ jalur yang benar-benar ditanggung server |
+
+- **Prasyarat fase D**: `npm install --ignore-scripts` di `saq-report/`
+  sekali (skrip mengimpor `repositories/JsonRepository.js` +
+  `repositories/MongoJsonRepository.js` dari submodule). Fase A–C tidak
+  butuh ini.
+- Korpus default `corpus/benchmarks/saq_payload_v1` (override `--corpus`).
+- Output per eksekusi: `out/raw/<run_id>/nd6_phase_<X>.json` (exhibit
+  mentah, semua ronde), `out/raw/<run_id>/metadata.json`, dan record
+  `out/measurements/<run_id>-nd6-<fase>-<site>.record.json`.
+- Validasi wajib sebelum dipakai analisis (lihat §6).
+- Waktu: ± 2–4 menit per fase (4 fase total ± 15 menit).
+
+## 6. Transfer hasil balik ke dev
 
 ```sh
 # dari dev (ganti user/host):
 scp -r user@saq-server:~/v5/out/raw/<run_id> out/raw/
-scp user@saq-server:~/v5/out/measurements/<run_id>_*.json out/measurements/
+scp "user@saq-server:~/v5/out/measurements/<run_id>*.json" out/measurements/
 ```
+
+(Gabungan pola record harness `<run_id>_*.json` dan ND-6
+`<run_id>-nd6-*.json`.)
 
 Lalu di dev: validasi + ledger.
 
 ```sh
-python scripts/measurement-schema/validate.py out/measurements/<run_id>_<corpus>_record.json
+python scripts/measurement-schema/validate.py out/measurements/<run_id>.record.json
 ```
 
-## 6. Disiplin metodologi (AGENTS §4 / PLANS §8)
+## 7. Disiplin metodologi (AGENTS §4 / plans §8)
 
 - **Jangan membandingkan angka lintas situs secara kasar** — perbandingan
   dev-vs-server adalah eksperimen P5/RQ2 yang disetujui; syaratnya korpus
@@ -88,7 +128,7 @@ python scripts/measurement-schema/validate.py out/measurements/<run_id>_<corpus>
 - Baseline dev (`site=dev_device`) tidak digantikan — kedua situs adalah
   dua baris komparatif paralel.
 
-## 7. Troubleshooting
+## 8. Troubleshooting
 
 | Gejala | Penanganan |
 |---|---|
