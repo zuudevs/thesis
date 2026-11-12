@@ -391,3 +391,60 @@ Dilaporkan apa adanya (larangan manipulasi boundary §11).
    proyeksi C++-side satu-panggilan (ABI v4) — **wajib diukur dulu**
    (peringatan O1-11: manuver ABI tambahan bisa netral). ND-6 wajib
    memprofilkan kontribusi open vs traversal vs boxing sebelum keputusan.
+
+## 14. Catatan as-built Stage 5 (ND-5, saq-report PR #3 `7930009`)
+
+Integrasi call-site read-only pertama: **GET `/rekap`** (stats 4 repo).
+Desain §2–§6 berlaku dengan deviasi as-built berikut:
+
+1. **Jalur opt-in, bukan penggantian**: flag env `SAQ_JSON_ENGINE=ze`
+   mengaktifkan jalur ze di route `/rekap` saja; default = baseline V8
+   byte-identical (`read().length`). Desain §4.2 (akuisisi slot
+   akuisisi-per-request + release-di-`finally`) tidak dipakai apa adanya —
+   untuk kebutuhan count yang murni sinkron, dipakai pola **sole-owner**:
+   `open → count → close → resetHeap` dalam satu fungsi sinkron
+   (`countJsonBytes`), atomik terhadap event loop, sehingga `resetHeap`
+   tidak pernah mematikan slot parser hidup milik handler lain. Pool
+   bersama (§4.2) tetap dibuka untuk stage lanjutan bila call-site
+   perlu menahan handle lintas await.
+2. **Loader CJS, bukan ESM import**: server saq-report CommonJS — binding
+   ESM `ze_json.mjs` dimuat via `require(esm)` (Node ≥ 22.12 unflagged,
+   stabil di Node 24) di `repositories/zeJsonBinding.js`; path binding
+   bisa dioverride `ZE_JSON_BINDING_PATH`. Tanpa ABI baru: frame key
+   `(ts, cursor)` + `get()/countElements()/getString()/kind()` (protokol
+   induk dari Stage 4, ABI v3 apa adanya).
+3. **`readCount()` baru, `read()` tidak disentuh**: `JsonRepository`
+   (file store) dan `MongoJsonRepository` (cache) masing-masing menambah
+   method `readCount()`; baseline `read()`/`write()` byte-identical.
+   Semantik `.length` aplikasi diparity-kan penuh, termasuk dua jebakan
+   yang baru ketahuan saat gate:
+   - **Nullish coalescing trigger pada null, bukan hanya undefined**:
+     `json[rootKey] ?? default` saat field bernilai `null` menghasilkan
+     `default` (bukan `null`) → `.length` default. Implementasi awal
+     mengembalikan `undefined` — diperbaiki menjadi
+     `valueLength(defaultValue)`.
+   - **Lokasi error menjadi bagian parity**: root `null` dengan rootKey
+     melempar TypeError **di dalam `read()`** baseline (tertangkap
+     try/catch) → AppError 500; tanpa rootKey, TypeError `null.length`
+     terjadi **di call-site** (di luar `read()`) → tetap TypeError.
+     `readCount()` mereplikasi keduanya: TypeError dari jalur rootKey
+     dibungkus AppError, TypeError jalur root-tanpa-rootKey diteruskan.
+4. **Cache Mongo = nilai unwrapped**: `rootKey` sudah diterapkan saat
+   seed, sehingga `MongoJsonRepository.readCount()` menghitung root
+   langsung (`countJsonBytes(bytes, null)`), bukan lookup rootKey —
+   deviasi dari mental model file store; fallback sebelum `init()`
+   didelegasikan ke `seedRepo.readCount()`.
+5. **Gate parity fungsional 26/26** (`scripts/check-json-lazy-parity.js`):
+   6 file store (korpus `saq_payload_v1`, provenance P0-8 — file runtime
+   tidak ter-commit), 6 cache Mongo disimulasikan (`_cacheLoaded=true`,
+   tanpa MongoDB), 2 kasus file hilang, 12 edge semantik (field
+   null/string/number/bool/object, key absen, root
+   array/object/string/null×2). Semua nilai + jenis & lokasi error
+   identik dengan baseline. Duplicate-key terkunci di level binding
+   (`tests/lazy.mjs` T2, first-wins) — data store SAQ tidak menyandikan
+   duplikat.
+6. **Scope**: SATU call-site (stats `/rekap`) sesuai keputusan pemilik;
+   dashboard/enrichment menyusul pasca benchmark ND-6 (hipotesis §13.3:
+   pada dokumen ~4–39 KB, biaya open + boxing ABI bisa mendominasi —
+  Workload B/C/D yang memutuskan, bukan penambahan call-site).
+
