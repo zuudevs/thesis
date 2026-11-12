@@ -1,7 +1,7 @@
 # P5 — Baseline Server SAQ: V8 & ze_json wasm64 in-situ
 
 Eksekusi: pemilik via SSH, 2026-11-11, mengikuti
-`reports/P5-saq-server-runbook.md`. Analisa & validasi: asisten.
+`docs/development/saq-server-runbook.md`. Analisa & validasi: asisten.
 Semua record **validator PASS (12/12)**; exhibit mentah di
 `out/raw/<run_id>/`, record tervalidasi di
 `out/measurements/<run_id>_<corpus>_record.json`.

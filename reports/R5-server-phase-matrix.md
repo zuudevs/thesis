@@ -1,7 +1,7 @@
 # R5 — Matriks Fase × Jalur × Situs (server SAQ re-run, `ab09adb`)
 
 Eksekusi server: pemilik via SSH, 2026-11-11 (batch siang UTC), mengikuti
-polanya `reports/P5-saq-server-runbook.md`. Run dev pendamping: asisten,
+polanya `docs/development/saq-server-runbook.md`. Run dev pendamping: asisten,
 window berbeda (satu mesin, dua invocation; sel bising di-re-run terpisah).
 Semua record **validator PASS (34/34)**.
 

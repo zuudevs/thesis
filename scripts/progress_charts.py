@@ -4,18 +4,18 @@
 Two charts, both rebuilt from the workspace source of truth on every run:
 
 1. progress_phases.png    — done/open task bars per phase, parsed from
-                            TASKS.md (## section = phase, checkbox = task).
+                            docs/project/tasks.md (## section = phase, checkbox = task).
 2. progress_timeline.png  — optimization-experiment log (native C++ vs
                             Node/wasm lanes) with per-experiment verdicts
                             (DITERIMA / DITOLAK / diagnostic / keep opt-in).
                             EXPERIMENTS below is curated: dates are report
-                            commit dates (git log), or the TASKS.md date for
+                            commit dates (git log), or the tasks.md date for
                             P4 candidates that never got their own report.
                             Update the table when a new experiment report
                             lands.
 
 Outputs: out/charts/*.png (gitignored analysis figures — AGENTS.md §4).
-Usage:   python scripts/progress_charts.py [--tasks TASKS.md]
+Usage:   python scripts/progress_charts.py [--tasks docs/project/tasks.md]
                                         [--reports reports]
                                         [--out out/charts]
 """
@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt
 ROOT = Path(__file__).resolve().parent.parent
 
 # --------------------------------------------------------------------------
-# Chart 1 — parse TASKS.md phases
+# Chart 1 - parse docs/project/tasks.md phases
 # --------------------------------------------------------------------------
 
 
@@ -66,7 +66,7 @@ PHASE_SHORT = {
 
 
 def parse_tasks(path: Path):
-    """Return [(phase_key, phase_title, done, open_ids)] from TASKS.md."""
+    """Return [(phase_key, phase_title, done, open_ids)] from tasks.md."""
     phases: dict[str, list[tuple[bool, str]]] = {}
     titles: dict[str, str] = {}
     current = None
@@ -116,7 +116,7 @@ def render_phases(rows, out_path: Path):
     ax.set_xlabel("jumlah tugas")
     ax.set_xlim(0, max(d + len(o) + 3.4 for _, _, d, o in rows))
     ax.set_title(
-        "Progres Skripsi per Fase  (sumber: TASKS.md)\n"
+        "Progres Skripsi per Fase  (sumber: tasks.md)\n"
         f"{sum(done)}/{total} tugas selesai — fase aktif: "
         + ", ".join(active),
         fontsize=12,
@@ -221,7 +221,7 @@ def render_timeline(experiments, out_path: Path):
         "Log Eksperimen Optimasi (P4/E3 + R5/O1) — "
         f"{n_acc} diterima, "
         f"{sum(1 for *_, v, _ in experiments if v == 'rejected')} ditolak\n"
-        "sumber: TASKS.md + reports/*.md (tanggal = commit laporan)",
+        "sumber: tasks.md + reports/*.md (tanggal = commit laporan)",
         fontsize=12,
     )
     fig.text(0.5, 0.015, NEXT_UP, ha="center", fontsize=9, color="#37474f")
@@ -232,7 +232,7 @@ def render_timeline(experiments, out_path: Path):
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--tasks", type=Path, default=ROOT / "TASKS.md")
+    ap.add_argument("--tasks", type=Path, default=ROOT / "docs" / "project" / "tasks.md")
     ap.add_argument("--reports", type=Path, default=ROOT / "reports")
     ap.add_argument("--out", type=Path, default=ROOT / "out" / "charts")
     args = ap.parse_args()
@@ -240,7 +240,7 @@ def main() -> None:
     args.out.mkdir(parents=True, exist_ok=True)
 
     rows = parse_tasks(args.tasks)
-    assert rows, "no phases parsed from TASKS.md"
+    assert rows, "no phases parsed from tasks.md"
     render_phases(rows, args.out / "progress_phases.png")
     print(f"[+] {args.out / 'progress_phases.png'} "
           f"({sum(d for _, _, d, _ in rows)} done, "
