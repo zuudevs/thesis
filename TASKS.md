@@ -807,10 +807,16 @@
     consumed/skipped, GC) — record tetap schema v1.0.0 (PLANS §3).
   - [x] Harness `scripts/bench/nd6_bench.mjs` (satu run_id per fase;
     baseline V8 ↔ ze dalam run yang sama).
-- [ ] **ND-7** — Kesimpulan riset: `reports/ondemand-saq-evaluation.md`
-  (hipotesis, implementasi, setup, hasil, speedup, memori/alokasi, bukti
-  korektness, limitasi, verdict ≥1.5× atau bukti bottleneck — tidak pernah
-  manufacture hasil).
+- [x] **ND-7** — Kesimpulan riset: `reports/ondemand-saq-evaluation.md`
+  (hipotesis H1–H5 + status, implementasi Stage 4–6, setup protokol, hasil
+  matriks A–D, speedup, bukti korektness parity + validator, analisis
+  bottleneck, **verdict: acceptance 2.85×/3.00× ≥ 1.5× TERCAPAI pada jalur
+  produksi** `/rekap` (cache Mongo ter-load, opt-in ze) — 2 run
+  self-contained independen, p95 2.10×/2.14×; limitasi jujur tercantum
+  (Workload D literal server utuh belum dijalankan — runner site-aware siap;
+  gap fidelity korpus; file-store 0.91× I/O-bound; L1 count-only; H4/H5
+  belum diuji; angka dev device). Tidak ada hasil dimanufaktur; semua angka
+  dari record tervalidasi `reports/nd6/` (6/6 PASS).
 
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
