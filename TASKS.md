@@ -753,11 +753,15 @@
   v3, diagram ZeParser) + PR root (AGENTS.md, TASKS, bump submodule
   `c1c91ce`→`d45beb7`, revisi audit — scanner32 = stub, npm-publish.yml
   sudah disinkronkan).
-- [ ] **ND-3** — Desain API lazy JS: `docs/architecture/lazy-access-api.md`
+- [x] **ND-3** — Desain API lazy JS: `docs/architecture/lazy-access-api.md`
   (semantik handle Document/Value/iterasi, key lookup — tanpa klaim O(1) tanpa
   bukti, skip subtree, lifetime slot/bump-heap untuk server, error model,
   proyeksi termaterialisasi untuk EJS). Full-materialization API tetap ada
-  sebagai pembanding, bukan jalur utama.
+  sebagai pembanding, bukan jalur utama. Hasil: arsitektur 3 lapis (L0 ABI
+  ada / L1 wrapper lazy / L2 proyeksi V8-shape subset); keputusan eksplisit
+  D1 (`get()` first-wins vs project last-wins, terkunci test), D2 (lifetime
+  per-request + fail-loud, reset heap hanya idle), D3 (skip tanpa ABI baru);
+  rencana uji T1–T7 untuk ND-4.
 - [ ] **ND-4** — Implementasi minimal sesuai consumption map audit §5 (kandidat
   lapisan JS di atas ABI + proyeksi + bila terukur perlu ekspor ABI skip/span).
   Eksperimen satu-per-satu: hipotesis → ukur → terima/tolak; varian ditolak
@@ -768,8 +772,10 @@
 - [ ] **ND-6** — Matriks benchmark 4 fase A–D (A penuh / B parsial / C deep
   selective / **D workload SAQ asli = acceptance utama, in-situ dev device**) +
   skema metrik v2 (median, P95, alloc, index count, consumed/skipped) + korpus
-  `saq_payload_v2` fidelity (keputusan pemilik) + kontrol eksperimen
-  (warmup, ronde independen, alternating, tanpa buang outlier).
+  **tetap `saq_payload_v1`** (keputusan pemilik 2026-11-12 — tidak diganti,
+  tidak diregenerasi; gap fidelity = limitasi terdokumentasi; Workload D pakai
+  server + data store asli sehingga struktur real terjamin) + kontrol
+  eksperimen (warmup, ronde independen, alternating, tanpa buang outlier).
 - [ ] **ND-7** — Kesimpulan riset: `reports/ondemand-saq-evaluation.md`
   (hipotesis, implementasi, setup, hasil, speedup, memori/alokasi, bukti
   korektness, limitasi, verdict ≥1.5× atau bukti bottleneck — tidak pernah

@@ -270,6 +270,14 @@ Catatan disiplin: direktif §11 melarang mengubah schema payload *supaya ze_json
 menang*; melengkapi fidelity korpus (status semantik, field yang benar-benar
 dipakai aplikasi) justru membuat workload lebih setia pada realita — diusulkan
 sebagai `saq_payload_v2` dengan persetujuan pemilik, tanpa menyentuh korpus lama.
+> **Keputusan pemilik (2026-11-12, Stage 3)**: usulan `saq_payload_v2`
+> **dicabut** — korpus tetap `saq_payload_v1` apa adanya (tidak diganti, tidak
+> diregenerasi). Struktur real tetap terjamin di jalur yang benar: Workload D
+> memakai server `saq-report` asli + data store asli (bukan korpus), dan target
+> implementasi proyeksi (Stage 4/5) memakai nama field real. Gap di tabel atas
+> menjadi **limitasi terdokumentasi** ND-7 — satu-satunya gap berdampak biaya
+> adalah `assistant_ids` kosong (schedules lebih kecil dari real); sisanya
+> netral biaya (kelas biaya sama).
 
 ---
 
@@ -466,6 +474,7 @@ Urutan prioritas mengikuti consumption map §5 (kandidat, belum keputusan):
 4. Stage 5 — integrasi call-site terpilih (read-only consumers) dengan
    baseline dipertahankan (ND-5).
 5. Stage 6 — matriks benchmark A–D + skema metrik v2 (median/P95/alloc/index)
-   + korpus v2 fidelity (keputusan pemilik) + workload D in-situ (ND-6).
+   + workload D in-situ pada korpus `saq_payload_v1` tetap (keputusan pemilik
+   2026-11-12: v2 dicabut) (ND-6).
 6. Stage 7 — `reports/ondemand-saq-evaluation.md`: hipotesis, hasil, speedup,
    memori/alokasi, bukti korektness, limitasi, verdict 1.5× (ND-7).
