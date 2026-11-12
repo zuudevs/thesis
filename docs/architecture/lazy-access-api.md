@@ -310,3 +310,84 @@ Semua record hasil ukur membawa `rationale` + `@cite`
 - Metrik skema v2 (median, P95, alloc count, index count, consumed/skipped)
   dipakai untuk memisahkan kontribusi: open (arena) vs traversal vs decode
   vs boxing JS.
+
+---
+
+# Bagian as-built (pasca-implementasi)
+
+## 12. Catatan as-built Stage 4 (ND-4, ze_json PR #31 `defd452`)
+
+Implementasi mengikuti desain §3–§8 dengan **empat deviasi as-built** —
+semuanya di sisi JS, tanpa perubahan ABI v3:
+
+1. **`ZeLazyDocument` dihapus dari permukaan.** Desain memisahkan
+   `ZeLazyDocument` (dokumen) dan `ZeLazyValue` (node); implementasi memakai
+   metode pada `ZeParser` (`get/at/lazy/project/sourceView/materializeAt`)
+   + class `ZeLazyValue`. Alasan: `ZeParser` sudah memiliki slot + frame
+   root — class dokumen terpisah jadi duplikasi state; reuse `#materialize`
+   oleh `project()`/`materializeAt()` menjamin parity semantik dengan
+   `parse()` secara konstruk. Tidak ada perilaku desain yang hilang.
+2. **Semantik frame key: `cursor == posisi quote pembuka`, bukan posisi
+   `:`.** Desain §5.1 berasumsi span key bisa diturunkan dari
+   `(ts, cursor)`; implementasi membuktikan frame key membawa
+   `cursor == ts` (verifikasi `containerBegin` → `{ts:1, cursor:1}` pada
+   `{"u":...}`) sehingga **span key mentah diturunkan dengan walk
+   skip-pair** dari source view (akhir token = `"` pertama yang tak
+   ter-escape; `\u0022` tak pernah memecah span). Biaya tetap
+   O(len key) — kelas biaya yang sama dengan desain; fast-compare byte
+   mentah untuk key bebas-escape tetap berlaku (D1 tidak berubah).
+3. **Escape-path `get()`/`project()`**: key ber-escape didecode sekali dan
+   dibandingkan ke needle (bukan "decode saat match" dari desain §5.1 —
+   klausul itu memerlukan decode terlebih dahulu untuk MENENTUKAN match;
+   bentuk implementasi lebih sederhana dan semantik identik: raw-equal
+   tapi ter-escape TIDAK pernah match). T2 mengunci kedua perilaku.
+4. **Tidak ada ekspor ABI baru** — skip subtree (D3) berjalan persis lewat
+   protokol induk (frame anak → `objectNext`/`arrayNext` induk);
+   `ze_skip_value` tidak diperlukan oleh profil awal (lihat §13).
+
+Permukaan final (`ze_json.mjs`): `ZeParser.{get,at,lazy,project,
+sourceView,materializeAt}` + `ZeLazyValue.{type,count,at,get,entries,
+items,asString,asNumber,asBool,isNull,value}`. Grammar shape `$count`/
+`$array`/object-shape sesuai §6.1 (termasuk key absen = properti absen,
+duplikat last-wins, null-proto target). Test as-built: `tests/lazy.mjs`
+43 checks (T1–T6 hijau; smoke + differential tetap hijau = T7).
+
+## 13. Laporan Stage 4 — temuan probe preliminary (bukan record)
+
+Sumber: `ze_json/bindings/js/benchmarks/lazy_probe.mjs` (dev device,
+single process, median 11 ronde, warmup 3 rep, tanpa alternating —
+**PRELIMINARY, bukan angka skripsi**; record tervalidasi di ND-6).
+Dilaporkan apa adanya (larangan manipulasi boundary §11).
+
+| Dokumen (bytes) | V8 parse | ze `parse()` | ze selective | ze L1 id-scan |
+|---|---|---|---|---|
+| `synthetic_10k` (10 KB) | 0.058 ms | 0.06× | **1.57×** | **1.36×** |
+| `synthetic_100k` (100 KB) | 0.635 ms | 0.06× | **2.42×** | **2.47×** |
+| `synthetic_1mb` (1 MB) | 6.35 ms | 0.07× | **2.52×** | **2.81×** |
+| `saq schedules` (39 KB) | 0.089 ms | 0.04× | 0.08× | **1.56×** |
+| `saq reports` (35 KB) | 0.072 ms | 0.05× | 0.14× | 0.32× |
+| `saq courses/lecturers` (~4 KB) | ~0.009 ms | 0.04× | 0.08× | ~1.0× |
+
+(rasio = waktu baseline / waktu jalur ze; bold = ze lebih cepat.)
+
+**Temuan:**
+
+1. **Full materialisasi via binding = 14–25× di bawah V8** (10–25 MB/s
+   vs 160–500 MB/s). Premis direktif terkonfirmasi: satu-satunya jalur
+   viable untuk SAQ adalah lazy/selective; `parse()` tetap pembanding.
+2. **Selective/L1 menang di dokumen ≥10 KB**: 1.36–2.81× pada korpus
+   sintetis. `project(shape)` subset + L1 id-scan membayar hanya field
+   yang diakses — penghematan tumbuh seiring ukuran dokumen.
+3. **Di ukuran SAQ, biaya per-panggilan ABI mendominasi**: boxing BigInt
+   ~0.4–0.8 µs per ekspor (3–5 arg) ≈ 2 panggilan per field yang
+   di-visit (`objectField` + `objectNext`). Konsekuensi:
+   `reports.json` (60 item, scan field berurutan) kalah 0.14–0.32×;
+   `schedules.json` menang 1.56× via L1 karena cost open
+   (copy + structural scan + carve arena ~25–50 µs) < full-parse V8.
+4. **Implikasi untuk ND-5/ND-6** (dipakai sebagai input hipotesis, bukan
+   keputusan): acceptance 1.5× di Workload D memerlukan (a) call-site
+   yang meng-visit sedikit field per dokumen (early-exit, id-scan), atau
+   (b) pengurangan overhead per-panggilan — kandidat: batch export /
+   proyeksi C++-side satu-panggilan (ABI v4) — **wajib diukur dulu**
+   (peringatan O1-11: manuver ABI tambahan bisa netral). ND-6 wajib
+   memprofilkan kontribusi open vs traversal vs boxing sebelum keputusan.
