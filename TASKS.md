@@ -789,13 +789,24 @@
   array, error); duplicate-key sudah terkunci di level binding (lazy.mjs T2).
   Call-site lain (dashboard/enrichment) menyusul setelah benchmark ND-6.
   Deviasi as-built tercatat di `docs/architecture/lazy-access-api.md` §14.
-- [ ] **ND-6** — Matriks benchmark 4 fase A–D (A penuh / B parsial / C deep
-  selective / **D workload SAQ asli = acceptance utama, in-situ dev device**) +
-  skema metrik v2 (median, P95, alloc, index count, consumed/skipped) + korpus
-  **tetap `saq_payload_v1`** (keputusan pemilik 2026-11-12 — tidak diganti,
-  tidak diregenerasi; gap fidelity = limitasi terdokumentasi; Workload D pakai
-  server + data store asli sehingga struktur real terjamin) + kontrol
-  eksperimen (warmup, ronde independen, alternating, tanpa buang outlier).
+- [x] **ND-6** — Matriks benchmark 4 fase A–D selesai (protokol
+  `docs/measurement/nd6-benchmark-plan.md` §3–§6 disetujui pemilik; 15 ronde,
+  alternating, tanpa trimming, GC 0/0; 6 record **PASS** validator, arsip
+  verbatim `reports/nd6/`). **Verdict: acceptance ≥1.5× TERCAPAI pada jalur
+  produksi** (cache Mongo ter-load): fase D = **2.85×** run utama +
+  **3.00×** run konfirmasi (p95 2.10×/2.14×) — `...064628/064642-bbee7bf`,
+  pasca kandidat cache-bytes (saq-report PR #4 `8c7f2d4`, satu perubahan per
+  eksperimen: stringify sekali per mutasi cache, bukan per `readCount()`;
+  sebelumnya 1.10× — `...064001-0dcb418`). Diagnostik: materialisasi penuh
+  14–27× di bawah V8 (A); L2 project kalah semua ukuran SAQ (B); L1 menang
+  schedules 1.57×/assistants 1.50×, kalah bila ABI-per-item banyak (C).
+  Limitasi jujur: file-store fallback 0.91× (I/O-bound ~4 ms — karakteristik
+  host); angka = dev device (site-aware runner siap untuk server);
+  hipotesis ABI v4 batch masih terbuka (O1-11). Rincian: plan doc §10.
+  - [x] Skema metrik v2 via `extras` (median, P95, binding_calls, index_count,
+    consumed/skipped, GC) — record tetap schema v1.0.0 (PLANS §3).
+  - [x] Harness `scripts/bench/nd6_bench.mjs` (satu run_id per fase;
+    baseline V8 ↔ ze dalam run yang sama).
 - [ ] **ND-7** — Kesimpulan riset: `reports/ondemand-saq-evaluation.md`
   (hipotesis, implementasi, setup, hasil, speedup, memori/alokasi, bukti
   korektness, limitasi, verdict ≥1.5× atau bukti bottleneck — tidak pernah

@@ -138,3 +138,48 @@ structural index menopang count).
 - Tidak memakai `native-sanitize` untuk angka; tidak memakai angka probe §13
   sebagai bukti.
 - Tidak membandingkan lintas mesin/preset/hash/korpus.
+
+## 10. Hasil eksekusi ND-6 (pasca-protokol — 2026-11-12)
+
+Eksekusi penuh sesuai protokol §3–§6 (15 ronde, warmup 3, alternating,
+tanpa trimming, GC 0/0 di semua fase, semua record **PASS** validator;
+arsip verbatim: `reports/nd6/*.record.json` — angka di bawah = **median**,
+speedup = baseline/ze **dalam run yang sama**; dev device `zuu`):
+
+| Fase | Run | Jalur (median ms/op) | Speedup |
+|---|---|---|---|
+| A materialisasi penuh | `...063944-0dcb418` | v8-parse 0.010–0.096 vs ze-parse 0.030–1.985 | **0.04–0.07×** (ze 14–27× lebih lambat) |
+| A klon (semantik `read()` Mongo) | idem | v8-clone 0.003–0.144 vs ze-parse | **0.02–0.07×** |
+| B parsial (L2 `project`) | `...063949-0dcb418` | v8-selective 0.003–0.100 vs ze-project 0.028–1.055 | **0.09–0.11×** (kalah semua) |
+| C deep selective (L1) | `...063955-0dcb418` | schedules v8 0.102 vs L1 0.065; assistants 0.018/0.012; lecturers 0.011/0.012; courses 0.013/0.014; reports 0.074/0.290; globalConfig 0.004/0.065 | **1.57× / 1.50× / 0.92× / 0.93× / 0.26× / 0.06×** |
+| D pre-candidate | `...064001-0dcb418` | file-store v8 4.207 vs ze 5.036; mongo-cache v8 0.359 vs ze 0.328 | **0.84× / 1.10×** |
+| D **pasca kandidat cache-bytes** (saq-report PR #4 `8c7f2d4`) | `...064628-bbee7bf` | file-store v8 3.927 vs ze 4.321; mongo-cache v8 0.365 vs ze **0.128** | **0.91× / 2.85×** (p95 2.10×) |
+| D konfirmasi (run independen kedua) | `...064642-bbee7bf` | mongo-cache v8 0.390 vs ze **0.130** | **3.00×** (p95 2.14×) |
+
+**Verdict**: acceptance **T_baseline/T_ze ≥ 1.5× TERCAPAI pada jalur
+produksi** (cache Mongo ter-load, mode `SAQ_JSON_ENGINE=ze`): **2.85×**
+(run utama) dan **3.00×** (run konfirmasi independen) — median; p95
+2.10×/2.14× — robust di atas target. Satu perubahan per eksperimen:
+kandidat cache-bytes (stringify sekali per mutasi cache, bukan per
+`readCount()`) adalah penyebab lompatan 1.10× → 2.85× (dibuktikan dua
+run self-contained, bukan klaim).
+
+**Limitasi jujur (dilaporkan apa adanya — larangan §11):**
+
+1. **File-store mode 0.91×** (ze kalah): iterasi dibayar ~4 ms I/O
+   `readFileSync` yang sama di kedua jalur (Defender real-time scan pada
+   mesin dev — karakteristik host); parser bukan penentu. Mode ini adalah
+   fallback degradasi, bukan jalur produksi.
+2. **L2 `project` (fase B) kalah di semua ukuran SAQ** — biaya open arena +
+   per-call ABI ≫ parse V8 pada dokumen 3.6–39 KB. L2 hanya viable untuk
+   dokumen ≫ ukuran SAQ; konsumen SAQ jalur L2 dihentikan rekomendasinya
+   (dipakai L1/count).
+3. **L1 traversal menang hanya bila panggilan ABI per item sedikit**
+   (schedules 1.57×, assistants 1.50×) dan kalah bila banyak (reports
+   0.26×, ~191 panggilan ABI/op). Call-site enrichment berikutnya (ND-5
+   lanjutan) harus konservatif: count-only terbukti; decode-per-item
+   harus diukur dahulu (hipotesis ABI v4 batch masih terbuka, O1-11).
+4. Angka = dev device; server SAQ belum tersedia (site-aware runner siap,
+   protokol identik saat akses ada). Perbandingan lintas run_id di tabel
+   adalah **narasi riset**, bukan bukti — bukti = speedup dalam satu run.
+
