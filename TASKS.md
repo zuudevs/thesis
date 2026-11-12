@@ -746,9 +746,13 @@
   sintesis bottleneck + hipotesis H1–H5 + inventaris dokumen usang →
   `docs/research/ondemand-direction-audit.md` (Stage 1). Ledger minimal ini
   ditambahkan di stage yang sama.
-- [ ] **ND-2** — Koreksi dokumentasi usang (AGENTS.md §1/§5/§7, ze_json/docs
+- [x] **ND-2** — Koreksi dokumentasi usang (AGENTS.md §1/§4/§5/§7, ze_json/docs
   architecture TODO parser, referensi ABI v2) sesuai inventaris audit §8;
   pastikan agent berikutnya paham on-demand lazy = arsitektur primer.
+  Hasil: PR ze_json #30 (docs English/Mermaid: seksi parser as-built, C-ABI
+  v3, diagram ZeParser) + PR root (AGENTS.md, TASKS, bump submodule
+  `c1c91ce`→`d45beb7`, revisi audit — scanner32 = stub, npm-publish.yml
+  sudah disinkronkan).
 - [ ] **ND-3** — Desain API lazy JS: `docs/architecture/lazy-access-api.md`
   (semantik handle Document/Value/iterasi, key lookup — tanpa klaim O(1) tanpa
   bukti, skip subtree, lifetime slot/bump-heap untuk server, error model,
