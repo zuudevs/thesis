@@ -8,24 +8,31 @@
 # before you copy it anywhere:
 #
 #   1. CMakeCache build type is Release (and the preset was used).
-#   2. ABI exports present: scanner surface (v2) + parser surface (v3).
+#   2. ABI exports present: scanner surface (v2) + parser surface (v3) -
+#      all 21 ze_* functions from include/ze_json/abi/cabi.hpp.
 #   3. SIMD actually used: v128 instructions found in the disassembly
 #      (llvm-objdump) - a non-simd build would print only scalar ops.
 #   4. sha256 written next to the artifact (ze_json.wasm.sha256) so the
 #      server side can record the provenance (P5 report gap).
-#   5. Optional gates: JS differential test (node bindings/js/tests/*.mjs)
-#      and the binding smoke test.
+#   5. Binding gates: differential, smoke, and the lazy layer (ND-4).
 #
 # Usage (from anywhere; it relocates itself):
 #   powershell -File scripts\build-wasm.ps1                # full: build+verify+gates
 #   powershell -File scripts\build-wasm.ps1 -Fresh         # also wipe build dir first
 #   powershell -File scripts\build-wasm.ps1 -SkipGates     # build+verify only
+#   powershell -File scripts\build-wasm.ps1 -VerifyOnly    # no rebuild: verify the
+#                                                          # existing artifact only
 # After it passes, copy bindings/js/ze_json.wasm (+ .sha256) to the target
 # machine - the server runbook records the hash alongside the run_id.
 param(
     [switch]$Fresh,
-    [switch]$SkipGates
+    [switch]$SkipGates,
+    [switch]$VerifyOnly
 )
+
+if ($Fresh -and $VerifyOnly) {
+    throw '-Fresh and -VerifyOnly are mutually exclusive'
+}
 
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
@@ -39,49 +46,70 @@ if (-not $env:VCPKG_VISUAL_STUDIO_PATH) {
 
 Set-Location (Join-Path $Root 'ze_json')
 $BuildDir = Join-Path (Get-Location) 'build\wasm64-release'
-
-if ($Fresh -and (Test-Path $BuildDir)) {
-    Remove-Item -Recurse -Force $BuildDir
-}
-
-Write-Host '== configure (wasm64-release) ==' -ForegroundColor Cyan
-cmake --preset wasm64-release
-if ($LASTEXITCODE -ne 0) { throw 'configure failed' }
-
-Write-Host '== build ==' -ForegroundColor Cyan
-cmake --build $BuildDir
-if ($LASTEXITCODE -ne 0) { throw 'build failed' }
-
 $Wasm = Join-Path (Get-Location) 'bindings\js\ze_json.wasm'
-if (-not (Test-Path $Wasm)) {
-    throw "artifact missing: POST_BUILD copy did not produce $Wasm"
+
+if (-not $VerifyOnly) {
+    if ($Fresh -and (Test-Path $BuildDir)) {
+        Remove-Item -Recurse -Force $BuildDir
+    }
+
+    Write-Host '== configure (wasm64-release) ==' -ForegroundColor Cyan
+    cmake --preset wasm64-release
+    if ($LASTEXITCODE -ne 0) { throw 'configure failed' }
+
+    Write-Host '== build ==' -ForegroundColor Cyan
+    cmake --build $BuildDir
+    if ($LASTEXITCODE -ne 0) { throw 'build failed' }
+
+    if (-not (Test-Path $Wasm)) {
+        throw "artifact missing: POST_BUILD copy did not produce $Wasm"
+    }
+}
+elseif (-not (Test-Path $Wasm)) {
+    throw "-VerifyOnly: no artifact at $Wasm - run a build (without -VerifyOnly) first"
 }
 
 Write-Host '== verify ==' -ForegroundColor Cyan
 
-# 1. build type straight from the cache the compiler actually used.
-$CacheType = (Select-String -Path (Join-Path $BuildDir 'CMakeCache.txt') `
-    -Pattern '^CMAKE_BUILD_TYPE:STRING=(.+)$').Matches[0].Groups[1].Value
-if ($CacheType -ne 'Release') {
-    throw "wrong build type '$CacheType' - the artifact is not the optimized build"
+# 1. build type straight from the cache the compiler actually used
+#    (only meaningful right after a build; skipped in -VerifyOnly without it).
+$CacheFile = Join-Path $BuildDir 'CMakeCache.txt'
+if (Test-Path $CacheFile) {
+    $CacheType = (Select-String -Path $CacheFile `
+        -Pattern '^CMAKE_BUILD_TYPE:STRING=(.+)$').Matches[0].Groups[1].Value
+    if ($CacheType -ne 'Release') {
+        throw "wrong build type '$CacheType' - the artifact is not the optimized build"
+    }
+    Write-Host "[ok] build type: $CacheType (preset wasm64-release)"
 }
-Write-Host "[ok] build type: $CacheType (preset wasm64-release)"
+else {
+    Write-Host '[warn] no CMakeCache.txt next to the artifact - build-type check skipped'
+}
 
-# 2. ABI exports (v2 scanner surface + v3 parser surface).
+# 2. ABI exports: the full v3 surface from include/ze_json/abi/cabi.hpp
+#    (3 core + 5 scanner + 13 parser). A v2-era artifact (9 symbols) fails
+#    here by design - the parser surface is part of the deployed contract.
 # NB: Windows PowerShell 5.1 has no Encoding::Latin1 - use code page 28591.
 $Blob = [System.Text.Encoding]::GetEncoding(28591).GetString(
     [System.IO.File]::ReadAllBytes($Wasm))
 $RequiredExports = @(
+    # core (3)
     'ze_abi_version', 'ze_alloc', 'ze_reset_heap',
-    'ze_reference_scan', 'ze_scanner8', 'ze_structural_scan',
-    'ze_parser_open', 'ze_parser_root', 'ze_parser_close'
+    # scanner surface (5)
+    'ze_reference_scan', 'ze_scanner8', 'ze_scanner64', 'ze_scanner128',
+    'ze_structural_scan',
+    # parser surface (13)
+    'ze_parser_open', 'ze_parser_root', 'ze_parser_close',
+    'ze_container_begin', 'ze_array_next', 'ze_object_next', 'ze_object_field',
+    'ze_value_kind', 'ze_get_string', 'ze_get_number', 'ze_get_bool',
+    'ze_is_null', 'ze_count_elements'
 )
 foreach ($Name in $RequiredExports) {
     if ($Blob.IndexOf($Name, [System.StringComparison]::Ordinal) -lt 0) {
         throw "missing ABI export: $Name"
     }
 }
-Write-Host "[ok] ABI exports: $($RequiredExports.Count) required symbols present"
+Write-Host "[ok] ABI exports: $($RequiredExports.Count) required symbols present (v3)"
 
 # 3. SIMD really used (v128.* in disassembly) - fails for a scalar-only build.
 $Objdump = Join-Path $env:TOOLCHAINS_DIR 'llvm\bin\llvm-objdump.exe'
@@ -110,7 +138,11 @@ if (-not $SkipGates) {
     if ($LASTEXITCODE -ne 0) { throw 'differential test failed' }
     node ze_json\bindings\js\tests\main.mjs
     if ($LASTEXITCODE -ne 0) { throw 'binding smoke failed' }
-    Write-Host '[ok] differential + smoke gates passed'
+    # ND-4: the lazy layer (L1/L2) rides the unchanged v3 surface - the same
+    # parity contract the deployed artifact must uphold server-side.
+    node ze_json\bindings\js\tests\lazy.mjs
+    if ($LASTEXITCODE -ne 0) { throw 'lazy layer gate failed' }
+    Write-Host '[ok] differential + smoke + lazy gates passed'
 }
 
 Write-Host ''
