@@ -762,10 +762,20 @@
   D1 (`get()` first-wins vs project last-wins, terkunci test), D2 (lifetime
   per-request + fail-loud, reset heap hanya idle), D3 (skip tanpa ABI baru);
   rencana uji T1–T7 untuk ND-4.
-- [ ] **ND-4** — Implementasi minimal sesuai consumption map audit §5 (kandidat
+- [x] **ND-4** — Implementasi minimal sesuai consumption map audit §5 (kandidat
   lapisan JS di atas ABI + proyeksi + bila terukur perlu ekspor ABI skip/span).
   Eksperimen satu-per-satu: hipotesis → ukur → terima/tolak; varian ditolak
-  dipertahankan.
+  dipertahankan. Hasil (ze_json PR #31, `defd452`): **tanpa ABI baru** —
+  L1 = `ZeParser.get/at/lazy` + `ZeLazyValue` (first-wins raw fast-compare
+  via skip-pair span walk, skip = tidak pernah dereference), L2 =
+  `ZeParser.project(shape)` (subset V8-shape satu pass, fail-loud). Deviasi
+  as-built tercatat di desain §12 (`ZeLazyDocument` dihapus dari permukaan —
+  redundan dengan `ZeParser`). Test: `tests/lazy.mjs` T1–T6 43 checks hijau +
+  smoke + differential tetap hijau (T7, 71 dokumen × 5 mode). Probe
+  preliminary `benchmarks/lazy_probe.mjs`: full materialize via binding
+  14–25× di bawah V8 (premis direktif terkonfirmasi); selective menang pada
+  dokumen ≥10 KB (1.57–2.52×), overhead per-panggilan ABI (~0.4–0.8 µs,
+  boxing BigInt) = target profil ND-6 pada ukuran SAQ.
 - [ ] **ND-5** — Integrasi call-site SAQ read-only (dashboard/rekap/enrichment)
   dengan baseline dipertahankan; semantik aplikasi identik (missing-key, null,
   boolean/numeric, decode string, urutan array, duplicate-key, error).
