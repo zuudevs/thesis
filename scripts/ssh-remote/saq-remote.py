@@ -2,10 +2,10 @@
 """ssh-remote-saq — non-interactive remote exec + file transfer to the SAQ server.
 
 Usage:
-    python scripts/ssh-remote-saq/ssh-remote.py run "<remote command>" [--timeout N]
-    python scripts/ssh-remote-saq/ssh-remote.py push <local> <remote>
-    python scripts/ssh-remote-saq/ssh-remote.py pull <remote> <local>
-    python scripts/ssh-remote-saq/ssh-remote.py smoke
+    python scripts/ssh-remote/saq-remote.py run "<remote command>" [--timeout N]
+    python scripts/ssh-remote/saq-remote.py push <local> <remote>
+    python scripts/ssh-remote/saq-remote.py pull <remote> <local>
+    python scripts/ssh-remote/saq-remote.py smoke
 
 Credentials: scripts/ssh-remote-saq/.env (gitignored) with SSH_SAQ_NAME /
 SSH_SAQ_HOST / SSH_SAQ_PASS. The remote is Windows OpenSSH (default shell
