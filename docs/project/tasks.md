@@ -429,9 +429,21 @@
   (korpus nyaris tanpa angka: 3.1 num/KB vs 34.8 @1mb; drift mesin
   +7% antar window; `elapsedMs` per repeat identik). Report:
   `reports/R5-4-dv-cache.md`.
-- [ ] **O1-4 (H5)** — Mirror JS `valueKind` dari launcher byte (hapus 1
-  re-entry wasm per value; profil 3.8%). Wajib differential ekshaustif vs
-  `ze_value_kind` (semua byte × korpus).
+- [x] **O1-4 (H5)** — Mirror JS `valueKind` dari launcher byte —
+  **DITERIMA** (ze_json PR #38, `ccdb610`, merged `f355f1a`, 2026-11-14):
+  tabel `kNodeKindByByte` (mirror `kOndemandNodeType`, keep-in-sync
+  generator) + `ZeParser.#srcBytes` + `#kindAt()` (bounds mirror
+  `classify()`; fallback ABI bila tanpa srcBytes); 5 call-site beralih
+  (`kind()`, `#materialize`, `get()`, `at()`, `#projectValue`); **ABI tak
+  berubah**, wasm byte-identik (`35b7f773…`). Differential ekshaustif:
+  tabel 256-byte == lookups.hpp + 1.266.946 pasangan in-situ (41 dok ×
+  semua posisi × 6 korpus) + bounds (`tests/kind_mirror.mjs`); smoke +
+  lazy 43 + differential 71×5 + ctest 6/6 PASS. Sandwich satu window
+  (protokol R5-8): 3 pasang × 6 korpus, `wasm-parse-full`, 36 record —
+  **median cand/base 1,075–1,115 (+7,5% s/d +11,5%) semua korpus**,
+  jauh di atas noise. Berbeda dari O1-10/R5-8 (netral): mirror menghapus
+  kelas panggilan, bukan menggabungkannya. Laporan:
+  `reports/R5-9-kind-mirror.md`.
 - [ ] **O1-5 (H6)** — `#frame`/`#plain`: hoist konstanta BigInt sentinel,
   dekode lebih ramping (profil 9.1% gabungan).
 - [x] **O1-6 (H4)** — Drop presize `countElements` untuk array (2×
