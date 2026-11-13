@@ -949,8 +949,13 @@
   Changes / Measurement Evidence / Checklist).
 - [x] **PW-2** — Dokumentasikan konvensi commit (Conventional Commits — type & scope
   list) di `AGENTS.md` §8 dan tautkan dari template PR.
-- [ ] **PW-3** — Aktifkan proteksi `main` bila punya akses settings (wajib PR);
-  jika tidak, catat sebagai disiplin manual di `AGENTS.md`.
+- [x] **PW-3** — Aktifkan proteksi `main` bila punya akses settings (wajib PR);
+  jika tidak, catat sebagai disiplin manual di `AGENTS.md`. **DIAKTIFKAN
+  2026-11-14** (akses admin terverifikasi): `main` di 5 repo (thesis,
+  ze_json, saq-report, thesis-proposal, submission-thesis-supervisor) —
+  required PR (approvals 0 agar solo-dev dapat merge PR sendiri),
+  enforce_admins = true (admin ikut terikat PR), force push + deletion
+  ditolak. Verifikasi: `gh api repos/zuudevs/<repo>/branches/main/protection`.
 - Selalu: branch per perubahan (contoh `perf/scanner-simd`), deskripsi PR
   Indonesia, judul `type(scope): subject` (English), bukti pengukuran
   ditautkan bila perubahan menyentuh performa.
