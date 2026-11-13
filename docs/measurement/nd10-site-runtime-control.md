@@ -38,8 +38,8 @@
 ## 3. E2 — Kontrol mesin (dev vs server, runtime setara)
 
 - Re-run matriks ND-6 di `saq_server` **dari tree bersih** (SSH via
-  `scripts/ssh-remote-saq/`; workspace `D:\SKRIPSI\RAFI\sources`) —
-  Node 26.13.0; `artifact_sha256` + Node/V8 tercatat; sha256 wasm server
+  `scripts/ssh-remote/saq-remote.py`; workspace `D:\SKRIPSI\RAFI\sources`) —
+  Node 26.13.1; `artifact_sha256` + Node/V8 tercatat; sha256 wasm server
   harus == dev (byte-identik) agar sebanding.
 - Bandingkan **rasio in-run** per site (bukan latensi absolut lintas mesin
   seolah satu variabel); hardware/OS/patch-Node = confounder dinyatakan.

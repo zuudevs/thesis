@@ -186,8 +186,8 @@
 - Baseline & mesin: kedua site tereksekusi — `dev_device` (Node 24.19.0/V8
   13.6 era verdict 2.85×/3.00×; **kini Node 26.13.1/V8 14.6** — lingkungan dev
   berubah 2026-11-13, verdict lama = histori berlabel runtime) dan
-  `saq_server` (`server-lanjut`, i5-9400, Node 26.13.0/V8 14.6; akses SSH via
-  `scripts/ssh-remote-saq/`). Runner site-aware (`--site=...`). Matriks ND-6
+  `saq_server` (`server-lanjut`, i5-9400, Node 26.13.1/V8 14.6; akses SSH via
+  `scripts/ssh-remote/saq-remote.py`). Runner site-aware (`--site=...`). Matriks ND-6
   per-site: `reports/nd6/` + `reports/nd6-server-phase-matrix.md` (server
   1.30× — acceptance ≥1.5× tidak tercapai di site itu). Aturan inferensi:
   - Bukti = speedup dalam satu run_id per site; angka lintas mesin/runtime =

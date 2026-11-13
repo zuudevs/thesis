@@ -180,7 +180,7 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   matriks ND-6 per-site: server 1.30× vs dev 2.85×/3.00× (dev = Node 24 era;
   kini dev Node 26.13.1 — kontrol runtime/hardware = ND-10).
 - Runner site-aware (`--site`, introspeksi host); akses server kini via SSH
-  (`scripts/ssh-remote-saq/`, Tailscale) sehingga re-run acceptance dari tree
+  (`scripts/ssh-remote/saq-remote.py`, Tailscale) sehingga re-run acceptance dari tree
   bersih bisa dieksekusi tanpa menunggu pemilik.
 - Analisis: delta per korpus, per engine; interpretasi RQ2 dengan introspeksi host
   (CPU model/core/freq) di setiap record; pembatasan dev-only dicatat di laporan.
@@ -195,6 +195,35 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
 - Chart + angka konsisten untuk dokumen skripsi (`thesis-proposal/` /
   `submission-thesis-supervisor/` — dikelola pemilik).
 - Update `AGENTS.md` / `plans.md` / `tasks.md` bila keputusan berubah.
+
+### P8 — Chart progres benchmark & pelengkapan Bab 3 (direktif pemilik 2026-11-13)
+
+> Status lingkungan 2026-11-13: server SAQ kini Node v26.13.1 (V8
+> 14.6.202.34-node.40) — identik dengan dev (verifikasi SSH smoke +
+> `process.versions.v8` kedua mesin). **Fresh run matriks ND-6 (ND-10 E1/E2)
+> menunggu instruksi eksplisit pemilik — jangan dieksekusi tanpa perintah.**
+> Tool SSH kini `scripts/ssh-remote/saq-remote.py` (rename dari
+> `ssh-remote-saq/`, ikut di-commit pada PR chart ini).
+
+- **P8-1** — Chart ringkas **2 figur** dari record tervalidasi `reports/nd6/**`
+  (fairness gate in-situ, reutilisasi loader `nd6_charts.py`):
+  `nd6-summary-map` (heatmap speedup 10 jalur × 2 site — A, B, C per-store,
+  D-mongo, D-file; hijau >1× unggul / merah <1× perlu perbaikan) dan
+  `nd6-acceptance` (fase D, garis target 1,5×, marker p95). Script
+  `scripts/analyze_measurement/nd6_summary_chart.py` → master `out/charts/`
+  + arsip SVG `reports/charts/`; label vintage runtime (dev Node 24 era,
+  server Node 26) sampai ND-10 tereksekusi; regenerate pasca fresh run.
+- **P8-2** — Isi Bab 3 `thesis-proposal/pages/bab_3/001-tempat_dan_waktu_penelitian.typ`
+  (tbl-hw/tbl-sw) dari introspeksi riil 2026-11-13: i5-9400 2,90 GHz 6C/6T;
+  8 GB DDR4 @2133 (2×4 GB); SSD NVMe 128 GB (V-GEN) + HDD 2 TB (Seagate);
+  Intel I219-V + Wi-Fi AC 3165, akses penguji via Tailscale; Windows 11
+  Education build 26300; Node 26.13.1 (V8 14.6) identik antara dev dan
+  server; MongoDB 8.2.7; Clang 23.1.5 C++23; CMake 4.4.5 + Ninja 1.13.2 +
+  vcpkg 2026.10.16; Google Benchmark 1.9.5; GoogleTest 1.18.0; pendamping
+  ZenBook UX425UAZ (Ryzen 5 5500U 6C/12T). Via PR submodule.
+- **P8-3 (DEFERRED)** — Fresh run ND-10 E1/E2 (Node 26 matched, tree bersih,
+  gate fail-fast) **hanya atas instruksi eksplisit pemilik** → regenerate
+  chart + sinkron verdict/angka.
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 
@@ -227,10 +256,12 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   gunakan ISA dispatch runtime (rekomendasi).
 - **Dependensi analitik tambahan** (numpy/pandas untuk chart & statistik) — hindari
   bila Python stdlib + node cukup.
-- **Status akses server SAQ**: tersedia (SSH via `scripts/ssh-remote-saq/`,
+- **Status akses server SAQ**: tersedia (SSH via `scripts/ssh-remote/saq-remote.py`,
   Tailscale) — eksekusi 2026-11-11/13 terarsip `reports/nd6/server-lanjut-*/`;
   re-run acceptance dari tree bersih terjadwal (gate fail-fast sudah di
-  harness `nd6_bench.mjs`).
+  harness `nd6_bench.mjs`). Update 2026-11-13: runtime server = Node
+  26.13.1 (V8 14.6.202.34-node.40) — identik dengan dev; fresh run ND-10
+  menunggu instruksi pemilik (P8-3).
 
 ## 8. Risiko & mitigasi
 
