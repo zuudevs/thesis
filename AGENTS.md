@@ -183,11 +183,26 @@
 - SIMD: runtime dispatch per-ISA; scalar fallback selalu ada; tail/sisa panjang
   ditangani eksplisit. `-march=native` hanya untuk build lokal (bukan build
   distributable), dan dicantumkan di laporan angka yang memakainya.
-- Baseline & mesin: SAAT INI akses server SAQ belum tersedia — **semua pengukuran
-  hanya di device pengembang (situs dev)**. Runner tetap dibuat site-aware
-  (`--site=...`) sehingga ketika akses server ada, prosedur identik dijalankan
-  tanpa mengubah harness. Perbandingan lintas arsitektur server-vs-dev ditunda
-  (RQ2 fase awal = in-situ dev saja).
+- Baseline & mesin: kedua site tereksekusi — `dev_device` (Node 24.19.0/V8
+  13.6 era verdict 2.85×/3.00×; **kini Node 26.13.1/V8 14.6** — lingkungan dev
+  berubah 2026-11-13, verdict lama = histori berlabel runtime) dan
+  `saq_server` (`server-lanjut`, i5-9400, Node 26.13.0/V8 14.6; akses SSH via
+  `scripts/ssh-remote-saq/`). Runner site-aware (`--site=...`). Matriks ND-6
+  per-site: `reports/nd6/` + `reports/nd6-server-phase-matrix.md` (server
+  1.30× — acceptance ≥1.5× tidak tercapai di site itu). Aturan inferensi:
+  - Bukti = speedup dalam satu run_id per site; angka lintas mesin/runtime =
+    **narasi riset**, bukan bukti — klaim kausal butuh isolasi variabel.
+  - Fase D ND-6 mengukur **lapisan repository** (`read()` clone vs
+    `readCount()` bytes kanonik + count ze) — bukan HTTP `/rekap` end-to-end;
+    klaim "endpoint produksi" menuntut Phase E terpisah. Karena `readCount()`
+    memakai cache bytes kanonik (saq-report `8c7f2d4`), fase D = gabungan
+    optimasi repository + jalur parser, **bukan parser murni**.
+  - Mongo-cache fase D = warm cache steady-state (di-seed dari korpus); cold
+    path serialisasi cache pertama ada di warmup untimed — jangan digabung
+    dalam satu angka tanpa menyatakan transisinya.
+  - Run acceptance WAJIB dari tree bersih (root + submodule; harness
+    fail-fast bila tracked changes; `--allow-dirty` = label exploratory,
+    bukan bukti acceptance).
 - Jangan membuat folder `results/benchmark/` baru — gunakan lokasi di §4.
 
 ## 7. Peta cepat file kunci
