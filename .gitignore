@@ -2,6 +2,7 @@
 .toolchains/
 .cache/
 out/
+data/
 
 compile_commands.json
 
@@ -11,5 +12,5 @@ __pycache__/
 *.png
 *.pdf
 
-# ssh-remote-saq credentials (never commit)
-scripts/ssh-remote-saq/.env
+# ssh-remote credentials (never commit)
+scripts/ssh-remote/.env
