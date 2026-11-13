@@ -1,7 +1,9 @@
 # ND-9 — Desain Diagnosis Biaya Parser (diagnosis, BUKAN optimasi)
 
-> Status: **desain, belum dieksekusi**. Eksekusi setelah PR-1 merge + tree
-> bersih (gate fail-fast) + persetujuan pemilik. Direktif: buktikan batas
+> Status: **harness terimplement & teruji smoke** (`scripts/bench/nd9_cost_diagnosis.mjs`,
+> 2026-11-13: syntax OK, gate REFUSED exit 3, smoke exploratory `--allow-dirty`
+> 25 results + 36 parity checks, record PASS validator). **Eksekusi penuh
+> menunggu tree bersih** (gate fail-fast). Direktif: buktikan batas
 > komponen dari source, jangan kurangi dua benchmark berbeda lalu sebut
 > selisihnya komponen tanpa validasi.
 
@@ -24,19 +26,24 @@ eksperimen diagnosis, bukan proyek optimasi.
 
 ## 3. Protokol
 
-- Harness baru `scripts/bench/nd9_cost_diagnosis.mjs` — korpus
-  `saq_payload_v1` (tidak diganti), 15 ronde, warmup 3, alternating stage
-  order, tanpa trimming, `--expose-gc`, GC counter, metadata lengkap
-  (incl. `artifact_sha256` + gate clean-tree dari `nd6_protocol.mjs`).
+- Harness `scripts/bench/nd9_cost_diagnosis.mjs` (terimplement 2026-11-13) — korpus
+  `saq_payload_v1` (tidak diganti), 15 ronde, warmup 3, CYCLES=4 bracket-samples
+  per ronde dirotasi-urutan-dokumen (urutan stage fix — data dependency
+  s1→s4), tanpa trimming, `--expose-gc`, GC counter, parity guard per siklus
+  (countElements == jumlah child root V8; mismatch = run void), metadata
+  lengkap (incl. `artifact_sha256` + gate clean-tree dari `nd6_protocol.mjs`).
 - Record schema v1.0.0: tiap stage = satu `results[]` entry (engine
   `wasm64_cabi`) dengan `rationale.purpose` + `basis_papers`
   (`10.1002_spe.3313`; `10.14778_3115404.3115416` Mison untuk index count).
 - **Larangan**: tidak ada perubahan core/scanner/ABI; stage diukur dari
   ekspor yang sudah ada. Selisih antar-stage TIDAK boleh disebut "biaya
   komponen X" bila stage menumpuk (mis. open termasuk scan) — dilaporkan
-  sebagai batas terikat, bukan dikurangi paksa.
+  sebagai batas terikat, bukan dikurangi paksa. Bracket gap antar stage
+  dikecualikan dari angka stage.
 - Site: `dev_device` dulu; re-run di `saq_server` untuk melihat apakah
   distribusi komponen berbeda lintas mesin (ragam varian implikasi RQ2).
+- Filename record: `<run_id>-nd9-cost-<site>.record.json` (`recordFilename`
+  prefix `nd9`); raw exhibit `out/raw/<run_id>/nd9_stages.json`.
 
 ## 4. Interpretasi yang sah
 

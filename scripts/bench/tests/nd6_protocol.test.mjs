@@ -23,6 +23,9 @@ test('record filename derives the suffix from the actual site', () => {
     assert.equal(
         recordFilename('x-20260101000000-abcdef0', 'A', 'saq_server'),
         'x-20260101000000-abcdef0-nd6-a-saq_server.record.json');
+    assert.equal(
+        recordFilename('x-20260101000000-abcdef0', 'cost', 'dev_device', 'nd9'),
+        'x-20260101000000-abcdef0-nd9-cost-dev_device.record.json');
 });
 
 test('gate: clean tree passes without the exploratory label', () => {

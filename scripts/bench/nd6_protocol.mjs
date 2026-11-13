@@ -7,7 +7,8 @@
  *   previous implementation hardcoded the `-dev_device` suffix regardless of
  *   --site, so saq_server records were written with a dev_device filename
  *   while the `site` field inside the record was correct. The suffix must be
- *   derived from the actual site value.
+ *   derived from the actual site value. `prefix` defaults to `nd6` (the ND-6
+ *   phase records); ND-9 passes `nd9` to keep its record names distinct.
  * gateDecision(): clean-tree acceptance gate. Audit directive + protocol
  *   §3.9: acceptance runs MUST execute from a clean tree (root + submodules).
  *   "Dirty" counts tracked modifications only — untracked owner-owned files
@@ -24,8 +25,8 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 
-export const recordFilename = (runId, phase, site) =>
-    `${runId}-nd6-${phase.toLowerCase()}-${site}.record.json`;
+export const recordFilename = (runId, phase, site, prefix = 'nd6') =>
+    `${runId}-${prefix}-${phase.toLowerCase()}-${site}.record.json`;
 
 export const gateDecision = ({ rootDirty, zeDirty, saqDirty, allowDirty }) => {
     const dirtyRepos = [];
