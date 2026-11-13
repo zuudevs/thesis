@@ -5,6 +5,43 @@ workspace ini bukan paket yang dirilis; versi dari artefak terkait
 (`ze_json` 0.1.x, npm `@zuudevs/ze-json`) tercatat di changelog masing-masing
 repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 2026-11-13 — AUD-1: audit artefak & protokol ND-6
+
+Audit berbasis source + re-validasi dari file (bukan ringkasan). Tidak ada
+angka benchmark baru; eksekusi ukur berikutnya menunggu tree bersih.
+
+### Added
+
+- Laporan [`reports/nd6-audit-2026-11-13.md`](reports/nd6-audit-2026-11-13.md):
+  klasifikasi Verified/Reported/Unknown (58/58 record PASS — 52 server +
+  6 dev; korpus identik lintas situs; tidak ada hash wasm terekam di
+  artefak era manapun).
+- Arsip verbatim `reports/nd6/server-lanjut-20261111/` (36) +
+  `server-lanjut-20261113/` (16).
+- Desain eksperimen: `docs/measurement/nd9-parser-cost-diagnosis.md`,
+  `nd10-site-runtime-control.md`, `nd11-phase-e-http.md`.
+- `scripts/bench/nd6_protocol.mjs` (+ unit test 5/5): helper protokol
+  murni — filename site-aware, gate clean-tree, sha256 wasm.
+
+### Changed
+
+- **Errata dokumen**: hitungan record server = 52 (bukan 54) dan batch
+  11-13 = 16 (bukan "10/10") — `tasks.md` (ND-7/ND-8), `reports/nd6-server-phase-matrix.md`;
+  fase D = lapisan repository, bukan HTTP `/rekap` end-to-end —
+  `tasks.md`, `docs/adr/0001`, `reports/ondemand-saq-evaluation.md` §8,
+  `docs/measurement/nd6-benchmark-plan.md` §2, AGENTS §6; status akses
+  server "belum tersedia" → tereksekusi (plans ×4, tasks, plan doc).
+- `scripts/bench/nd6_bench.mjs`: gate fail-fast clean-tree (exit 3,
+  teruji hidup) + `--allow-dirty` → `config.exploratory`, `artifact_sha256`
+  wasm, metadata artifact/gate.
+- `scripts/node-benchmark/harness.mjs`: `library.version` = identitas
+  baseline (`node-builtin (saq-report@<hash>)`), bukan versi runtime.
+- `schemas/measurement.schema.json`: field opsional
+  `library.artifact_sha256` + `config.exploratory`.
+- `scripts/ssh-remote-saq/ssh-remote.py`: rewrite CLI non-interaktif
+  (run/push/pull/smoke; smoke exit 0, scp roundtrip byte-identik);
+  `.env` di-gitignore.
+
 ## 2026-11-13 — ND-8: matriks ND-6 di server SAQ
 
 Eksekusi pemilik di `site=saq_server` (Node 26/V8 14.6, korpus byte-exact);

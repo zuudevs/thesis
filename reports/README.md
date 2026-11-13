@@ -16,6 +16,17 @@ disimpan apa adanya di `reports/nd6/` (exhibit, tidak diubah).
   (p95 1.46×), acceptance ≥1.5× **tidak tercapai di site ini**; dekomposisi
   komponen + kandidat perbaikan (plan doc §7).
 - [`nd6/`](nd6/) — arsip record tervalidasi ND-6 (6/6 PASS, verbatim).
+- [`nd6/server-lanjut-20261111/`](nd6/server-lanjut-20261111/) + [`nd6/server-lanjut-20261113/`](nd6/server-lanjut-20261113/) —
+  arsip verbatim 52 record server (36 + 16; seluruhnya PASS re-validasi
+  AUD-1; batch 11-13 = exploratory — root server dirty).
+- [`nd6-audit-2026-11-13.md`](nd6-audit-2026-11-13.md) — **AUD-1**: audit
+  artefak & protokol ND-6; klasifikasi Verified/Reported/Unknown, kesalahan
+  hitung dokumen yang dikoreksi (errata), fix harness (gate clean-tree,
+  `artifact_sha256`), dan rencana eksperimen ND-9/ND-10/ND-11.
+- Desain eksperimen berikutnya (belum dieksekusi):
+  [`../docs/measurement/nd9-parser-cost-diagnosis.md`](../docs/measurement/nd9-parser-cost-diagnosis.md),
+  [`../docs/measurement/nd10-site-runtime-control.md`](../docs/measurement/nd10-site-runtime-control.md),
+  [`../docs/measurement/nd11-phase-e-http.md`](../docs/measurement/nd11-phase-e-http.md).
 
 ### Server & baseline (P5)
 - [`P5-saq-server-baseline.md`](P5-saq-server-baseline.md) — baseline V8

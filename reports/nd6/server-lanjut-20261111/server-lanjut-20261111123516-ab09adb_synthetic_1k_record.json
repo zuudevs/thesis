@@ -1,0 +1,172 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "server-lanjut-20261111123516-ab09adb",
+  "site": "saq_server",
+  "generator": "node_harness",
+  "library": {
+    "name": "ze_json",
+    "version": "0.1.0",
+    "language_runtime": "node 26.13.0 (wasm64 C-ABI, ABI v3)"
+  },
+  "git_commit": {
+    "hash": "ab09adb",
+    "dirty": true,
+    "repo": "ze_json"
+  },
+  "host": {
+    "hostname": "server-lanjut",
+    "os": "Windows_NT",
+    "os_version": "10.0.26300 (Windows 11 Education)",
+    "arch": "x86_64",
+    "cpu_model": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz",
+    "cpu_cores": 6,
+    "cpu_freq": "2.90 GHz",
+    "ram_gb": 7.9,
+    "toolchain": "node 26.13.0 (v8 14.6.202.34-node.40)"
+  },
+  "corpus": {
+    "name": "synthetic_1k",
+    "document_count": 1,
+    "total_bytes": 1024,
+    "max_document_bytes": 1024,
+    "sha256": "8cefb403460248b3bad6c92b3ec97a7932bfac4df225adb12ef74e1cbe9fbc65"
+  },
+  "config": {
+    "date_utc": "2026-11-11T12:35:22Z",
+    "iterations": 194541,
+    "warmup_runs": 1,
+    "repeats": 5,
+    "cpu_pinning": false,
+    "threads": 1,
+    "scanner_mode": "multi",
+    "notes": "generator=node_harness; min_time_ms=200; warmup_ms=300; gc_between_repeats=false; repo=ze_json"
+  },
+  "results": [
+    {
+      "name": "ze-wasm64/wasm-scan@structural/synthetic_1k",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze-wasm64 (P3/R2): structural pre-scan of the corpus documents through the wasm64 C-ABI binding, scanner mode 'structural' (Mison-style structural index stream)",
+        "basis_papers": [
+          "10.48550_arXiv.1902.08318",
+          "10.14778_3115404.3115416",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000023582426393425227,
+        "seconds_stddev": 4.787255424148635e-8,
+        "bytes_per_second": 434221645.77835417,
+        "documents_per_second": 424044.575955424,
+        "cpu_seconds": 0.0000023620894098083403
+      },
+      "extras": {
+        "bytes_per_op": 1024,
+        "iterations_median": 84809,
+        "rss_bytes_snapshot": 64061440
+      }
+    },
+    {
+      "name": "ze-wasm64/wasm-scan@scanner8/synthetic_1k",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze-wasm64 (P3/R2): structural pre-scan of the corpus documents through the wasm64 C-ABI binding, scanner mode 'scanner8' (Mison-style structural index stream)",
+        "basis_papers": [
+          "10.48550_arXiv.1902.08318",
+          "10.14778_3115404.3115416",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000002307494577507038,
+        "seconds_stddev": 4.288023173954422e-8,
+        "bytes_per_second": 443771357.03014535,
+        "documents_per_second": 433370.4658497513,
+        "cpu_seconds": 0.000002325873481786085
+      },
+      "extras": {
+        "bytes_per_op": 1024,
+        "iterations_median": 86676,
+        "rss_bytes_snapshot": 64507904
+      }
+    },
+    {
+      "name": "ze-wasm64/wasm-scan@scanner64/synthetic_1k",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze-wasm64 (P3/R2): structural pre-scan of the corpus documents through the wasm64 C-ABI binding, scanner mode 'scanner64' (Mison-style structural index stream)",
+        "basis_papers": [
+          "10.48550_arXiv.1902.08318",
+          "10.14778_3115404.3115416",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000126157747331769,
+        "seconds_stddev": 4.0037474557262243e-8,
+        "bytes_per_second": 811682216.6355666,
+        "documents_per_second": 792658.4146831705,
+        "cpu_seconds": 0.0000013188561896696846
+      },
+      "extras": {
+        "bytes_per_op": 1024,
+        "iterations_median": 158532,
+        "rss_bytes_snapshot": 64819200
+      }
+    },
+    {
+      "name": "ze-wasm64/wasm-scan@scanner128/synthetic_1k",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze-wasm64 (P3/R2): structural pre-scan of the corpus documents through the wasm64 C-ABI binding, scanner mode 'scanner128' (Mison-style structural index stream)",
+        "basis_papers": [
+          "10.48550_arXiv.1902.08318",
+          "10.14778_3115404.3115416",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000010280655491644436,
+        "seconds_stddev": 9.58754550057273e-8,
+        "bytes_per_second": 996045437.7955298,
+        "documents_per_second": 972700.6228471971,
+        "cpu_seconds": 0.0000010854265431533378
+      },
+      "extras": {
+        "bytes_per_op": 1024,
+        "iterations_median": 194541,
+        "rss_bytes_snapshot": 65138688
+      }
+    },
+    {
+      "name": "ze-wasm64/wasm-scan@reference/synthetic_1k",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze-wasm64 (P3/R2): structural pre-scan of the corpus documents through the wasm64 C-ABI binding, scanner mode 'reference' (Mison-style structural index stream)",
+        "basis_papers": [
+          "10.48550_arXiv.1902.08318",
+          "10.14778_3115404.3115416",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000002733566596050024,
+        "seconds_stddev": 4.589663741694968e-8,
+        "bytes_per_second": 374602177.7847555,
+        "documents_per_second": 365822.4392429253,
+        "cpu_seconds": 0.000002708617201370825
+      },
+      "extras": {
+        "bytes_per_op": 1024,
+        "iterations_median": 73165,
+        "rss_bytes_snapshot": 65224704
+      }
+    }
+  ]
+}

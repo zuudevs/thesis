@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "server-lanjut-20261111123614-0340a72",
+  "site": "saq_server",
+  "generator": "node_harness",
+  "library": {
+    "name": "saq_baseline",
+    "version": "26.13.0",
+    "language_runtime": "node 26.13.0 (v8 14.6.202.34-node.40)"
+  },
+  "git_commit": {
+    "hash": "0340a72",
+    "dirty": false,
+    "repo": "saq_report"
+  },
+  "host": {
+    "hostname": "server-lanjut",
+    "os": "Windows_NT",
+    "os_version": "10.0.26300 (Windows 11 Education)",
+    "arch": "x86_64",
+    "cpu_model": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz",
+    "cpu_cores": 6,
+    "cpu_freq": "2.90 GHz",
+    "ram_gb": 7.9,
+    "toolchain": "node 26.13.0 (v8 14.6.202.34-node.40)"
+  },
+  "corpus": {
+    "name": "synthetic_100k",
+    "document_count": 1,
+    "total_bytes": 102400,
+    "max_document_bytes": 102400,
+    "sha256": "fc219dcd731857e6bfd13c062af1397c98ebbf4db4679ddd714b50fe63ea4b5e"
+  },
+  "config": {
+    "date_utc": "2026-11-11T12:36:25Z",
+    "iterations": 539,
+    "warmup_runs": 1,
+    "repeats": 5,
+    "cpu_pinning": false,
+    "threads": 1,
+    "notes": "generator=node_harness; min_time_ms=200; warmup_ms=300; gc_between_repeats=false; repo=saq_report"
+  },
+  "results": [
+    {
+      "name": "v8/body-parse/synthetic_100k",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "v8 baseline (P2): JSON.parse over the corpus documents as delivered by express.json() body parsing",
+        "basis_papers": [
+          "10.48550_arXiv.1902.08318",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00037398841121495327,
+        "seconds_stddev": 0.00000813649071216744,
+        "bytes_per_second": 273805275.58952796,
+        "documents_per_second": 2673.879644428984,
+        "cpu_seconds": 0.00038000748783227254
+      },
+      "extras": {
+        "bytes_per_op": 102400,
+        "iterations_median": 535,
+        "rss_bytes_snapshot": 76136448
+      }
+    },
+    {
+      "name": "v8/store-read/synthetic_100k",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "v8 baseline (P2): JSON.parse plus rootKey unwrap shaped like saq-report JsonRepository.read() (disk I/O excluded — identical across engines)",
+        "basis_papers": [
+          "10.48550_arXiv.1902.08318",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0003713801484230056,
+        "seconds_stddev": 0.000008233676281758593,
+        "bytes_per_second": 275728254.282901,
+        "documents_per_second": 2692.6587332314552,
+        "cpu_seconds": 0.0003681257014590348
+      },
+      "extras": {
+        "bytes_per_op": 102400,
+        "iterations_median": 539,
+        "rss_bytes_snapshot": 93138944
+      }
+    },
+    {
+      "name": "v8/export-stringify/synthetic_100k",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "v8 baseline (P2): JSON.stringify(data, null, 2) over parsed corpus documents, shaped like saq-report exportService/JsonRepository.write",
+        "basis_papers": [
+          "10.48550_arXiv.1902.08318",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0005097173027989822,
+        "seconds_stddev": 0.000049593964207986726,
+        "bytes_per_second": 387212674.390684,
+        "documents_per_second": 1961.871795422199,
+        "cpu_seconds": 0.0005235849056603774
+      },
+      "extras": {
+        "bytes_per_op": 197369,
+        "iterations_median": 393,
+        "rss_bytes_snapshot": 110755840
+      }
+    }
+  ]
+}
