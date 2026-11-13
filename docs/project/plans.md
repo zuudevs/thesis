@@ -200,10 +200,11 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
 
 > Status lingkungan 2026-11-13: server SAQ kini Node v26.13.1 (V8
 > 14.6.202.34-node.40) — identik dengan dev (verifikasi SSH smoke +
-> `process.versions.v8` kedua mesin). **Fresh run matriks ND-6 (ND-10 E1/E2)
-> menunggu instruksi eksplisit pemilik — jangan dieksekusi tanpa perintah.**
-> Tool SSH kini `scripts/ssh-remote/saq-remote.py` (rename dari
-> `ssh-remote-saq/`, ikut di-commit pada PR chart ini).
+> `process.versions.v8` kedua mesin). **ND-10 E1/E2 TEREKSEKUSI
+> 2026-11-13/14 atas instruksi pemilik** — verdict baru di
+> `reports/nd10-runtime-control.md` (acceptance ≥1,5× tidak tercapai di
+> kedua site; runtime V8 14.6 = penyebab dominan kompresi).
+> Tool SSH: `scripts/ssh-remote/saq-remote.py`.
 
 - **P8-1** — Chart ringkas **2 figur** dari record tervalidasi `reports/nd6/**`
   (fairness gate in-situ, reutilisasi loader `nd6_charts.py`):
@@ -221,9 +222,15 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   server; MongoDB 8.2.7; Clang 23.1.5 C++23; CMake 4.4.5 + Ninja 1.13.2 +
   vcpkg 2026.10.16; Google Benchmark 1.9.5; GoogleTest 1.18.0; pendamping
   ZenBook UX425UAZ (Ryzen 5 5500U 6C/12T). Via PR submodule.
-- **P8-3 (DEFERRED)** — Fresh run ND-10 E1/E2 (Node 26 matched, tree bersih,
-  gate fail-fast) **hanya atas instruksi eksplisit pemilik** → regenerate
-  chart + sinkron verdict/angka.
+- **P8-3** — Fresh run ND-10 E1/E2 — **TEREKSEKUSI 2026-11-13/14** atas
+  instruksi pemilik: Node 26.13.1 matched, wasm `35b7f773…` byte-identik,
+  tree bersih kedua site, 10 record PASS (`reports/nd10/`). Verdict:
+  acceptance ≥1,5× **tidak tercapai di kedua site** (D: dev 1,45×/1,41×,
+  server 1,13×/1,10×); runtime V8 14.6 = penyebab dominan kompresi
+  (E1 antar-era confounded — wasm era lama tak terekam sidecarnya).
+  Chart di-regenerate (`nd10-summary-map`, `nd10-acceptance`); laporan
+  `reports/nd10-runtime-control.md`. Lanjut: countermeasure O1 (slot
+  reuse, ABI v4 thin-call — disetujui pemilik, lazy decode).
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 
@@ -258,10 +265,9 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   bila Python stdlib + node cukup.
 - **Status akses server SAQ**: tersedia (SSH via `scripts/ssh-remote/saq-remote.py`,
   Tailscale) — eksekusi 2026-11-11/13 terarsip `reports/nd6/server-lanjut-*/`;
-  re-run acceptance dari tree bersih terjadwal (gate fail-fast sudah di
-  harness `nd6_bench.mjs`). Update 2026-11-13: runtime server = Node
-  26.13.1 (V8 14.6.202.34-node.40) — identik dengan dev; fresh run ND-10
-  menunggu instruksi pemilik (P8-3).
+  re-run acceptance dari tree bersih TEREKSEKUSI (ND-10, `reports/nd10/`;
+  gate fail-fast `nd6_bench.mjs`). Runtime server = Node 26.13.1 — identik
+  dengan dev; wasm byte-identik terverifikasi via sidecar.
 
 ## 8. Risiko & mitigasi
 

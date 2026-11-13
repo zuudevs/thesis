@@ -889,9 +889,24 @@
   Clang 23.1.5; CMake 4.4.5/Ninja 1.13.2/vcpkg 2026.10.16; gbench 1.9.5;
   gtest 1.18.0; ZenBook UX425UAZ pendamping) — PR submodule
   `docs/bab3-measurement-env` (dibuka 2026-11-13).
-- [ ] **P8-3 (DEFERRED)** — Fresh run ND-10 E1/E2 (Node 26 matched, tree
-  bersih, gate fail-fast) **hanya atas instruksi eksplisit pemilik** →
-  regenerate chart + sinkron verdict/angka.
+- [x] **P8-3** — Fresh run ND-10 E1/E2 (Node 26 matched, tree bersih, gate
+  fail-fast) — **TEREKSEKUSI 2026-11-13/14 atas instruksi pemilik**.
+  Identitas terkunci: root `5a90545`, ze_json `d9e25ac`, saq-report
+  `8c7f2d4`, Node 26.13.1 identik, wasm `35b7f773…` **byte-identik** di
+  kedua site (sidecar `artifact.wasm_sha256`), korpus sha256 sama; 10
+  record PASS validator (`reports/nd10/` + sidecar `reports/nd10/raw/`).
+  **Verdict: acceptance ≥1,5× TIDAK tercapai di kedua site** — fase D:
+  dev 1,45× (p95 1,77×) / konfirmasi 1,41× (p95 2,64×); server 1,13×
+  (p95 1,25×) / 1,10× (p95 1,30×). Verdict era Node 24 (2,85×/3,00×) =
+  histori berlabel runtime (E1 antar-era **confounded**: wasm era lama
+  tak terekam sidecarnya). Matriks ND-10 §4 baris 1: **runtime V8 14.6 =
+  penyebab dominan kompresi**; sisa gap antar mesin kecil (E2). Keunggulan
+  fase C era lama lenyap di Node 26 (assistants 1,05×, schedules 0,97×).
+  Chart + CSV di-regenerate (`--vintage=nd10`); laporan:
+  `reports/nd10-runtime-control.md`. Catatan proses: server stash
+  `nd10-e2 pre-run vscode settings` (pemilik) + pull 714cbb9→5a90545;
+  gate root via `submodule.{thesis-proposal,submission-thesis-supervisor}.ignore dirty`
+  (lokal; mismatch pointer tetap terlihat).
 
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 

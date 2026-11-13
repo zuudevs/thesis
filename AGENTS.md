@@ -189,7 +189,13 @@
   `saq_server` (`server-lanjut`, i5-9400, Node 26.13.1/V8 14.6; akses SSH via
   `scripts/ssh-remote/saq-remote.py`). Runner site-aware (`--site=...`). Matriks ND-6
   per-site: `reports/nd6/` + `reports/nd6-server-phase-matrix.md` (server
-  1.30× — acceptance ≥1.5× tidak tercapai di site itu). Aturan inferensi:
+  1.30× — acceptance ≥1.5× tidak tercapai di site itu). **ND-10 E1/E2
+  tereksekusi 2026-11-13/14 (`reports/nd10-runtime-control.md`): Node 26
+  matched + wasm `35b7f773…` byte-identik + tree bersih — fase D dev
+  1,45×/1,41×, server 1,13×/1,10× → acceptance ≥1,5× tidak tercapai di
+  KEDUA site; runtime V8 14.6 = penyebab dominan kompresi (E1 antar-era
+  confounded). Angka skripsi wajib berlabel runtime; countermeasure = O1
+  (slot reuse, ABI v4 thin-call, lazy decode).** Aturan inferensi:
   - Bukti = speedup dalam satu run_id per site; angka lintas mesin/runtime =
     **narasi riset**, bukan bukti — klaim kausal butuh isolasi variabel.
   - Fase D ND-6 mengukur **lapisan repository** (`read()` clone vs
