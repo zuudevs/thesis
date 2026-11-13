@@ -451,9 +451,12 @@
   minimal (assert internal mismatch saja; mesin framing sama).
   Report: `reports/R5-2-array-count-drop.md`.
 - [ ] **O1-7 (H7)** — ABI v4 thin-call (i32 ts/cursor, kurangi boxing
-  BigInt per re-entry) — **keputusan pemilik** (ABI visible outside
-  module); jadwalkan setelah O1-2..O1-6 bila overhead re-entry masih
-  dominan (prioritas #2 R5: walk 7.5–12.7× vs V8).
+  BigInt per re-entry) — **keputusan pemilik: DISETUJUI (2026-11-13/14,
+  kerjakan di loop O1)**; breaking change ABI visible outside module →
+  sinkron `cabi.hpp` + `ze_json.mjs` + smoke + docs. Catatan ND-9 (2026-11-14):
+  boundary ABI ≈ 0 pada jalur **count** (fase D) — target manfaat O1-7 =
+  jalur **materialisasi A/B** (re-entry per value; profil R5 walk
+  7.5–12.7× vs V8), bukan fase D.
 - [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
   count `decode_interior` saat `cap >= inner_len` (invariant output
   decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%
@@ -862,13 +865,16 @@
   end-to-end) — `docs/measurement/nd9-parser-cost-diagnosis.md`,
   `nd10-site-runtime-control.md`, `nd11-phase-e-http.md`.
 
-- [ ] **ND-9** — Diagnosis biaya parser (desain:
-  `docs/measurement/nd9-parser-cost-diagnosis.md`; **harness terimplement
-  2026-11-13** `scripts/bench/nd9_cost_diagnosis.mjs` — 5 stage siklus
-  s1-copy → s2-open → s3-count → s4-close + s5 ABI-boundary, parity guard
-  countElements==child-root V8 per siklus, smoke exploratory 25 results +
-  36 parity checks PASS validator). **Eksekusi penuh menunggu tree
-  bersih** (dev `utils/typ/` milik pemilik; gate fail-fast).
+- [x] **ND-9** — Diagnosis biaya parser — **TEREKSEKUSI 2026-11-13/14**
+  (dev + server, tree bersih pasca ND-10; 15 ronde, CYCLES=4, parity guard
+  **360/360 PASS per site**; record PASS validator, `reports/nd9/`).
+  **Verdict: `s2-open` (arena+scan+match, batas terikat) mendominasi jalur
+  count ~88–90%** (dev 0,140 ms, server 0,193 ms dari Σ 0,158/0,215 ms);
+  `s3-count` murah (6%); **`s5-boundary` (floor per-panggilan ABI) ≈ 0 →
+  hipotesis boxing-ABI = penyebab utama fase D TERBANTAHKAN**; O1-7 tetap
+  relevan untuk jalur materialisasi A/B (re-entry per value), bukan fase D.
+  Gap hardware terlokalisasi di open (+38% server) — konsisten sisa gap
+  ND-10 (1,13× vs 1,45×). Laporan: `reports/nd9-cost-diagnosis.md`.
 
 ## P8 — Chart progres benchmark & pelengkapan Bab 3 (2026-11-13)
 

@@ -1,0 +1,843 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "server-lanjut-20261113181730-5a90545",
+  "site": "saq_server",
+  "generator": "node_harness",
+  "library": {
+    "name": "ze_json",
+    "version": "0.0.0-unknown (ze_json@d9e25ac, saq-report@8c7f2d4)",
+    "language_runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI v3",
+    "artifact_sha256": "35b7f7737f0806f651d8b0acc79a2b6013d94ae26b7c68a83af7e16d7eef3185"
+  },
+  "git_commit": {
+    "hash": "5a90545",
+    "dirty": false,
+    "repo": "v5"
+  },
+  "host": {
+    "hostname": "server-lanjut",
+    "os": "Windows_NT 10.0.26300",
+    "arch": "x64",
+    "cpu_model": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz",
+    "cpu_cores": 6,
+    "ram_gb": 7.9,
+    "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 ABI v3"
+  },
+  "corpus": {
+    "name": "saq_payload_v1",
+    "document_count": 6,
+    "total_bytes": 88381,
+    "max_document_bytes": 39209,
+    "sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1"
+  },
+  "config": {
+    "date_utc": "2026-11-13T18:17:30Z",
+    "iterations": 4,
+    "warmup_runs": 3,
+    "repeats": 15,
+    "cpu_pinning": false,
+    "threads": 1,
+    "exploratory": false,
+    "notes": "ND-9 cost diagnosis (5 stages, 360 parity checks); stage order fixed by data dependency s1->s4, document order rotated per round; no outlier trimming; bracket gaps excluded (stage times = per-stage averages over 4 cycles/round; s2-open is an INSEPARABLE bound over arena carve + scan + match); s5-boundary = per-call floor over a 4096-call micro-loop. gc_exposed=false; gc(minor=0, major=0); raw: out/raw/server-lanjut-20261113181730-5a90545/."
+  },
+  "results": [
+    {
+      "name": "nd9/s1-copy/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 7.61666667e-7,
+        "seconds_stddev": 9.21352e-8,
+        "bytes_per_second": 5242450770,
+        "documents_per_second": 1312910.28
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 7.75e-7,
+        "seconds_p95": 9.15e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000009585,
+        "seconds_stddev": 5.27873e-7,
+        "bytes_per_second": 416588419,
+        "documents_per_second": 104329.682
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 0.000009425,
+        "seconds_p95": 0.0000104275,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000110833333,
+        "seconds_stddev": 1.41912e-7,
+        "bytes_per_second": 3602706770,
+        "documents_per_second": 902255.639
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 0.000001075,
+        "seconds_p95": 0.000001315,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 4.86666667e-7,
+        "seconds_stddev": 5.54276e-8,
+        "bytes_per_second": 8204794520,
+        "documents_per_second": 2054794.52
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 4.75e-7,
+        "seconds_p95": 5.8e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s1-copy/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 8.83333333e-7,
+        "seconds_stddev": 2.24289e-7,
+        "bytes_per_second": 6355471700,
+        "documents_per_second": 1132075.47
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 7.75e-7,
+        "seconds_p95": 0.0000013575,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000012945,
+        "seconds_stddev": 2.14515e-7,
+        "bytes_per_second": 433680958,
+        "documents_per_second": 77249.9034
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 0.00001285,
+        "seconds_p95": 0.000013405,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000119,
+        "seconds_stddev": 2.42521e-7,
+        "bytes_per_second": 4717647060,
+        "documents_per_second": 840336.134
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 0.000001125,
+        "seconds_p95": 0.0000016125,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 4.9e-7,
+        "seconds_stddev": 8.20569e-8,
+        "bytes_per_second": 11457142900,
+        "documents_per_second": 2040816.33
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 4.75e-7,
+        "seconds_p95": 6.65e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s1-copy/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 9.83333333e-7,
+        "seconds_stddev": 6.42564e-7,
+        "bytes_per_second": 3642711860,
+        "documents_per_second": 1016949.15
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 8e-7,
+        "seconds_p95": 0.00000189,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000009315,
+        "seconds_stddev": 0.00000107513,
+        "bytes_per_second": 384541063,
+        "documents_per_second": 107353.731
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 0.0000088,
+        "seconds_p95": 0.0000116275,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000131,
+        "seconds_stddev": 3.93044e-7,
+        "bytes_per_second": 2734351150,
+        "documents_per_second": 763358.779
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 0.000001175,
+        "seconds_p95": 0.0000018625,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 5.35e-7,
+        "seconds_stddev": 1.01571e-7,
+        "bytes_per_second": 6695327100,
+        "documents_per_second": 1869158.88
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 5.25e-7,
+        "seconds_p95": 7.2e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s1-copy/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000002005,
+        "seconds_stddev": 4.71805e-7,
+        "bytes_per_second": 19555611000,
+        "documents_per_second": 498753.117
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 0.000001875,
+        "seconds_p95": 0.0000027125,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000856216667,
+        "seconds_stddev": 0.00000137076,
+        "bytes_per_second": 457933156,
+        "documents_per_second": 11679.2868
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 0.000084725,
+        "seconds_p95": 0.0000880975,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000127666667,
+        "seconds_stddev": 2.32283e-7,
+        "bytes_per_second": 30712010400,
+        "documents_per_second": 783289.817
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 0.000001175,
+        "seconds_p95": 0.0000016625,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 5.45e-7,
+        "seconds_stddev": 8.02081e-8,
+        "bytes_per_second": 71943119300,
+        "documents_per_second": 1834862.39
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 5.25e-7,
+        "seconds_p95": 6.975e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s1-copy/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000168666667,
+        "seconds_stddev": 1.01598e-7,
+        "bytes_per_second": 21120355700,
+        "documents_per_second": 592885.375
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 0.000001675,
+        "seconds_p95": 0.00000185,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000768083333,
+        "seconds_stddev": 0.00000185781,
+        "bytes_per_second": 463790821,
+        "documents_per_second": 13019.4206
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 0.000076,
+        "seconds_p95": 0.000079915,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000480166667,
+        "seconds_stddev": 1.35236e-7,
+        "bytes_per_second": 7418882330,
+        "documents_per_second": 208261.02
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 0.00000475,
+        "seconds_p95": 0.00000509,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 5.76666667e-7,
+        "seconds_stddev": 5.12076e-8,
+        "bytes_per_second": 61773988400,
+        "documents_per_second": 1734104.05
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 5.5e-7,
+        "seconds_p95": 6.75e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s1-copy/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 8.86666667e-7,
+        "seconds_stddev": 5.22324e-7,
+        "bytes_per_second": 406015038,
+        "documents_per_second": 1127819.55
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 7.5e-7,
+        "seconds_p95": 0.0000015125,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000153333333,
+        "seconds_stddev": 6.87184e-8,
+        "bytes_per_second": 234782609,
+        "documents_per_second": 652173.913
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 0.0000015,
+        "seconds_p95": 0.00000165,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000272166667,
+        "seconds_stddev": 7.00171e-7,
+        "bytes_per_second": 132271892,
+        "documents_per_second": 367421.923
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 0.00000235,
+        "seconds_p95": 0.0000037775,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 5.03333333e-7,
+        "seconds_stddev": 5.31246e-8,
+        "bytes_per_second": 715231788,
+        "documents_per_second": 1986754.97
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 5e-7,
+        "seconds_p95": 5.975e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 360,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s5-boundary",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 5: JS/BigInt boxing floor per plain ABI call (abiVersion x 4096 micro-loop, 0 args) — the cross-boundary cost every parser call pays.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 3.71940104e-8
+      },
+      "extras": {
+        "stage": "s5-boundary",
+        "doc": null,
+        "doc_bytes": 0,
+        "seconds_median": 2.92480469e-8,
+        "seconds_p95": 8.96435548e-8,
+        "rounds": 15,
+        "cycles_per_round": 1,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": null,
+        "abi_calls": 4096,
+        "note": "micro-loop x4096, 0 args"
+      }
+    }
+  ]
+}

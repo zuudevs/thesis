@@ -1,9 +1,14 @@
 # ND-9 — Desain Diagnosis Biaya Parser (diagnosis, BUKAN optimasi)
 
-> Status: **harness terimplement & teruji smoke** (`scripts/bench/nd9_cost_diagnosis.mjs`,
+> Status: **TEREKSEKUSI 2026-11-13/14** (dev + server, tree bersih) — hasil
+> dan interpretasi: [`reports/nd9-cost-diagnosis.md`](../../reports/nd9-cost-diagnosis.md).
+> Verdict: `s2-open` mendominasi jalur count (~88–90%); boundary ABI ≈ 0
+> (hipotesis boxing-ABI terbantahkan untuk fase D). Desain asli di bawah
+> dipertahankan apa adanya.
+>
+> Harness terimplement & teruji smoke (`scripts/bench/nd9_cost_diagnosis.mjs`,
 > 2026-11-13: syntax OK, gate REFUSED exit 3, smoke exploratory `--allow-dirty`
-> 25 results + 36 parity checks, record PASS validator). **Eksekusi penuh
-> menunggu tree bersih** (gate fail-fast). Direktif: buktikan batas
+> 25 results + 36 parity checks, record PASS validator). Direktif: buktikan batas
 > komponen dari source, jangan kurangi dua benchmark berbeda lalu sebut
 > selisihnya komponen tanpa validasi.
 
