@@ -11,6 +11,10 @@ disimpan apa adanya di `reports/nd6/` (exhibit, tidak diubah).
 - [`ondemand-saq-evaluation.md`](ondemand-saq-evaluation.md) — **ND-7**:
   evaluasi lengkap jalur on-demand di SAQ; verdict 2.85×/3.00× (fase D,
   cache Mongo) — acceptance ≥1.5× tercapai; hipotesis H1–H5, limitasi jujur.
+- [`nd6-server-phase-matrix.md`](nd6-server-phase-matrix.md) — **ND-8**:
+  matriks ND-6 di server SAQ (`saq_server`, Node 26) — fase D **1.30×**
+  (p95 1.46×), acceptance ≥1.5× **tidak tercapai di site ini**; dekomposisi
+  komponen + kandidat perbaikan (plan doc §7).
 - [`nd6/`](nd6/) — arsip record tervalidasi ND-6 (6/6 PASS, verbatim).
 
 ### Server & baseline (P5)

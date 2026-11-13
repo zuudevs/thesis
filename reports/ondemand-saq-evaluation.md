@@ -208,3 +208,20 @@ materialisasi, dan string/field hanya di-decode bila benar-benar dibaca.
 Speedup 2.85×/3.00× (≥ 1.5×) dicapai **tanpa mengubah** baseline, workload,
 atau korpus — semua hasil berasal dari record tervalidasi yang dapat
 direproduksi, dengan limitasi yang dilaporkan apa adanya.
+
+---
+
+## Addendum (2026-11-13, ND-8) — transferabilitas verdict ke `saq_server`
+
+Limitasi #1 di §8 ("Workload D literal server utuh belum dijalankan") telah
+dieksekusi sebatas boundary yang sama: matriks ND-6 dijalankan penuh di
+`site=saq_server` (Node 26/V8 14.6, korpus byte-exact, 10 record PASS
+validator). Hasil: fase D jalur produksi **1.30×** (p95 1.46×) — **di bawah
+acceptance ≥1.5×**, dan fase C kalah di semua store. Konsekuensi pembacaan
+laporan ini: verdict 2.85×/3.00× berlaku **per-site** (`dev_device`, Node
+24/V8 13.6) sebagai bukti dalam-run; di `saq_server` verdict saat ini
+adalah 1.30×. Dekomposisi komponen + kandidat perbaikan (slot reuse, ABI v4
+batch, lazy decode) dan catatan kepatuhan (root server dirty, §3.9):
+[`nd6-server-phase-matrix.md`](nd6-server-phase-matrix.md) dan plan doc §11.
+Atribusi kausal (versi runtime vs mesin) menunggu eksperimen isolasi satu
+variabel — belum diklaim.

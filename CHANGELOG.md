@@ -5,6 +5,25 @@ workspace ini bukan paket yang dirilis; versi dari artefak terkait
 (`ze_json` 0.1.x, npm `@zuudevs/ze-json`) tercatat di changelog masing-masing
 repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 2026-11-13 — ND-8: matriks ND-6 di server SAQ
+
+Eksekusi pemilik di `site=saq_server` (Node 26/V8 14.6, korpus byte-exact);
+10 record PASS validator.
+
+### Added
+
+- Laporan [`reports/nd6-server-phase-matrix.md`](reports/nd6-server-phase-matrix.md):
+  **acceptance ≥1.5× tidak tercapai di server** — fase D produksi 1.30×
+  (p95 1.46×) vs verdict dev 2.85×/3.00×; dekomposisi komponen + kandidat
+  perbaikan (plan doc §7).
+
+### Changed
+
+- `docs/measurement/nd6-benchmark-plan.md`: seksi §11 (hasil saq_server) +
+  pointer di limitasi #4 §10; ND-7 report addendum per-site; ledger **ND-8**.
+- `scripts/bench/nd6_bench.mjs`: nama file record memakai `--site`
+  aktual (sebelumnya hardcode `-dev_device`).
+
 ## 2026-11-12 — Overhaul arsitektur dokumentasi (PW-4)
 
 Direktif on-demand 7 stage (ND-1…ND-7) selesai pada main `3947bcd` (verdict

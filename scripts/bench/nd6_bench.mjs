@@ -626,7 +626,7 @@ const record = {
     results,
 };
 const recordFile = path.join(MEAS_DIR,
-    `${RUN_ID}-nd6-${PHASE.toLowerCase()}-dev_device.record.json`);
+    `${RUN_ID}-nd6-${PHASE.toLowerCase()}-${SITE}.record.json`);
 fs.writeFileSync(recordFile, JSON.stringify(record, null, 2));
 
 // Ringkasan ---------------------------------------------------------------
