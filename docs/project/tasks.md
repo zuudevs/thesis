@@ -862,6 +862,14 @@
   end-to-end) — `docs/measurement/nd9-parser-cost-diagnosis.md`,
   `nd10-site-runtime-control.md`, `nd11-phase-e-http.md`.
 
+- [ ] **ND-9** — Diagnosis biaya parser (desain:
+  `docs/measurement/nd9-parser-cost-diagnosis.md`; **harness terimplement
+  2026-11-13** `scripts/bench/nd9_cost_diagnosis.mjs` — 5 stage siklus
+  s1-copy → s2-open → s3-count → s4-close + s5 ABI-boundary, parity guard
+  countElements==child-root V8 per siklus, smoke exploratory 25 results +
+  36 parity checks PASS validator). **Eksekusi penuh menunggu tree
+  bersih** (dev `utils/typ/` milik pemilik; gate fail-fast).
+
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
 - [x] **PW-1** — Buat `.github/PULL_REQUEST_TEMPLATE.md` di ketiga repo (root v5,
