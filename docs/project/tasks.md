@@ -444,8 +444,16 @@
   jauh di atas noise. Berbeda dari O1-10/R5-8 (netral): mirror menghapus
   kelas panggilan, bukan menggabungkannya. Laporan:
   `reports/R5-9-kind-mirror.md`.
-- [ ] **O1-5 (H6)** — `#frame`/`#plain`: hoist konstanta BigInt sentinel,
-  dekode lebih ramping (profil 9.1% gabungan).
+- [x] **O1-5 (H6)** — `#frame`/`#plain`: hoist konstanta BigInt sentinel,
+  dekode lebih ramping — **DITERIMA** (ze_json PR #39, `a7e9c45`, merged
+  `47ff76e`, 2026-11-14): `kStepSentinelU32` (compare number, nol alokasi
+  BigInt/call) + `kFrameDone` singleton frozen + fast path dekode eksak
+  Number < 2^53 (nol BigInt arithmetic; cakup seluruh dokumen < 2 MiB)
+  di `#frame`/`#plain`; slow path `asUintN` dipertahankan; wasm/ABI tak
+  berubah. Sandwich 3 pasang × 6 korpus (`wasm-parse-full`, 36 record):
+  **median cand/base 1,075–1,165 (+7,5% s/d +16,5%), 18/18 pasangan > 1**.
+  Profil 9,1% terkonfirmasi. Sisa overhead = objek frame per step →
+  target O1-7. Laporan: `reports/R5-10-frame-decode.md`.
 - [x] **O1-6 (H4)** — Drop presize `countElements` untuk array (2×
   `begin_array` per array; `begin_array` 15.8% self terpanas) — ukur,
   terima hanya jika menang (kehilangan invariant check).
