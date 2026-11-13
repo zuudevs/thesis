@@ -470,13 +470,21 @@
   checker 1.015** — naik semua, tanpa regresi. Kehilangan cakupan
   minimal (assert internal mismatch saja; mesin framing sama).
   Report: `reports/R5-2-array-count-drop.md`.
-- [ ] **O1-7 (H7)** — ABI v4 thin-call (i32 ts/cursor, kurangi boxing
-  BigInt per re-entry) — **keputusan pemilik: DISETUJUI (2026-11-13/14,
-  kerjakan di loop O1)**; breaking change ABI visible outside module →
-  sinkron `cabi.hpp` + `ze_json.mjs` + smoke + docs. Catatan ND-9 (2026-11-14):
-  boundary ABI ≈ 0 pada jalur **count** (fase D) — target manfaat O1-7 =
-  jalur **materialisasi A/B** (re-entry per value; profil R5 walk
-  7.5–12.7× vs V8), bukan fase D.
+- [x] **O1-7 (H7)** — ABI v4 thin-call — **DITERIMA** (ze_json PR #40,
+  `ae209f0`, merged `fe877f2`, 2026-11-14; keputusan pemilik disetujui
+  2026-11-13/14). **ADDITIVE v4** (append-only — signature/packing v3
+  utuh): `ze_{container_begin,array_next,object_next,object_field}4(u32,
+  u32, u32, u64 out) -> i32` — scalar args i32 (nol `BigInt(...)` per
+  call), frame via out pair u32 (token_start, cursor), status i32 (0 ok /
+  1 done / <0 = −JsonErrc); out pointer pre-boxed sekali per generasi
+  heap (lazy re-carve pasca `resetHeap`); binding guard sub-2-GiB →
+  fallback v3; gate build-wasm 21 → 25 ekspor; wasm v4 `c5b42b7d…`.
+  Sandwich dua-artefak 3 pasang × 6 korpus (`wasm-parse-full`, 36
+  record): **median cand/base 1,274–1,451 (+27,4% s/d +45,1%), 18/18
+  pasangan > 1** — eksperimen O1 terbesar. ND-9 benar: manfaat di
+  materialisasi A/B, bukan fase D. **Follow-up: re-measure matriks
+  ND-6 pasca-O1 (keputusan pemilik; protokol ND-10 siap).** Laporan:
+  `reports/R5-11-thin-step.md`.
 - [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
   count `decode_interior` saat `cap >= inner_len` (invariant output
   decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%
