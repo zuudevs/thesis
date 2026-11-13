@@ -17,8 +17,9 @@ antar-arsitektur sistem."
   yang riil?
 - **RQ2** — Bagaimana pengaruh **arsitektur sistem** (site: server SAQ vs device dev;
   ISA: native x86-64 vs wasm64) terhadap hasil ukur yang setara?
-  (Catatan: akses server SAQ belum tersedia — fase awal membatasi site dev;
-  pengukuran server dijadwalkan ulang saat akses ada, runner identik — lihat P5.)
+  (Update 2026-11-13: server SAQ tereksekusi — matriks ND-6 di `saq_server`
+  = 1.30× vs dev 2.85×/3.00× (Node 24 era); lihat `reports/nd6-server-phase-matrix.md`
+  dan P5 di bawah. Kontrol runtime/hardware = ND-10.)
 - **RQ3** — Optimasi apa yang berdampak terukur (berbasis paper) tanpa melanggar
   kebenaran (validitas, kepatuhan JSON)?
 
@@ -173,12 +174,14 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
 - Setiap fast-path wajib punya reference scalar + differential test + lulus
   `native-sanitize`.
 
-### P5 — Pengukuran lintas arsitektur (site server DITUNDA)
-- Status: akses server SAQ belum tersedia — **pengukuran saat ini hanya
-  `site=dev_device`**: V8 baseline + ze native + ze wasm64.
-- Runner tetap dibuat site-aware (`--site`, introspeksi host) agar ketika akses
-  server SAQ didapatkan, baseline `site=saq_server` (V8; opsi ze-wasm64 bila
-  infrastruktur izin) dijalankan dengan prosedur identik — tanpa ubah harness.
+### P5 — Pengukuran lintas arsitektur (site server TEREKSEKUSI 2026-11-11/13)
+- Status: baseline V8 + harness ze P5-style tereksekusi di `saq_server`
+  (Node 26.13.0/V8 14.6); record diarsip verbatim `reports/nd6/server-lanjut-*/`;
+  matriks ND-6 per-site: server 1.30× vs dev 2.85×/3.00× (dev = Node 24 era;
+  kini dev Node 26.13.1 — kontrol runtime/hardware = ND-10).
+- Runner site-aware (`--site`, introspeksi host); akses server kini via SSH
+  (`scripts/ssh-remote-saq/`, Tailscale) sehingga re-run acceptance dari tree
+  bersih bisa dieksekusi tanpa menunggu pemilik.
 - Analisis: delta per korpus, per engine; interpretasi RQ2 dengan introspeksi host
   (CPU model/core/freq) di setiap record; pembatasan dev-only dicatat di laporan.
 - Chart ke `out/charts/`.
@@ -224,9 +227,10 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   gunakan ISA dispatch runtime (rekomendasi).
 - **Dependensi analitik tambahan** (numpy/pandas untuk chart & statistik) — hindari
   bila Python stdlib + node cukup.
-- **Status akses server SAQ**: belum tersedia saat ini (keterbatasan pemilik) —
-  pengukuran site server ditunda; runner tetap disiapkan site-aware agar
-  prosedur identik siap jalan begitu akses ada.
+- **Status akses server SAQ**: tersedia (SSH via `scripts/ssh-remote-saq/`,
+  Tailscale) — eksekusi 2026-11-11/13 terarsip `reports/nd6/server-lanjut-*/`;
+  re-run acceptance dari tree bersih terjadwal (gate fail-fast sudah di
+  harness `nd6_bench.mjs`).
 
 ## 8. Risiko & mitigasi
 
@@ -239,7 +243,7 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
 | Konfigurasi PGO gagal/lama | dokumentasi fail/skip; jangan bawa hasil setengah jadi |
 | Format tool skill vs schema jadi beda | normalisasi dulu, baru compare |
 | Baseline server beda hardware | introspeksi host wajib; catat di record setiap run |
-| Akses server SAQ belum tersedia | pengukuran dev-only dulu; runner site-aware; limitation dicatat di pembahasan; re-run penuh saat akses ada |
+| Akses server SAQ | TERESELESAI (SSH/Tailscale) — eksekusi 11-11/13 terarsip; risiko tersisa: re-run acceptance wajib tree bersih (gate fail-fast harness) |
 
 ## 9. Definisi selesai (DoD per fase)
 

@@ -23,8 +23,12 @@ bukti dalam-run; angka lintas situs adalah **narasi riset, bukan bukti**
 | `server-lanjut-20261113004510-714cbb9` | idem | ND-6 fase C | saq_server |
 | `server-lanjut-20261113004520-714cbb9` | idem | ND-6 fase D (acceptance) | saq_server |
 
-- Record: **10/10 PASS** validator (6 harness + 4 ND-6); raw exhibit
-  `out/raw/<run_id>/`, record `out/measurements/<run_id>-*.record.json`.
+- Record: batch ini = **16 record** (12 harness P5-style + 4 ND-6) —
+  *errata AUD-1 2026-11-13: sebelumnya tertulis "10/10 (6 harness + 4
+  ND-6)"; hitungan dikoreksi dari file*. Seluruh 52 record server dua batch
+  (36 + 16) **PASS** validator (re-validasi AUD-1); diarsip verbatim
+  `reports/nd6/server-lanjut-20261111/` + `server-lanjut-20261113/`; raw
+  exhibit `out/raw/<run_id>/`.
 - Host server: `server-lanjut`, i5-9400 @2.90 GHz, **Node v26.13.0
   (V8 14.6.202.34-node.40)** — identik dengan eksekusi P5/R5 (Node 26 sejak
   awal di server). Dev pembanding: Ryzen 5 5500U, Node v24.19.0 (V8 13.6).

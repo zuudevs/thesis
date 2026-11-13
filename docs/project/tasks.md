@@ -819,10 +819,18 @@
   gap fidelity korpus; file-store 0.91× I/O-bound; L1 count-only; H4/H5
   belum diuji; angka dev device). Tidak ada hasil dimanufaktur; semua angka
   dari record tervalidasi `reports/nd6/` (6/6 PASS).
+  *(Errata AUD-1, 2026-11-13: (a) "jalur produksi `/rekap`" pada verdict di
+  atas = **lapisan repository** (`readCount()` cache Mongo), bukan HTTP
+  `/rekap` end-to-end — klaim endpoint produksi menuntut Phase E (ND-11);
+  (b) server SAQ kini tereksekusi — lihat ND-8; (c) arsip kini memuat 6
+  record dev + 52 record server (2 batch), seluruhnya PASS re-validasi
+  AUD-1.)*
 - [x] **ND-8** — Eksekusi matriks ND-6 di server SAQ (`site=saq_server`,
-  2026-11-13, eksekusi pemilik; runbook §5): 10 record **PASS** validator
-  (4 fase ND-6 + 6 harness P5-style), korpus `saq_payload_v1` sha256
-  identik dev. **Verdict: acceptance ≥1.5× TIDAK tercapai di site ini** —
+  2026-11-13, eksekusi pemilik; runbook §5): *(errata AUD-1: batch ini = **16
+  record** — 12 harness P5-style + 4 fase ND-6; sebelumnya tertulis "10/10
+  (6 harness + 4 ND-6)", dikoreksi dari file)* — seluruhnya **PASS**
+  validator (re-validasi AUD-1: 52 record server dua batch = 36 + 16), korpus
+  `saq_payload_v1` sha256 identik dev. **Verdict: acceptance ≥1.5× TIDAK tercapai di site ini** —
   fase D jalur produksi (cache Mongo) = **1.30×** (p95 1.46×) vs verdict
   dev 2.85×/3.00×; file-store 0.95× (konsisten). Diagnostik: A 0.035–0.039×,
   B 0.056–0.091×, C kalah semua store (dua kemenangan L1 di dev —
@@ -837,6 +845,22 @@
   Rincian: `reports/nd6-server-phase-matrix.md` + plan doc §11.
   Limitasi verdict: perbandingan lintas situs = narasi riset (bukan bukti);
   bukti tetap speedup dalam satu run per site.
+- [x] **AUD-1** — Audit artefak & protokol ND-6 (2026-11-13, branch
+  `audit/nd6-artifact-audit`, laporan [`reports/nd6-audit-2026-11-13.md`](../../reports/nd6-audit-2026-11-13.md)):
+  klasifikasi Verified/Reported/Unknown dari file + source (52 record server
+  + 6 dev = 58/58 PASS re-validasi; korpus `saq_payload_v1` sha256 identik
+  di 18 record lintas situs; fase D = lapisan repository bukan HTTP —
+  errata ND-7/ND-8 + ADR 0001 + plan doc; batch 11-13 exploratory karena
+  root server dirty; tidak ada hash wasm terekam di artefak era manapun —
+  klaim `7e26044f…` = reported-only). Fix harness: gate fail-fast
+  clean-tree (exit 3, uji hidup) + `--allow-dirty` exploratory,
+  `artifact_sha256` wasm, filename site-aware via `nd6_protocol.mjs`
+  (unit test 5/5), `harness.mjs` `library.version` identitas baseline.
+  SSH non-interaktif `scripts/ssh-remote-saq/` (smoke + scp roundtrip
+  byte-identik). Desain eksperimen berikutnya: **ND-9** (diagnosis biaya
+  parser), **ND-10** (kontrol runtime/mesin), **ND-11** (Phase E HTTP
+  end-to-end) — `docs/measurement/nd9-parser-cost-diagnosis.md`,
+  `nd10-site-runtime-control.md`, `nd11-phase-e-http.md`.
 
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
@@ -863,10 +887,15 @@
 
 ## Status mesin & environment
 
-- Dev device = workspace ini (Windows x86_64, toolchain portabel) — **satu-satunya
-  site pengukuran aktif saat ini** (akses server SAQ belum tersedia).
-- Runner dibuat site-aware (`--site=dev_device|saq_server`); site server diaktifkan
-  begitu akses dapat, dengan prosedur runner identik (tanpa perubahan harness).
+- Dev device = workspace ini (Windows x86_64, toolchain portabel). **Update
+  AUD-1 2026-11-13: Node dev = v26.13.1 (V8 14.6.202.34-node.40) — V8 kini
+  identik dengan server; verdict dev lama 2.85×/3.00× = histori Node
+  24.19.0 (berlabel runtime), tak reproducible tanpa memasang Node 24 lagi.**
+- Site server (`server-lanjut`, i5-9400, Node 26.13.0) **aktif** via SSH
+  (`scripts/ssh-remote-saq/`, workspace `D:\SKRIPSI\RAFI\sources`); runner
+  site-aware (`--site=dev_device|saq_server`) dengan prosedur identik; run
+  acceptance wajib tree bersih — harness fail-fast bila tracked changes
+  (`--allow-dirty` = label exploratory, bukan bukti acceptance).
 - Build aktif: `ze_json/build/native-release` + `build/wasm64-release`.
 - Working tree `ze_json` harus bersih (commit/stash) sebelum mengumpulkan hasil;
   bila dirty, simpan record dengan suffix `<hash>-dirty` dan sebut di laporan.
