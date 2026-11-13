@@ -1,0 +1,353 @@
+{
+  "metadata": {
+    "run_id": "server-lanjut-20261113174305-5a90545",
+    "phase": "B",
+    "site": "saq_server",
+    "generator": "node_harness",
+    "cmd": "node scripts/bench/nd6_bench.mjs --phase B --rounds 15 --warmup 3 --site saq_server",
+    "host": {
+      "hostname": "server-lanjut",
+      "os": "Windows_NT 10.0.26300",
+      "arch": "x64",
+      "cpu_model": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz",
+      "cpu_cores": 6,
+      "ram_gb": 7.9,
+      "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 ABI v3"
+    },
+    "git": {
+      "root": {
+        "hash": "5a90545",
+        "dirty": false
+      },
+      "ze_json": {
+        "hash": "d9e25ac",
+        "dirty": false
+      },
+      "saq_report": {
+        "hash": "8c7f2d4",
+        "dirty": false
+      },
+      "untracked_owner_files_ignored": [
+        ".tmp/"
+      ]
+    },
+    "corpus": {
+      "dir": "D:\\SKRIPSI\\RAFI\\sources\\corpus\\benchmarks\\saq_payload_v1",
+      "manifest_sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1",
+      "document_count": 6,
+      "total_bytes": 88381
+    },
+    "artifact": {
+      "wasm_path": "D:\\SKRIPSI\\RAFI\\sources\\ze_json\\bindings\\js\\ze_json.wasm",
+      "wasm_sha256": "35b7f7737f0806f651d8b0acc79a2b6013d94ae26b7c68a83af7e16d7eef3185"
+    },
+    "gate": {
+      "clean": true,
+      "dirty_repos": [],
+      "exploratory": false
+    },
+    "protocol": {
+      "rounds": 15,
+      "warmup": 3,
+      "alternating": true,
+      "outlier_trimming": false,
+      "gc_exposed": false
+    },
+    "gc_at_start": {
+      "minor": 0,
+      "major": 0,
+      "other": 0
+    },
+    "date_utc": "2026-11-13T17:43:05Z"
+  },
+  "raw_rounds": [
+    {
+      "doc": "courses",
+      "path": "v8-selective",
+      "reps": 30,
+      "rounds_ms": [
+        0.0104533333,
+        0.01035,
+        0.00958666667,
+        0.00838666667,
+        0.00845,
+        0.00785,
+        0.00772333333,
+        0.00796,
+        0.00825666667,
+        0.00796333333,
+        0.00812333333,
+        0.00775666667,
+        0.00760333333,
+        0.00773,
+        0.00738
+      ],
+      "binding_calls": 0,
+      "index_calls": 0
+    },
+    {
+      "doc": "courses",
+      "path": "ze-project-selective",
+      "reps": 30,
+      "rounds_ms": [
+        0.1885,
+        0.164956667,
+        0.17221,
+        0.106846667,
+        0.106723333,
+        0.104393333,
+        0.109826667,
+        0.102426667,
+        0.102486667,
+        0.107333333,
+        0.10403,
+        0.107976667,
+        0.11059,
+        0.0826233333,
+        0.0828233333
+      ],
+      "binding_calls": 1812,
+      "index_calls": 0
+    },
+    {
+      "doc": "assistants",
+      "path": "v8-selective",
+      "reps": 30,
+      "rounds_ms": [
+        0.0121633333,
+        0.0139333333,
+        0.01089,
+        0.0110133333,
+        0.01072,
+        0.0109133333,
+        0.0107133333,
+        0.01186,
+        0.0107466667,
+        0.0109166667,
+        0.0108966667,
+        0.0108933333,
+        0.0104,
+        0.0107733333,
+        0.01044
+      ],
+      "binding_calls": 0,
+      "index_calls": 0
+    },
+    {
+      "doc": "assistants",
+      "path": "ze-project-selective",
+      "reps": 30,
+      "rounds_ms": [
+        0.13107,
+        0.139593333,
+        0.127923333,
+        0.132353333,
+        0.124963333,
+        0.126143333,
+        0.131396667,
+        0.126576667,
+        0.12533,
+        0.129503333,
+        0.12492,
+        0.128826667,
+        0.1218,
+        0.12111,
+        0.1273
+      ],
+      "binding_calls": 1812,
+      "index_calls": 0
+    },
+    {
+      "doc": "lecturers",
+      "path": "v8-selective",
+      "reps": 30,
+      "rounds_ms": [
+        0.00687666667,
+        0.00729,
+        0.00655,
+        0.00682333333,
+        0.00677,
+        0.00666333333,
+        0.00668333333,
+        0.00671,
+        0.00655,
+        0.00677666667,
+        0.00667,
+        0.00667333333,
+        0.00760666667,
+        0.00665,
+        0.00654
+      ],
+      "binding_calls": 0,
+      "index_calls": 0
+    },
+    {
+      "doc": "lecturers",
+      "path": "ze-project-selective",
+      "reps": 30,
+      "rounds_ms": [
+        0.0753433333,
+        0.0746366667,
+        0.0850633333,
+        0.0767,
+        0.0748066667,
+        0.0745466667,
+        0.0804866667,
+        0.0762166667,
+        0.0761733333,
+        0.07442,
+        0.0740933333,
+        0.0783066667,
+        0.0737733333,
+        0.0751266667,
+        0.0756266667
+      ],
+      "binding_calls": 1812,
+      "index_calls": 0
+    },
+    {
+      "doc": "schedules",
+      "path": "v8-selective",
+      "reps": 5,
+      "rounds_ms": [
+        0.06946,
+        0.0655,
+        0.06598,
+        0.06598,
+        0.06488,
+        0.06624,
+        0.0647,
+        0.06566,
+        0.07252,
+        0.06542,
+        0.06472,
+        0.06578,
+        0.06474,
+        0.06722,
+        0.06488
+      ],
+      "binding_calls": 0,
+      "index_calls": 0
+    },
+    {
+      "doc": "schedules",
+      "path": "ze-project-selective",
+      "reps": 5,
+      "rounds_ms": [
+        0.66926,
+        0.67506,
+        0.71344,
+        0.67594,
+        0.67416,
+        0.70898,
+        0.66882,
+        0.69934,
+        0.6661,
+        0.66796,
+        0.6962,
+        0.6665,
+        0.68744,
+        0.70096,
+        0.66846
+      ],
+      "binding_calls": 312,
+      "index_calls": 0
+    },
+    {
+      "doc": "reports",
+      "path": "v8-selective",
+      "reps": 5,
+      "rounds_ms": [
+        0.05152,
+        0.05688,
+        0.05062,
+        0.05096,
+        0.0505,
+        0.05168,
+        0.05058,
+        0.05202,
+        0.05056,
+        0.05128,
+        0.05054,
+        0.05144,
+        0.05074,
+        0.05118,
+        0.05194
+      ],
+      "binding_calls": 0,
+      "index_calls": 0
+    },
+    {
+      "doc": "reports",
+      "path": "ze-project-selective",
+      "reps": 5,
+      "rounds_ms": [
+        0.4528,
+        0.49804,
+        0.45084,
+        0.45028,
+        0.45242,
+        0.48824,
+        0.45246,
+        0.45882,
+        0.45778,
+        0.45322,
+        0.47026,
+        0.4507,
+        0.45214,
+        0.46062,
+        0.47312
+      ],
+      "binding_calls": 312,
+      "index_calls": 0
+    },
+    {
+      "doc": "globalConfig",
+      "path": "v8-selective",
+      "reps": 30,
+      "rounds_ms": [
+        0.00285666667,
+        0.00290666667,
+        0.00307666667,
+        0.00247666667,
+        0.00198333333,
+        0.00183,
+        0.00175333333,
+        0.00184,
+        0.00175,
+        0.00179333333,
+        0.00173333333,
+        0.00176,
+        0.00175666667,
+        0.00177,
+        0.00173333333
+      ],
+      "binding_calls": 0,
+      "index_calls": 0
+    },
+    {
+      "doc": "globalConfig",
+      "path": "ze-project-selective",
+      "reps": 30,
+      "rounds_ms": [
+        0.02845,
+        0.0276566667,
+        0.0260366667,
+        0.0187933333,
+        0.0197733333,
+        0.0195233333,
+        0.0180233333,
+        0.0177966667,
+        0.0160366667,
+        0.0153866667,
+        0.0167666667,
+        0.01621,
+        0.0169366667,
+        0.0155166667,
+        0.0227366667
+      ],
+      "binding_calls": 1812,
+      "index_calls": 0
+    }
+  ]
+}

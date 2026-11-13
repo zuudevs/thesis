@@ -1,0 +1,61 @@
+{
+  "run_id": "server-lanjut-20261113174306-5a90545",
+  "phase": "C",
+  "site": "saq_server",
+  "generator": "node_harness",
+  "cmd": "node scripts/bench/nd6_bench.mjs --phase C --rounds 15 --warmup 3 --site saq_server",
+  "host": {
+    "hostname": "server-lanjut",
+    "os": "Windows_NT 10.0.26300",
+    "arch": "x64",
+    "cpu_model": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz",
+    "cpu_cores": 6,
+    "ram_gb": 7.9,
+    "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 ABI v3"
+  },
+  "git": {
+    "root": {
+      "hash": "5a90545",
+      "dirty": false
+    },
+    "ze_json": {
+      "hash": "d9e25ac",
+      "dirty": false
+    },
+    "saq_report": {
+      "hash": "8c7f2d4",
+      "dirty": false
+    },
+    "untracked_owner_files_ignored": [
+      ".tmp/"
+    ]
+  },
+  "corpus": {
+    "dir": "D:\\SKRIPSI\\RAFI\\sources\\corpus\\benchmarks\\saq_payload_v1",
+    "manifest_sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1",
+    "document_count": 6,
+    "total_bytes": 88381
+  },
+  "artifact": {
+    "wasm_path": "D:\\SKRIPSI\\RAFI\\sources\\ze_json\\bindings\\js\\ze_json.wasm",
+    "wasm_sha256": "35b7f7737f0806f651d8b0acc79a2b6013d94ae26b7c68a83af7e16d7eef3185"
+  },
+  "gate": {
+    "clean": true,
+    "dirty_repos": [],
+    "exploratory": false
+  },
+  "protocol": {
+    "rounds": 15,
+    "warmup": 3,
+    "alternating": true,
+    "outlier_trimming": false,
+    "gc_exposed": false
+  },
+  "gc_at_start": {
+    "minor": 0,
+    "major": 0,
+    "other": 0
+  },
+  "date_utc": "2026-11-13T17:43:06Z"
+}

@@ -1,0 +1,178 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "server-lanjut-20261113174349-5a90545",
+  "site": "saq_server",
+  "generator": "node_harness",
+  "library": {
+    "name": "ze_json",
+    "version": "0.0.0-unknown (ze_json@d9e25ac, saq-report@8c7f2d4)",
+    "language_runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI v3",
+    "artifact_sha256": "35b7f7737f0806f651d8b0acc79a2b6013d94ae26b7c68a83af7e16d7eef3185"
+  },
+  "git_commit": {
+    "hash": "5a90545",
+    "dirty": false,
+    "repo": "v5"
+  },
+  "host": {
+    "hostname": "server-lanjut",
+    "os": "Windows_NT 10.0.26300",
+    "arch": "x64",
+    "cpu_model": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz",
+    "cpu_cores": 6,
+    "ram_gb": 7.9,
+    "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 ABI v3"
+  },
+  "corpus": {
+    "name": "saq_payload_v1",
+    "document_count": 6,
+    "total_bytes": 88381,
+    "max_document_bytes": 39209,
+    "sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1"
+  },
+  "config": {
+    "date_utc": "2026-11-13T17:43:49Z",
+    "iterations": 2,
+    "warmup_runs": 3,
+    "repeats": 15,
+    "cpu_pinning": false,
+    "threads": 1,
+    "exploratory": false,
+    "notes": "ND-6 phase D; alternating rounds; no outlier trimming; gc_exposed=false; gc(minor=0, major=0); raw: out/raw/server-lanjut-20261113174349-5a90545/; per-result detail in extras (seconds_median/p95, binding_calls, index_count, consumed/skipped — kumulatif GC sejak start fase). Baseline=V8 (engine=v8), candidate=ze_json wasm64_cabi — same run_id; phase D measures through the saq-report repository layer (binding calls not observable there: extras.binding_calls=null)."
+  },
+  "results": [
+    {
+      "name": "D/D-file-store-v8",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Workload SAQ asli: satu iterasi = request GET /rekap (4 repo) jalur baseline repo.read().length (file store).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00203062333,
+        "seconds_stddev": 0.0000237777,
+        "bytes_per_second": 43524073.9,
+        "documents_per_second": 1969.83849
+      },
+      "extras": {
+        "path": "D-file-store-v8",
+        "seconds_median": 0.00203395,
+        "seconds_p95": 0.00206088,
+        "rounds": 15,
+        "reps_per_round": 2,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": null,
+        "index_count": null,
+        "consumed_fields": 1871,
+        "skipped_fields": 0,
+        "total_fields": 1871,
+        "doc_bytes": 88381
+      }
+    },
+    {
+      "name": "D/D-file-store-ze",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Workload SAQ asli: request GET /rekap jalur ze opt-in repo.readCount() (file store) — acceptance T_baseline/T_ze >= 1.5x.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00219732,
+        "seconds_stddev": 0.0000793694,
+        "bytes_per_second": 40222179.7,
+        "documents_per_second": 1820.3994
+      },
+      "extras": {
+        "path": "D-file-store-ze",
+        "seconds_median": 0.0022026,
+        "seconds_p95": 0.00229302,
+        "rounds": 15,
+        "reps_per_round": 2,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": null,
+        "index_count": null,
+        "consumed_fields": 0,
+        "skipped_fields": 1871,
+        "total_fields": 1871,
+        "doc_bytes": 88381
+      }
+    },
+    {
+      "name": "D/D-mongo-cache-v8",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Workload SAQ asli mode cache Mongo (state pasca-init disimulasikan tanpa MongoDB): repo.read() klon + .length.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000199343333,
+        "seconds_stddev": 0.0000253381,
+        "bytes_per_second": 443360701,
+        "documents_per_second": 20065.883
+      },
+      "extras": {
+        "path": "D-mongo-cache-v8",
+        "seconds_median": 0.00019025,
+        "seconds_p95": 0.000244725,
+        "rounds": 15,
+        "reps_per_round": 2,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": null,
+        "index_count": null,
+        "consumed_fields": 1871,
+        "skipped_fields": 0,
+        "total_fields": 1871,
+        "doc_bytes": 88381
+      }
+    },
+    {
+      "name": "D/D-mongo-cache-ze",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Workload SAQ asli mode cache Mongo: repo.readCount() stringify + structural count (acceptance).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000175406667,
+        "seconds_stddev": 0.00000799773,
+        "bytes_per_second": 503863403,
+        "documents_per_second": 22804.1504
+      },
+      "extras": {
+        "path": "D-mongo-cache-ze",
+        "seconds_median": 0.00017365,
+        "seconds_p95": 0.000187895,
+        "rounds": 15,
+        "reps_per_round": 2,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": null,
+        "index_count": null,
+        "consumed_fields": 0,
+        "skipped_fields": 1871,
+        "total_fields": 1871,
+        "doc_bytes": 88381
+      }
+    }
+  ]
+}
