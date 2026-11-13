@@ -1,0 +1,159 @@
+{
+  "metadata": {
+    "run_id": "zuu-20261113173306-5a90545",
+    "phase": "D",
+    "site": "dev_device",
+    "generator": "node_harness",
+    "cmd": "node scripts/bench/nd6_bench.mjs --phase D --rounds 15 --warmup 3 --site dev_device",
+    "host": {
+      "hostname": "zuu",
+      "os": "Windows_NT 10.0.26200",
+      "arch": "x64",
+      "cpu_model": "AMD Ryzen 5 5500U with Radeon Graphics         ",
+      "cpu_cores": 12,
+      "ram_gb": 7.4,
+      "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 ABI v3"
+    },
+    "git": {
+      "root": {
+        "hash": "5a90545",
+        "dirty": false
+      },
+      "ze_json": {
+        "hash": "d9e25ac",
+        "dirty": false
+      },
+      "saq_report": {
+        "hash": "8c7f2d4",
+        "dirty": false
+      },
+      "untracked_owner_files_ignored": []
+    },
+    "corpus": {
+      "dir": "D:\\kuliah_\\7_semester\\skripsi\\v5\\corpus\\benchmarks\\saq_payload_v1",
+      "manifest_sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1",
+      "document_count": 6,
+      "total_bytes": 88381
+    },
+    "artifact": {
+      "wasm_path": "D:\\kuliah_\\7_semester\\skripsi\\v5\\ze_json\\bindings\\js\\ze_json.wasm",
+      "wasm_sha256": "35b7f7737f0806f651d8b0acc79a2b6013d94ae26b7c68a83af7e16d7eef3185"
+    },
+    "gate": {
+      "clean": true,
+      "dirty_repos": [],
+      "exploratory": false
+    },
+    "protocol": {
+      "rounds": 15,
+      "warmup": 3,
+      "alternating": true,
+      "outlier_trimming": false,
+      "gc_exposed": false
+    },
+    "gc_at_start": {
+      "minor": 0,
+      "major": 0,
+      "other": 0
+    },
+    "date_utc": "2026-11-13T17:33:06Z"
+  },
+  "raw_rounds": [
+    {
+      "doc": "D-rekap-request",
+      "path": "D-file-store-v8",
+      "reps": 2,
+      "rounds_ms": [
+        4.08905,
+        5.00915,
+        4.08825,
+        4.2121,
+        4.5748,
+        3.689,
+        3.89735,
+        3.8111,
+        4.3217,
+        3.8352,
+        3.59135,
+        3.35865,
+        4.49585,
+        4.74125,
+        3.38235
+      ],
+      "binding_calls": 0,
+      "index_calls": 0
+    },
+    {
+      "doc": "D-rekap-request",
+      "path": "D-file-store-ze",
+      "reps": 2,
+      "rounds_ms": [
+        4.9693,
+        4.89165,
+        4.79515,
+        4.13845,
+        4.58485,
+        4.5882,
+        3.74455,
+        4.42,
+        3.8105,
+        4.4413,
+        3.9853,
+        4.2699,
+        4.6142,
+        4.5919,
+        4.21995
+      ],
+      "binding_calls": 0,
+      "index_calls": 0
+    },
+    {
+      "doc": "D-rekap-request",
+      "path": "D-mongo-cache-v8",
+      "reps": 2,
+      "rounds_ms": [
+        0.20625,
+        0.1943,
+        0.45185,
+        0.203,
+        0.3927,
+        0.19625,
+        0.35725,
+        0.19595,
+        0.19375,
+        0.1919,
+        0.63675,
+        0.21075,
+        0.18465,
+        0.1889,
+        0.2236
+      ],
+      "binding_calls": 0,
+      "index_calls": 0
+    },
+    {
+      "doc": "D-rekap-request",
+      "path": "D-mongo-cache-ze",
+      "reps": 2,
+      "rounds_ms": [
+        0.14015,
+        0.1375,
+        0.3307,
+        0.18275,
+        0.26795,
+        0.1315,
+        0.16035,
+        0.12915,
+        0.14015,
+        0.12715,
+        0.1804,
+        0.1389,
+        0.1266,
+        0.12935,
+        0.1406
+      ],
+      "binding_calls": 0,
+      "index_calls": 0
+    }
+  ]
+}

@@ -1,9 +1,16 @@
 # ND-10 — Desain Kontrol Lintas Runtime & Mesin (isolasi variabel)
 
-> Status: **desain, belum dieksekusi**. Revisi AUD-1 2026-11-13 atas keputusan
-> pemilik: Node 24 TIDAK dipasang ulang di dev — kontrol runtime mengandalkan
-> identitas artefak + histori berlabel, kontrol mesin memakai dev(Node 26) vs
-> server(Node 26).
+> Status: **TEREKSEKUSI 2026-11-13/14** (E1 + E2, instruksi pemilik) — hasil,
+> interpretasi matriks §4, dan batas klaim:
+> [`reports/nd10-runtime-control.md`](../../reports/nd10-runtime-control.md).
+> Verdict: acceptance ≥1,5× tidak tercapai di kedua site pada Node 26 matched
+> (dev 1,45×/1,41×; server 1,13×/1,10×); runtime V8 14.6 = penyebab dominan
+> kompresi rasio (E1 confounded antar-era — wasm era lama tak terekam
+> sidecarnya). Desain asli di bawah dipertahankan apa adanya.
+>
+> Revisi AUD-1 2026-11-13 atas keputusan pemilik: Node 24 TIDAK dipasang
+> ulang di dev — kontrol runtime mengandalkan identitas artefak + histori
+> berlabel, kontrol mesin memakai dev(Node 26) vs server(Node 26).
 
 ## 1. Latar (fakta terverifikasi)
 

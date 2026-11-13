@@ -65,11 +65,21 @@ GRAY = "#455a64"
 # ---------------------------------------------------------------------------
 # Pinned run provenance (deterministic; abort when a pinned record is absent)
 # ---------------------------------------------------------------------------
-# dev 2026-11-12: A/B/C diagnostic runs = root 0dcb418;
-# acceptance D = bbee7bf (post-cache-bytes, saq-report 8c7f2d4) — main run
-# 064628 (2.85x), confirmation 064642 (3.00x). See tasks.md ND-6/ND-7.
-# server 2026-11-13: 714cbb9 batch — reports/nd6-server-phase-matrix.md.
-RUNS = {
+# Two vintages, selected with `--vintage=nd6|nd10` (default nd10):
+#
+# nd6 (HISTORICAL, 2026-11-12/13): dev A/B/C = root 0dcb418, acceptance D =
+#   bbee7bf main 064628 (2.85x) + confirm 064642 (3.00x); server = 714cbb9
+#   batch (root dirty = exploratory). Vintage runtime MIXED (dev Node 24,
+#   server Node 26) — superseded by ND-10 for the runtime-controlled claim.
+#
+# nd10 (FRESH, PLANS P8-3, 2026-11-13): ND-10 E1+E2 executed from CLEAN
+#   trees on both sites, root 5a90545, ze_json d9e25ac, saq-report 8c7f2d4,
+#   Node 26.13.1 (V8 14.6.202.34-node.40) IDENTICAL both sites, wasm
+#   35b7f773... byte-identical (sidecar artifact.wasm_sha256), corpus
+#   saq_payload_v1 sha256 9f826c8a... identical. D run + confirm run per
+#   site. E1 (dev Node24-era -> Node26) vs old dev records is CONFOUNDED
+#   (wasm 7e26044f-era -> 35b7f773; era sidecars lost) — labeled in report.
+RUNS_ND6 = {
     ("A", "dev_device"): "zuu-20261112063944-0dcb418",
     ("B", "dev_device"): "zuu-20261112063949-0dcb418",
     ("C", "dev_device"): "zuu-20261112063955-0dcb418",
@@ -79,7 +89,32 @@ RUNS = {
     ("C", "saq_server"): "server-lanjut-20261113004510-714cbb9",
     ("D", "saq_server"): "server-lanjut-20261113004520-714cbb9",
 }
-D_DEV_CONFIRM = "zuu-20261112064642-bbee7bf"
+CONFIRM_ND6 = ["zuu-20261112064642-bbee7bf"]  # dev only
+RUNS_ND10 = {
+    ("A", "dev_device"): "zuu-20261113173228-5a90545",
+    ("B", "dev_device"): "zuu-20261113173230-5a90545",
+    ("C", "dev_device"): "zuu-20261113173232-5a90545",
+    ("D", "dev_device"): "zuu-20261113173306-5a90545",
+    ("A", "saq_server"): "server-lanjut-20261113174303-5a90545",
+    ("B", "saq_server"): "server-lanjut-20261113174305-5a90545",
+    ("C", "saq_server"): "server-lanjut-20261113174306-5a90545",
+    ("D", "saq_server"): "server-lanjut-20261113174348-5a90545",
+}
+CONFIRM_ND10 = [
+    "zuu-20261113173308-5a90545",            # dev confirm
+    "server-lanjut-20261113174349-5a90545",  # server confirm
+]
+
+VINTAGE = "nd10"
+for _a in sys.argv[1:]:
+    if _a.startswith("--vintage="):
+        VINTAGE = _a.split("=", 1)[1]
+if VINTAGE not in ("nd6", "nd10"):
+    raise SystemExit("vintage must be nd6 or nd10")
+
+RUNS = RUNS_ND6 if VINTAGE == "nd6" else RUNS_ND10
+CONFIRM_RUNS = CONFIRM_ND6 if VINTAGE == "nd6" else CONFIRM_ND10
+PREFIX = VINTAGE  # output filename prefix: nd6-* / nd10-*
 
 PAIRS = {
     "A": ("A/{d}/v8-parse", "A/{d}/ze-parse"),
@@ -187,10 +222,16 @@ def build_cells(nd6, log_rows):
 # ---------------------------------------------------------------------------
 
 def draw_map(cells):
-    site_labels = [
-        "dev_device\n2026-11-12 · Node 24.19.0 (V8 13.6)",
-        "saq_server\n2026-11-13 · Node 26.13.0 (V8 14.6)\n* git dirty → exploratory",
-    ]
+    if VINTAGE == "nd6":
+        site_labels = [
+            "dev_device\n2026-11-12 · Node 24.19.0 (V8 13.6)",
+            "saq_server\n2026-11-13 · Node 26.13.0 (V8 14.6)\n* git dirty → exploratory",
+        ]
+    else:
+        site_labels = [
+            "dev_device\nNode 26.13.1 (V8 14.6) · tree bersih",
+            "saq_server\nNode 26.13.1 (V8 14.6) · tree bersih",
+        ]
     zlog = lambda v: math.log10(v)  # noqa: E731
     z = [[zlog(cells[(r["key"], s)]["speedup"]) for s in SITES] for r in ROWS]
     norm = TwoSlopeNorm(vmin=math.log10(0.03), vcenter=0.0, vmax=math.log10(3.2))
@@ -228,20 +269,27 @@ def draw_map(cells):
     cbar.ax.set_yticklabels([f"{t:g}×" for t in ticks], fontsize=8.5)
     cbar.set_label("speedup (skala log)", fontsize=9)
 
-    fig.suptitle("ze_json vs baseline V8 — peta speedup ND-6 (in-situ, satu run_id)",
-                 fontsize=13, fontweight="bold", y=0.99)
-    fig.text(0.5, 0.955,
-             "Hijau = ze_json unggul (>1×) · merah = perlu perbaikan (<1×) · "
-             "target acceptance ≥ 1,5×",
-             ha="center", fontsize=9.5, color="#37474f")
-    fig.text(0.5, 0.012,
-             "Speedup = median V8 / median ze dalam pasangan in-situ (fairness gate: satu run_id, korpus sha256 sama, status ok). "
-             "A/B = median lintas 6 store (bracket = min–max).\n"
-             "Fase D dev = run utama post-cache-bytes (run konfirmasi 3,00× ada di figur acceptance). Sumber: record PASS reports/nd6/. "
-             "*Server git dirty = exploratory. Regenerasi wajib setelah fresh run ND-10.",
-             ha="center", fontsize=7.8, color="#555555")
+    if VINTAGE == "nd6":
+        title = "ze_json vs baseline V8 — peta speedup ND-6 (in-situ, satu run_id)"
+        sub = ("Hijau = ze_json unggul (>1×) · merah = perlu perbaikan (<1×) · "
+               "target acceptance ≥ 1,5×")
+        foot = ("Speedup = median V8 / median ze dalam pasangan in-situ (fairness gate: satu run_id, korpus sha256 sama, status ok). "
+                "A/B = median lintas 6 store (bracket = min–max).\n"
+                "Fase D dev = run utama post-cache-bytes (run konfirmasi 3,00× ada di figur acceptance). Sumber: record PASS reports/nd6/. "
+                "*Server git dirty = exploratory. Vintage runtime campuran (dev Node 24, server Node 26).")
+    else:
+        title = "ze_json vs baseline V8 — peta speedup ND-10 (kontrol runtime + mesin)"
+        sub = ("Fresh run 2026-11-13 · Node 26.13.1 identik di kedua site · wasm 35b7f773 byte-identik · tree bersih · "
+               "hijau = unggul (>1×) · merah = perlu perbaikan (<1×)")
+        foot = ("Speedup = median V8 / median ze dalam pasangan in-situ (fairness gate: satu run_id, korpus sha256 sama, status ok). "
+                "A/B = median lintas 6 store (bracket = min–max).\n"
+                "E1: verdict era Node 24 (2,85×/3,00×) tidak reproducible di Node 26 — komparasi antar-era confounded "
+                "(wasm era lama 7e26044f tak terekam sidecarnya). Sumber: record PASS reports/nd10/.")
+    fig.suptitle(title, fontsize=13, fontweight="bold", y=0.99)
+    fig.text(0.5, 0.955, sub, ha="center", fontsize=9.5, color="#37474f")
+    fig.text(0.5, 0.012, foot, ha="center", fontsize=7.8, color="#555555")
     fig.tight_layout(rect=(0, 0.035, 1, 0.935))
-    base.save(fig, "nd6-summary-map")
+    base.save(fig, f"{PREFIX}-summary-map")
 
 
 # ---------------------------------------------------------------------------
@@ -249,16 +297,27 @@ def draw_map(cells):
 # ---------------------------------------------------------------------------
 
 def draw_acceptance(nd6, log_rows):
-    spec = [
-        (RUNS[("D", "dev_device")],
-         "dev · run utama\n2026-11-12 · Node 24.19.0 (V8 13.6)", GREEN, ""),
-        (D_DEV_CONFIRM,
-         "dev · run konfirmasi\n2026-11-12 · Node 24.19.0 (V8 13.6)", GREEN, ""),
-        (RUNS[("D", "saq_server")],
-         "server · 2026-11-13\nNode 26.13.0 · git dirty (exploratory)", AMBER, "*"),
-    ]
+    if VINTAGE == "nd6":
+        rt_dev = "2026-11-12 · Node 24.19.0 (V8 13.6)"
+        rt_srv = "2026-11-13 · Node 26.13.0 · git dirty (exploratory)"
+    else:
+        rt_dev = "2026-11-13 · Node 26.13.1 · tree bersih"
+        rt_srv = rt_dev
+    if VINTAGE == "nd6":
+        spec = [
+            (RUNS[("D", "dev_device")], f"dev · run utama\n{rt_dev}"),
+            (RUNS[("D", "saq_server")], f"server · run utama\n{rt_srv}"),
+            *[(rid, f"dev · konfirmasi\n{rt_dev}") for rid in CONFIRM_RUNS],
+        ]
+    else:
+        spec = [
+            (RUNS[("D", "dev_device")], "dev · utama"),
+            (RUNS[("D", "saq_server")], "server · utama"),
+            *[(rid, "dev · konfirmasi" if rid.startswith("zuu-")
+               else "server · konfirmasi") for rid in CONFIRM_RUNS],
+        ]
     bars = []
-    for prefix, label, color, star in spec:
+    for prefix, label in spec:
         matches = [r for r in nd6 if r["run_id"].startswith(prefix)]
         if len(matches) != 1:
             raise SystemExit(f"acceptance run {prefix}: expected 1, found {len(matches)}")
@@ -270,9 +329,12 @@ def draw_acceptance(nd6, log_rows):
                                     f"acceptance:{rec['site']}"):
             raise SystemExit(f"acceptance pair rejected by fairness gate ({prefix})")
         bp, cp = base.p95_of(b)[0], base.p95_of(c)[0]
+        speedup = base.median_of(b)[0] / base.median_of(c)[0]
         bars.append({
-            "label": label, "color": color, "star": star, "rec": rec,
-            "speedup": base.median_of(b)[0] / base.median_of(c)[0],
+            "label": label,
+            "color": GREEN if speedup >= 1.5 else (AMBER if speedup >= 1.0 else RED),
+            "star": "*" if rec["dirty"] else "", "rec": rec,
+            "speedup": speedup,
             "p95": (bp / cp) if bp and cp else None,
         })
 
@@ -293,10 +355,11 @@ def draw_acceptance(nd6, log_rows):
 
     ax.axhline(1.0, color=GRAY, ls="--", lw=1)
     ax.axhline(1.5, color=RED, ls="--", lw=1.4)
-    ax.annotate("1× (setara)", (-0.45, 1.0), fontsize=8.5,
-                va="bottom", ha="left", color=GRAY)
-    ax.annotate("target acceptance 1,5×", (-0.45, 1.5),
-                fontsize=8.5, va="bottom", ha="left", color=RED)
+    ax.annotate("1× (setara)", (len(bars) - 1 + 0.42, 1.0), fontsize=8.5,
+                va="center", ha="left", color=GRAY)
+    ax.annotate("target 1,5×", (len(bars) - 1 + 0.42, 1.5), fontsize=8.5,
+                va="center", ha="left", color=RED)
+    ax.set_xlim(-0.5, len(bars) - 1 + 1.05)
     ax.set_xticks(list(xs), labels=[b["label"] for b in bars], fontsize=9)
     ax.set_ylim(0, max(vals + [b["p95"] for b in bars if b["p95"]]) * 1.2)
     ax.set_ylabel("Speedup fase D = T_baseline / T_ze (median)")
@@ -304,18 +367,23 @@ def draw_acceptance(nd6, log_rows):
     ax.set_axisbelow(True)
     ax.spines[["top", "right"]].set_visible(False)
 
-    fig.suptitle("ND-6 fase D — acceptance jalur produksi (cache Mongo ter-load)",
-                 fontsize=13, fontweight="bold", y=0.99)
-    fig.text(0.5, 0.935,
-             "Satu iterasi = GET /rekap atas 4 repository pada LAPISAN REPOSITORY "
-             "saq-report (bukan HTTP end-to-end).",
-             ha="center", fontsize=9, color="#37474f")
-    fig.text(0.5, 0.015,
-             "Baseline repo.read().length (V8) vs ze repo.readCount() (structural count, wasm64 C-ABI) dalam satu run_id.\n"
-             "File-store fallback: lihat peta (I/O-bound). Regenerasi wajib setelah fresh run ND-10.",
-             ha="center", fontsize=7.8, color="#555555")
+    if VINTAGE == "nd6":
+        acc_title = "ND-6 fase D — acceptance jalur produksi (cache Mongo ter-load)"
+        acc_sub = ("Satu iterasi = GET /rekap atas 4 repository pada LAPISAN REPOSITORY "
+                   "saq-report (bukan HTTP end-to-end).")
+        acc_foot = ("Baseline repo.read().length (V8) vs ze repo.readCount() (structural count, wasm64 C-ABI) dalam satu run_id.\n"
+                    "File-store fallback: lihat peta (I/O-bound). Vintage runtime campuran (dev Node 24, server Node 26).")
+    else:
+        acc_title = "ND-10 fase D — acceptance jalur produksi (kontrol runtime + mesin)"
+        acc_sub = ("Node 26.13.1 identik di kedua site · wasm 35b7f773 byte-identik · tree bersih · "
+                   "target ≥ 1,5× TIDAK tercapai di kedua site.")
+        acc_foot = ("Baseline repo.read().length (V8) vs ze repo.readCount() (structural count, wasm64 C-ABI) dalam satu run_id.\n"
+                    "E1: verdict era Node 24 (2,85×/3,00×) turun ~1,4× di Node 26 → runtime V8 14.6 = penyebab dominan kompresi (wasm era lama tak terekam sidecarnya → confounded).")
+    fig.suptitle(acc_title, fontsize=13, fontweight="bold", y=0.99)
+    fig.text(0.5, 0.935, acc_sub, ha="center", fontsize=9, color="#37474f")
+    fig.text(0.5, 0.015, acc_foot, ha="center", fontsize=7.8, color="#555555")
     fig.tight_layout(rect=(0, 0.045, 1, 0.915))
-    base.save(fig, "nd6-acceptance")
+    base.save(fig, f"{PREFIX}-acceptance")
     return bars
 
 
@@ -336,6 +404,9 @@ def write_csv(name, fieldnames, rows):
 
 def main():
     recs = base.load_records()
+    if VINTAGE == "nd10":
+        base.RECORDS_DIR = os.path.join(base.ROOT, "reports", "nd10")
+        recs = base.load_records() + recs
     nd6 = base.nd6_phase_records(recs)
     print(f"loaded {len(recs)} records ({len(nd6)} ND-6 phase records)")
     log_rows = []
@@ -366,7 +437,7 @@ def main():
                     "ze_json_commit": cell["rec"]["ze_hash"],
                     "saq_report_commit": cell["rec"]["saq_hash"],
                 })
-    write_csv("nd6-summary-map.csv", list(map_rows[0].keys()), map_rows)
+    write_csv(f"{PREFIX}-summary-map.csv", list(map_rows[0].keys()), map_rows)
 
     acc_rows = [{
         "site": b["rec"]["site"], "run_id": b["rec"]["run_id"],
@@ -376,9 +447,9 @@ def main():
         "ze_json_commit": b["rec"]["ze_hash"],
         "saq_report_commit": b["rec"]["saq_hash"],
     } for b in bars]
-    write_csv("nd6-acceptance.csv", list(acc_rows[0].keys()), acc_rows)
+    write_csv(f"{PREFIX}-acceptance.csv", list(acc_rows[0].keys()), acc_rows)
     if log_rows:
-        write_csv("nd6-summary-fairness.csv", list(log_rows[0].keys()), log_rows)
+        write_csv(f"{PREFIX}-summary-fairness.csv", list(log_rows[0].keys()), log_rows)
 
     print("\n== summary map ==")
     for row in ROWS:
