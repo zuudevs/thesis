@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "@types/node": "^26.6.6"
+  },
+  "dependencies": {
+    "pele": "^1.13.0"
+  },
+  "scripts": {
+	"make": "npx tsx make-graph.ts"
+  }
+}

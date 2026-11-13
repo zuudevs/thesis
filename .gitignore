@@ -14,3 +14,8 @@ __pycache__/
 
 # ssh-remote credentials (never commit)
 scripts/ssh-remote/.env
+
+# owner-local workspace (never commit — personal data / local tooling)
+journal/
+scripts/grapher/node_modules/
+utils/typ/metadata.json

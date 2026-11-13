@@ -1,0 +1,98 @@
+{
+	"document": {
+		"title": {
+			"primary": null,
+			"secondary": []
+		},
+		"topic": {
+			"primary": null,
+			"secondary": []
+		},
+		"keywords": [],
+		"type": null,
+		"approval_date": null
+	},
+	"student": {
+		"id": "00000000",
+		"first_name": "First",
+		"middle_name": "Middle",
+		"last_name": "Last",
+		"full_name": "First Middle Last",
+		"sex": null,
+		"religion": null,
+		"major": "Teknik Informatika",
+		"faculty": "Telematika Energi",
+		"phone": "080000000000",
+		"email": "student@example.edu",
+		"pob": {
+			"city": null,
+			"date": 1,
+			"month": null,
+			"year": 1900
+		},
+		"address": {
+			"streets": [
+				"Jl. Contoh"
+			],
+			"subdistrict": null,
+			"city": null,
+			"province": {
+				"primary": null,
+				"secondary": []
+			},
+			"zip_code": "00000"
+		},
+		"academic": {
+			"SD": null,
+			"SMP": null,
+			"SMA": null,
+			"Diploma III": null,
+			"Sarjana": null
+		}
+	},
+	"lectures": {
+		"academic_advisor": {
+			"id": "0000000000",
+			"first_name": "Advisor",
+			"middle_name": null,
+			"last_name": null,
+			"full_name": "Advisor",
+			"prefixes": [],
+			"suffixes": []
+		},
+		"thesis_supervisor": {
+			"id": "0000000000",
+			"first_name": "Supervisor",
+			"middle_name": null,
+			"last_name": null,
+			"full_name": "Supervisor",
+			"prefixes": null,
+			"suffixes": []
+		},
+		"head_of_study_program": {
+			"id": "0000000000",
+			"first_name": "Head",
+			"middle_name": null,
+			"last_name": null,
+			"full_name": "Head",
+			"prefixes": [],
+			"suffixes": []
+		}
+	},
+	"institute": {
+		"full_name": "Institut Teknologi PLN",
+		"short_name": "ITPLN",
+		"address": {
+			"streets": [
+				"Jl. Contoh No.1"
+			],
+			"subdistrict": null,
+			"city": null,
+			"province": {
+				"primary": null,
+				"secondary": []
+			},
+			"zip_code": "00000"
+		}
+	}
+}
