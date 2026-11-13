@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "server-lanjut-20261111123444-ab09adb",
+  "site": "saq_server",
+  "generator": "node_harness",
+  "library": {
+    "name": "ze_json",
+    "version": "0.1.0",
+    "language_runtime": "node 26.13.0 (wasm64 C-ABI parser, ABI v3)"
+  },
+  "git_commit": {
+    "hash": "ab09adb",
+    "dirty": true,
+    "repo": "ze_json"
+  },
+  "host": {
+    "hostname": "server-lanjut",
+    "os": "Windows_NT",
+    "os_version": "10.0.26300 (Windows 11 Education)",
+    "arch": "x86_64",
+    "cpu_model": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz",
+    "cpu_cores": 6,
+    "cpu_freq": "2.90 GHz",
+    "ram_gb": 7.9,
+    "toolchain": "node 26.13.0 (v8 14.6.202.34-node.40)"
+  },
+  "corpus": {
+    "name": "saq_payload_v1",
+    "document_count": 6,
+    "total_bytes": 88381,
+    "max_document_bytes": 39209,
+    "sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1"
+  },
+  "config": {
+    "date_utc": "2026-11-11T12:35:07Z",
+    "iterations": 981,
+    "warmup_runs": 1,
+    "repeats": 5,
+    "cpu_pinning": false,
+    "threads": 1,
+    "notes": "generator=node_harness; min_time_ms=200; warmup_ms=300; gc_between_repeats=false; repo=ze_json"
+  },
+  "results": [
+    {
+      "name": "ze-parser/wasm-open/saq_payload_v1",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze-wasm64 parser (R5 phase split): document open only — alloc + ze_parser_open + ze_parser_root + root kind classification, no traversal, no JS materialization",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0002040205912334353,
+        "seconds_stddev": 0.0000033280221143271005,
+        "bytes_per_second": 433196470.3448813,
+        "documents_per_second": 29408.79625789805,
+        "cpu_seconds": 0.00020608519269776882
+      },
+      "extras": {
+        "bytes_per_op": 88381,
+        "iterations_median": 981,
+        "rss_bytes_snapshot": 150847488
+      }
+    },
+    {
+      "name": "ze-parser/wasm-walk-full/saq_payload_v1",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze-wasm64 parser (R5 phase split): full on-demand traversal — every value token consumed through the wasm64 C-ABI frame re-entry (open + structural walk), NO JS value materialization",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.001578655905511811,
+        "seconds_stddev": 0.00004162721863905937,
+        "bytes_per_second": 55984967.7763352,
+        "documents_per_second": 3800.7015835757825,
+        "cpu_seconds": 0.001577287066246057
+      },
+      "extras": {
+        "bytes_per_op": 88381,
+        "iterations_median": 127,
+        "rss_bytes_snapshot": 150810624
+      }
+    },
+    {
+      "name": "ze-parser/wasm-parse-full/saq_payload_v1",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze-wasm64 parser (P7-7): full V8-shaped materialization of every corpus document through the wasm64 C-ABI parser (ZeParser.parse), tree fully built — the ze_json counterpart of the v8 body-parse baseline",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.004170808333333334,
+        "seconds_stddev": 0.00006546340811468986,
+        "bytes_per_second": 21190376.765495095,
+        "documents_per_second": 1438.570061359009,
+        "cpu_seconds": 0.004149377593360996
+      },
+      "extras": {
+        "bytes_per_op": 88381,
+        "iterations_median": 48,
+        "rss_bytes_snapshot": 150949888
+      }
+    }
+  ]
+}

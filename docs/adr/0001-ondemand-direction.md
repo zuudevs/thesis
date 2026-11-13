@@ -38,4 +38,9 @@ ke Node, dan belum terintegrasi ke call-site nyata SAQ.
 - **Batas jujur:** workload D literal server utuh belum dijalankan (runner
   site-aware siap; akses server belum ada); file-store fallback 0.91×
   (I/O-bound); L1 masih count-only; angka = dev device.
+  *(Errata AUD-1, 2026-11-13: server SAQ tereksekusi — matriks ND-6 di
+  `saq_server` = 1.30× (p95 1.46×), acceptance tidak tercapai di site itu →
+  verdict 2.85×/3.00× berlaku per-site; dan "jalur produksi `/rekap`" pada
+  hasil = lapisan repository, bukan HTTP endpoint. Lihat
+  `reports/nd6-server-phase-matrix.md` + addendum laporan ND-7.)*
 - Call-site lain (dashboard/enrichment) menyusul setelah benchmark ND-6.

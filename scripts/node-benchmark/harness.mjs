@@ -393,9 +393,12 @@ const ENGINES = {
   v8: {
     repo: 'saq_report',
     schemaEngine: 'v8',
-    library: () => ({
+    library: (meta) => ({
       name: 'saq_baseline',
-      version: process.versions.node,
+      // AUD-1: version names the measured baseline identity (the node-builtin
+      // parser of this saq-report commit), NOT the runtime version — the
+      // runtime belongs in language_runtime.
+      version: `node-builtin (saq-report@${meta.hash}${meta.dirty ? '-dirty' : ''})`,
       language_runtime: `node ${process.versions.node} (v8 ${process.versions.v8})`,
     }),
     makeContexts: () => CONTEXTS,
@@ -509,7 +512,7 @@ function buildRecord(opts, meta, corpus, results, engineCfg, scannerModes) {
     run_id: meta.runId,
     site: opts.site,
     generator: 'node_harness',
-    library: engineCfg.library(),
+    library: engineCfg.library(meta),
     git_commit: { hash: meta.hash, dirty: meta.dirty, repo: meta.repo },
     host: meta.host,
     corpus: {

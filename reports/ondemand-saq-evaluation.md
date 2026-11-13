@@ -150,6 +150,9 @@ Eksperimen kandidat dibuktikan dua run self-contained: 1.10× → 2.85× →
    (persis kode produksi Stage 5) dengan data store asli; render EJS,
    join service, dan `express.json()` tidak termasuk boundary. Runner
    site-aware siap; protokol identik dijalankan saat akses ada.
+   *(Update AUD-1 2026-11-13: tereksekusi — lihat Addendum §12; hasil
+   `saq_server` 1.30×, di bawah acceptance; boundary tetap lapisan
+   repository.)*
 2. **Gap fidelity korpus** (audit §4.4): `saq_payload_v1` anonim, indent-2
    seperti writer repo; distribusi field tidak identik data live — terdok
    umentasi sebagai limitasi.

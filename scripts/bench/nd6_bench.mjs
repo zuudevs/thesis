@@ -39,6 +39,7 @@ import { performance } from 'node:perf_hooks';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
+import { recordFilename, gateDecision, wasmSha256 } from './nd6_protocol.mjs';
 
 const require = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -60,7 +61,8 @@ const OUT_DIR = process.env.OUT_DIR || path.join(ROOT, 'out');
 const VALID_PHASES = new Set(['A', 'B', 'C', 'D']);
 if (!VALID_PHASES.has(PHASE)) {
     console.error('usage: node scripts/bench/nd6_bench.mjs --phase A|B|C|D '
-        + '[--rounds 15] [--warmup 3] [--site dev_device] [--corpus <dir>]');
+        + '[--rounds 15] [--warmup 3] [--site dev_device] [--corpus <dir>] '
+        + '[--allow-dirty]');
     process.exit(2);
 }
 
@@ -508,6 +510,21 @@ const zeHash = git('git -C ze_json rev-parse --short HEAD');
 const saqHash = git('git -C saq-report rev-parse --short HEAD');
 const zeDirty = dirtyTracked('ze_json');
 const saqDirty = dirtyTracked('saq-report');
+// Acceptance gate (audit ND-6 / protocol §3.9): acceptance runs MUST execute
+// from a clean tree (root + both submodules; tracked changes only — untracked
+// owner files do not affect the measured code). Refuse otherwise; --allow-dirty
+// produces an exploratory run labeled in the record (never acceptance evidence).
+const GATE = gateDecision({
+    rootDirty: DIRTY, zeDirty, saqDirty,
+    allowDirty: argv.includes('--allow-dirty'),
+});
+if (!GATE.ok) {
+    console.error(`[nd6] REFUSED: tracked changes in ${GATE.dirtyRepos.join(', ')} `
+        + '— acceptance runs require a clean tree (protocol §3.9).');
+    console.error('[nd6] For an exploratory run add --allow-dirty '
+        + '(record config.exploratory=true; NOT acceptance evidence).');
+    process.exit(3);
+}
 const HOSTNAME = os.hostname().replace(/[^A-Za-z0-9._-]/g, '-');
 const tsNow = () => {
     const d = new Date();
@@ -526,6 +543,10 @@ const zeVersion = (() => {
     try { return require(path.join(ROOT, 'ze_json', 'package.json')).version; }
     catch { return '0.0.0-unknown'; }
 })();
+
+// Identity of the actually-loaded wasm artifact (cross-site byte-identity check).
+const WASM_PATH = path.join(path.dirname(BINDING_PATH), 'ze_json.wasm');
+const WASM_SHA256 = wasmSha256(WASM_PATH);
 
 const metadata = {
     run_id: RUN_ID,
@@ -555,6 +576,15 @@ const metadata = {
         manifest_sha256: manifestSha256,
         document_count: MANIFEST.document_count,
         total_bytes: MANIFEST.total_bytes,
+    },
+    artifact: {
+        wasm_path: WASM_PATH,
+        wasm_sha256: WASM_SHA256, // null when the artifact was not found
+    },
+    gate: {
+        clean: GATE.dirtyRepos.length === 0,
+        dirty_repos: GATE.dirtyRepos,
+        exploratory: GATE.exploratory,
     },
     protocol: {
         rounds: ROUNDS,
@@ -593,6 +623,7 @@ const record = {
             + `saq-report@${saqHash}${saqDirty ? '-dirty' : ''})`,
         language_runtime: `node ${process.version} (v8 ${process.versions.v8}) `
             + `+ wasm64 C-ABI v3`,
+        ...(WASM_SHA256 ? { artifact_sha256: WASM_SHA256 } : {}),
     },
     git_commit: {
         hash: ROOT_HASH + (DIRTY ? '-dirty' : ''),
@@ -614,6 +645,7 @@ const record = {
         repeats: ROUNDS,
         cpu_pinning: false,
         threads: 1,
+        exploratory: GATE.exploratory,
         notes: `ND-6 phase ${PHASE}; alternating rounds; no outlier trimming; `
             + `gc_exposed=${Boolean(global.gc)}; gc(minor=${gcCounts.minor - gcAtStart.minor}, `
             + `major=${gcCounts.major - gcAtStart.major}); raw: out/raw/${RUN_ID}/; `
@@ -621,12 +653,16 @@ const record = {
             + `index_count, consumed/skipped — kumulatif GC sejak start fase). `
             + `Baseline=V8 (engine=v8), candidate=ze_json wasm64_cabi — same run_id; `
             + `phase D measures through the saq-report repository layer (binding `
-            + `calls not observable there: extras.binding_calls=null).`,
+            + `calls not observable there: extras.binding_calls=null).`
+            + (GATE.exploratory
+                ? ` EXPLORATORY run (tracked changes: ${GATE.dirtyRepos.join(', ')}; `
+                  + `--allow-dirty) — NOT acceptance evidence.`
+                : ''),
     },
     results,
 };
 const recordFile = path.join(MEAS_DIR,
-    `${RUN_ID}-nd6-${PHASE.toLowerCase()}-${SITE}.record.json`);
+    recordFilename(RUN_ID, PHASE, SITE));
 fs.writeFileSync(recordFile, JSON.stringify(record, null, 2));
 
 // Ringkasan ---------------------------------------------------------------

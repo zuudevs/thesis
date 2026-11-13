@@ -13,14 +13,16 @@
 - Acceptance utama = **Fase D**. Fase A–C adalah matriks diagnostik yang
   memisahkan kontribusi biaya: open/arena vs traversal vs decode vs boxing
   ABI (hipotesis §13.3).
-- Site: `dev_device` (akses server SAQ belum ada — runner site-aware;
-  protokol identik saat `saq_server` tersedia).
+- Site: `dev_device` + `saq_server` (runner site-aware; protokol identik di
+  kedua site — server tereksekusi 2026-11-13, lihat §11; kontrol
+  runtime/hardware lintas site = ND-10).
 
 ## 2. Definisi fase (per dokumen korpus, satu run_id per fase)
 
 Korpus: **`corpus/benchmarks/saq_payload_v1`** (6 dokumen file store SAQ,
 provenance sha256 manifest P0-8) — tidak diganti, tidak diregenerasi.
-Baseline selalu V8 (`JSON.parse` bawaan Node 24); candidate selalu jalur
+Baseline selalu V8 (`JSON.parse` bawaan runtime site — Node 24.19.0 di dev
+era awal, Node 26.13.0 di server); candidate selalu jalur
 `ze_json` wasm64 C-ABI v3 pada hash bersih yang sama (submodule pointer
 tercatat di record `git_commit`).
 
@@ -35,7 +37,14 @@ tercatat di record `git_commit`).
 - Fase D berjalan pada level **repositori aplikasi** (`JsonRepository`
   file-store mode memakai file korpus sebagai data store; `MongoJsonRepository`
   diukur terpisah dengan cache yang di-seed dari file yang sama — replikasi
-  state pasca-`init()` tanpa MongoDB). Satu iterasi D = satu request `/rekap`.
+  state pasca-`init()` tanpa MongoDB; **warm cache steady-state** —
+  serialisasi bytes kanonik pertama jatuh di warmup untimed, cold path tidak
+  termasuk angka). Satu iterasi D = **sekuens pemanggilan repository yang
+  dilakukan handler `/rekap`** (4 repo) — BUKAN request HTTP end-to-end
+  (tanpa Express, routing, `express.json()`, render EJS); klaim endpoint
+  produksi menuntut Phase E (ND-11, terpisah). Karena `readCount()` memakai
+  cache bytes kanonik (saq-report `8c7f2d4`), D mengukur gabungan optimasi
+  repository + jalur parser — bukan parser murni.
 - GlobalConfig tidak ikut iterasi `.length` (`.length`-nya `undefined` di
   kedua jalur — sudah terkunci parity gate ND-5); dilaporkan sebagai
   result `skip` dengan alasan, agar matriks jujur.
