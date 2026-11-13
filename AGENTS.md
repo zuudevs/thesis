@@ -3,7 +3,8 @@
 > Wajib dibaca agent di setiap sesi. Bahasa kerja: **Indonesia** untuk semua dokumen,
 > laporan, dan percakapan; **English** untuk kode, identifier, nama file, dan pesan commit.
 >
-> Sumber kebenaran rencana kerja: `PLANS.md` dan `TASKS.md` di root — baca keduanya
+> Sumber kebenaran rencana kerja: `docs/project/plans.md` dan
+> `docs/project/tasks.md` — baca keduanya
 > sebelum mulai berubah. Dokumen ini hanya berisi aturan dan fakta operasional.
 
 ## 1. Identitas proyek
@@ -21,7 +22,7 @@
   stub 32-bit), `ondemand/{string,number}.cpp` (promosi scalar lazy),
   `abi/cabi.cpp`. **Parser on-demand (`Document`/`Value`/`ArrayIter`/
   `ObjectIter`) terimplement & teruji sejak P7** (75 TEST gtest, 6 target) —
-  bukan TODO; status as-built: `docs/research/ondemand-direction-audit.md` §3.
+  bukan TODO; status as-built: `docs/research/audit-2026-11-12.md` §3.
 - **`bindings/js`**: binding Node raw wasm64 C-ABI (`ze_json.mjs`: `ZeJson`/
   `ZeDocument`/`ZeParser`, ABI v3 — `SCANNER_MODES` untuk memilih varian
   scanner + surface parser on-demand pada slot pool 64; `ZeParser` = jalur
@@ -101,7 +102,7 @@
 - Semua hasil pengukuran menyusun **struktur JSON identik antara `ze_json` dan
   `saq-report`**: satu "measurement record" (`schema_version`, `run_id`, metadata
   host/tool/library/corpus/config, array `results`). Rincian schema + validator ada di
-  `PLANS.md` §3 dan `schemas/` setelah fase P0 selesai.
+  `docs/project/plans.md` §3 dan `schemas/` setelah fase P0 selesai.
 - **Dasar tindakan (rationale) wajib** di setiap hasil pengukuran: benchmark/test
   code membawa komentar Doxygen yang menyatakan apa yang diuji dan paper dasarnya
   (`@cite`), dan record membawa field `rationale` yang isinya sama. Record tanpa
@@ -159,10 +160,11 @@
   "STALE" lama tidak berlaku lagi, diverifikasi Stage 2 2026-11-12).
 - `compile_commands.json` di root adalah salinan untuk clangd; sinkronkan setelah
   reconfigure build.
-- `ze_json/docs/{architecture,development,requirement}/` berisi **isi penuh
-  English/Mermaid** sejak P6, dikoreksi Stage 2 (parser on-demand as-built +
-  ABI v3 tercakup); `docs/` root = `research/ondemand-direction-audit.md`
-  (audit Stage 1, Bahasa Indonesia).
+- `ze_json/docs/` modular (architecture/ per-topik kebab-case, development/,
+  requirements/, adr/) berisi **isi penuh English/Mermaid** sejak P6,
+  direstrukturisasi 2026-11-12 (parser on-demand as-built + ABI v3 tercakup);
+  `docs/` root = `research/audit-2026-11-12.md` (audit Stage 1, snapshot
+  historis, Bahasa Indonesia).
 - Build aktif sekarang: `ze_json/build/native-release` dan `build/wasm64-release`
   (keduanya gitignored).
 
@@ -192,17 +194,18 @@
 
 | Kebutuhan | Lokasi |
 |---|---|
-| Rencana & tugas | `PLANS.md`, `TASKS.md` (root) |
+| Rencana & tugas | `docs/project/plans.md`, `docs/project/tasks.md` |
 | Preset build | `ze_json/CMakePresets.json` |
-| Modul toolchain / wasm | `ze_json/cmake/modules/*` (`toolchain.cmake`; `ToolChain.cmake` = wasm) |
+| Modul toolchain / wasm | `ze_json/cmake/modules/*` (`toolchain.cmake` — native chainload & wasm) |
 | Env / bootstrap | `scripts/env/activate.ps1`, `scripts/bootstraps/ze_json.bat` |
+| Build wasm64 terverifikasi | `scripts/build-wasm.ps1` (`-Fresh`/`-SkipGates`/`-VerifyOnly`) |
 | Codegen tabel | `ze_json/scripts/GenerateLookups.py` |
 | Korpus JSON_checker | `corpus/test/json_checker/` + `InstallJsonChecker.py` |
 | Literatur (paper) | `out/rag/<DOI>.chunks.json` |
 | Bibliografi | `assets/bib/cites.bib`; validasi tahun `scripts/eval-cite/` |
 | Lapisan on-demand ze_json | `ze_json/include/ze_json/ondemand/{document,value}.hpp`, `ze_json/src/ondemand/document.cpp` |
 | Binding JS | `ze_json/bindings/js/ze_json.mjs` (`ZeJson`/`ZeDocument`/`ZeParser`) |
-| Audit arah on-demand | `docs/research/ondemand-direction-audit.md` (root; feed Stage 2–7) |
+| Audit arah on-demand | `docs/research/audit-2026-11-12.md` (snapshot historis; feed Stage 2–7) |
 | Baseline Node | `saq-report/` (`MongoJsonRepository.js` clone hot path, `JsonRepository.js`, `exportService.js`, `express.json()`) |
 | Kontrak C-ABI | `ze_json/include/ze_json/abi/cabi.hpp` (+ `src/abi/cabi.cpp`) |
 | Schema pengukuran | `schemas/`, `scripts/measurement-schema/` (dibuat di fase P0) |
@@ -221,7 +224,7 @@ Scope: root `v5`, `ze_json`, `saq-report` (serta submodul dokumen bila nanti dis
   - Breaking change: tambahkan `!` setelah type + footer `BREAKING CHANGE:`.
 - **Template PR wajib** di setiap repo: `.github/PULL_REQUEST_TEMPLATE.md`
   (seksi Rationale / Changes / Measurement Evidence / Checklist — rincian template
-  di `PLANS.md` §10; pembuatannya di TASKS PW-1). Deskripsi PR boleh Indonesia.
+  di `docs/project/plans.md` §10; pembuatannya di TASKS PW-1). Deskripsi PR boleh Indonesia.
 - PR yang menyentuh jalur performa **wajib menautkan bukti pengukuran**: path record
   tervalidasi + path exhibit raw + status validator + hash baseline vs candidate.
 - Artifacts hasil ukur tidak di-commit (`out/` gitignored); bila perlu arsip

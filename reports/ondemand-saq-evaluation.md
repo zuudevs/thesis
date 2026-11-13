@@ -195,7 +195,7 @@ Eksperimen kandidat dibuktikan dua run self-contained: 1.10× → 2.85× →
   (legalitas perbandingan: kind/generator/site/host/corpus/library/preset
   harus sama — hash boleh beda).
 - Desain & as-built: `docs/architecture/lazy-access-api.md` §12–14;
-  audit: `docs/research/ondemand-direction-audit.md`.
+  audit: `docs/research/audit-2026-11-12.md`.
 
 ---
 

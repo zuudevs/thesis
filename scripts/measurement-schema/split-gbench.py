@@ -4,7 +4,7 @@ raw exhibits + converter arguments (P1-6 onward).
 
 A single benchmark session covers several corpora (synthetic ladder, SAQ
 stores, checker batch) but the measurement record schema holds exactly ONE
-corpus object per record (PLANS.md section 3). This tool partitions the raw
+corpus object per record (docs/project/plans.md section 3). This tool partitions the raw
 google-benchmark rows by corpus label, writes one raw exhibit per corpus to
 the run's exhibit directory, and emits `convert_args.json` so the converter
 step (convert-gbench.py) can build one validated record per corpus with

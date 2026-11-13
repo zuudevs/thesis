@@ -5,7 +5,7 @@
  *
  * Rationale: the thesis compares JSON parsing pathways against the V8 baseline
  * actually used by the SAQ server. The three measured contexts mirror the real
- * JSON workloads of saq-report (PLANS.md section 5, P2-2):
+ * JSON workloads of saq-report (docs/project/plans.md section 5, P2-2):
  *
  *   body-parse        JSON.parse(utf8)                 — express.json() body parsing
  *   store-read        JSON.parse + rootKey unwrap      — JsonRepository.read() hot path

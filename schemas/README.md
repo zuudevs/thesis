@@ -1,7 +1,7 @@
 # Measurement Record Schema
 
 `measurement.schema.json` — single source of truth for every measurement record
-(benchmark/test, ze_json C++ or saq-report Node.js). Design rationale: `PLANS.md` §3;
+(benchmark/test, ze_json C++ or saq-report Node.js). Design rationale: `docs/project/plans.md` §3;
 validation rules & usage: `AGENTS.md` §4.
 
 Validate a record (stdlib-only, no dependencies):

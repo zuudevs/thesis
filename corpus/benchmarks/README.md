@@ -1,7 +1,7 @@
 # Korpus benchmark (`corpus/benchmarks/`)
 
 Objek ukur benchmark — bukan fixture unit test (fixture kebenaran parser tetap di
-`corpus/test/json_checker`). Desain lengkap: `PLANS.md` §4; aturan provenance:
+`corpus/test/json_checker`). Desain lengkap: `docs/project/plans.md` §4; aturan provenance:
 `AGENTS.md` §4. Seluruh korpus **deterministik dan timestamp-free** — regenerasi
 yang tak mengubah sumber menghasilkan byte identik, jadi hash manifest stabil.
 

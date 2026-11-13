@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """analyze_measurement.py — summarize / compare / trend over measurement records v1.
 
-Ported to the skripsi workspace as TASKS.md P0-6 from the cpp-highperf-json skill
+Ported to the skripsi workspace as docs/project/tasks.md P0-6 from the cpp-highperf-json skill
 script (scripts/analyze_benchmark_result/main.py). The analyzer now reads validated
 measurement records (schemas/measurement.schema.json) instead of raw google-benchmark
 files; raw exhibits stay untouched under out/raw/<run_id>/.

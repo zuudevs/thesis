@@ -1,13 +1,15 @@
-# TASKS.md — Daftar Tugas Skripsi (v5)
+# Daftar Tugas Skripsi (v5) — tasks
 
 > Checklist operasional; satu perubahan = satu task ID. Tandai `[x]` hanya setelah
-> DoD (`PLANS.md` §9) terpenuhi. Setiap sesi kerja di `ze_json` dimulai dengan
+> DoD ([`plans.md`](plans.md) §9) terpenuhi. Setiap sesi kerja di `ze_json` dimulai dengan
 > memuat skill `cpp-highperf-json` dan `scripts/env/activate.ps1`.
+> Riwayat migrasi: semula `TASKS.md` di root; dipindah ke `docs/project/tasks.md`
+> pada overhaul arsitektur dokumentasi 2026-11-12 (PW-2).
 
 ## P0 — Fondasi pengukuran
 
 - [x] **P0-1** — `schemas/measurement.schema.json` (JSON Schema draft-07) sesuai
-  rancangan `PLANS.md` §3, termasuk kewajiban field `rationale`
+  rancangan `plans.md` §3, termasuk kewajiban field `rationale`
   (`purpose` + `basis_papers[]`) pada setiap entry `results[]`.
 - [x] **P0-2** — Validator `scripts/measurement-schema/validate.py` (stdlib-only;
   `python scripts/measurement-schema/validate.py <record.json>`; exit 0 = valid);
@@ -53,7 +55,7 @@
   `InstallJsonChecker.py`: 33 `fail*.json` + 3 `pass*.json` + `README.md` (teks
   identik hasil `write_info()`) = 37 berkas; cache paket `.cache/json_checker/`
   utuh (`.c`, header, `CMakeLists.txt` dari `install()`).
-- [x] **P0-10** — README singkat di `schemas/` (merujuk `PLANS.md` §3 + cara validasi
+- [x] **P0-10** — README singkat di `schemas/` (merujuk `plans.md` §3 + cara validasi
   + penunjuk converter/analyzer).
 
 ## P1 — Harness & korpus native (ze_json)
@@ -231,7 +233,7 @@
     smoke wasm PASS, differential 71×5 agree. Catatan skema: field
     `run_id` record dari convert-gbench kini diisi `--run-id` sinkron
     sidecar (run C2 ke atas; record lama memakai stamp konversi).
-- [x] **P4-4** — PGO cycle (bila dipilih di `PLANS.md` §7): build `native-pgo` →
+- [x] **P4-4** — PGO cycle (bila dipilih di `plans.md` §7): build `native-pgo` →
   run benchmark → `ninja pgo_merge` → rebuild (preset otomatis USE). **SIKLUS
   DIEKSEKUSI 2026-11-11 — hasil CAMPUR, PGO tidak diadopsi sebagai preset
   default** (lihat rincian di bawah).
@@ -272,7 +274,7 @@
     `ninja hotspots_ze_json_parser_benchmark` dsb.) diperbaiki
     (`EXPORT_OUT_DIR`→`OUT_DIR`, `report -i` direktori sesi) + di-wire ke
     kedua driver benchmark. Runbook server SAQ:
-    `reports/P5-saq-server-runbook.md` (PR root terpisah).
+    `docs/development/saq-server-runbook.md` (PR root terpisah).
     - **E1 — `native-release-march` (flag set + march) DITOLAK**: sandwich
       vs canonical (`zuu-20261111090544` vs `zuu-20261111090519`,
       window ~3.5 menit, kontrol stabil): FullWalk ladder flat
@@ -326,7 +328,7 @@
 - [x] **P5-1** — Paket runner untuk server SAQ: instruksi deploy konsisten
   (`node scripts/host-introspect.mjs` + `node scripts/node-benchmark/harness.mjs
   --site=saq_server`); hasil dipindah ke `out/measurements/`. — **SELESAI
-  2026-11-11**: runbook `reports/P5-saq-server-runbook.md` (root PR #23),
+  2026-11-11**: runbook `docs/development/saq-server-runbook.md` (root PR #23),
   dieksekusi pemilik via SSH tanpa perubahan harness.
 - [x] **P5-2** — Baseline V8 di server SAQ → record v1. — **SELESAI
   2026-11-11**: `server-lanjut-20261111040248-0340a72` (saq-report `0340a72`,
@@ -524,7 +526,7 @@
   tabel toolchain versi persis, env variables + fallback, presets, korpus
   (provenance manifest), CI parity.
 - [x] **P6-4** — Sinkronisasi dokumen: `AGENTS.md` (status docs & scanner),
-  `TASKS.md` (tick P0..P6 dengan nota hasil terverifikasi), pointer submodule
+  `docs/project/tasks.md` (tick P0..P6 dengan nota hasil terverifikasi), pointer submodule
   diperbarui per merge.
 - [x] **P6-5** — Angka final + chart siap transfer ke skripsi:
   `reports/final-numbers.md` (agregat 3 jalur: ze_native / V8 / ze-wasm64,
@@ -736,7 +738,7 @@
 > "Scan the structure once. Access only what is needed." Target: Speedup =
 > T_baseline / T_ze_json ≥ 1.5× pada **workload SAQ asli** (acceptance
 > benchmark = fase D), dibuktikan eksperimen tanpa mengubah workload/benchmark.
-> Deliverable stage: `docs/research/ondemand-direction-audit.md` (ND-1),
+> Deliverable stage: `docs/research/audit-2026-11-12.md` (ND-1),
 > `docs/architecture/lazy-access-api.md` (ND-3), `reports/ondemand-saq-evaluation.md`
 > (ND-7). Satu PR per stage; laporan §13 di tiap stage. Larangan §11 direktif
 > berlaku (materialisasi DOM penuh sebagai jalur utama, hash index serampangan,
@@ -744,7 +746,7 @@
 
 - [x] **ND-1** — Audit berbasis bukti source ketiga repo + consumption map SAQ +
   sintesis bottleneck + hipotesis H1–H5 + inventaris dokumen usang →
-  `docs/research/ondemand-direction-audit.md` (Stage 1). Ledger minimal ini
+  `docs/research/audit-2026-11-12.md` (Stage 1). Ledger minimal ini
   ditambahkan di stage yang sama.
 - [x] **ND-2** — Koreksi dokumentasi usang (AGENTS.md §1/§4/§5/§7, ze_json/docs
   architecture TODO parser, referensi ABI v2) sesuai inventaris audit §8;
@@ -821,7 +823,7 @@
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
 - [x] **PW-1** — Buat `.github/PULL_REQUEST_TEMPLATE.md` di ketiga repo (root v5,
-  `ze_json/`, `saq-report/`) sesuai template `PLANS.md` §10 (seksi: Rationale /
+  `ze_json/`, `saq-report/`) sesuai template `plans.md` §10 (seksi: Rationale /
   Changes / Measurement Evidence / Checklist).
 - [x] **PW-2** — Dokumentasikan konvensi commit (Conventional Commits — type & scope
   list) di `AGENTS.md` §8 dan tautkan dari template PR.
@@ -830,6 +832,16 @@
 - Selalu: branch per perubahan (contoh `perf/scanner-simd`), deskripsi PR
   Indonesia, judul `type(scope): subject` (English), bukti pengukuran
   ditautkan bila perubahan menyentuh performa.
+- [x] **PW-4** — Overhaul arsitektur dokumentasi (2026-11-12): migrasi riil
+  `PLANS.md` → `docs/project/plans.md` dan `TASKS.md` → `docs/project/tasks.md`
+  (git mv) + update seluruh referensi lintas-file; audit on-demand menjadi
+  snapshot historis `docs/research/audit-2026-11-12.md`; runbook P5 dipindah
+  ke `docs/development/saq-server-runbook.md` (+ seksi ND-6); index README
+  per folder docs + root README + CHANGELOG workspace + `reports/README.md`;
+  ADR thesis 0001/0004/0005/0006/0007; `scripts/build-wasm.ps1` diperluas
+  (gate lazy.mjs, mode `-VerifyOnly`, cek 21 ekspor ABI v3); pointer
+  submodule ze_json naik ke rilis 0.1.2 (publish GitHub Packages
+  terverifikasi, run 43182598841).
 
 ## Status mesin & environment
 

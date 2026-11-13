@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """make_corpus.py — deterministic benchmark corpus builder + manifest (TASKS P0-8).
 
-Corpus families (PLANS.md section 4, location corpus/benchmarks/<name>/):
+Corpus families (docs/project/plans.md section 4, location corpus/benchmarks/<name>/):
 
   synthetic_1k|synthetic_10k|synthetic_100k|synthetic_1mb
       Size-sensitivity ladder (KiB nominal), one single document each, compact
@@ -15,7 +15,7 @@ Corpus families (PLANS.md section 4, location corpus/benchmarks/<name>/):
       for reports, bare object root for config_global; written pretty with
       indent 2 exactly like JsonRepository.write() = JSON.stringify(data, null, 2).
       Names/phones/emails come from synthetic pools — never real data
-      (PLANS.md section 8: SAQ data must not be shared).
+      (docs/project/plans.md section 8: SAQ data must not be shared).
   checker_batch
       Many small valid documents: pass1/2/3 copied byte-exact from
       corpus/test/json_checker plus 22 seeded valid documents exercising

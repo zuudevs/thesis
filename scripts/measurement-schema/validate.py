@@ -13,7 +13,7 @@ Design notes:
   minLength, minimum, additionalProperties) are driven by
   ``schemas/measurement.schema.json`` -- do not duplicate schema semantics here.
 - A record without a non-empty ``rationale`` (``purpose`` + ``basis_papers``) per
-  ``results[]`` entry therefore fails automatically, per PLANS.md section 3.
+  ``results[]`` entry therefore fails automatically, per docs/project/plans.md section 3.
 - Numbers compared for optimization work must come from records that pass this
   validator (see AGENTS.md section 4).
 """

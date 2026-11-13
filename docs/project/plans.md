@@ -1,7 +1,9 @@
-# PLANS.md — Rencana Skripsi (v5)
+# Rencana Skripsi (v5) — plans
 
-> Dokumen strategi. Tugas operasional dipecah di `TASKS.md`. Ubah dokumen ini hanya
+> Dokumen strategi. Tugas operasional dipecah di [`tasks.md`](tasks.md). Ubah dokumen ini hanya
 > bila ada keputusan besar baru (lingkup, metode, schema, atau target mesin).
+> Riwayat migrasi: semula `PLANS.md` di root; dipindah ke `docs/project/plans.md`
+> pada overhaul arsitektur dokumentasi 2026-11-12 (PW-2).
 
 ## 1. Tujuan & pertanyaan riset
 
@@ -189,7 +191,7 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   - `requirement/` — dependensi, toolchain, python, korpus, env variables.
 - Chart + angka konsisten untuk dokumen skripsi (`thesis-proposal/` /
   `submission-thesis-supervisor/` — dikelola pemilik).
-- Update `AGENTS.md` / `PLANS.md` / `TASKS.md` bila keputusan berubah.
+- Update `AGENTS.md` / `plans.md` / `tasks.md` bila keputusan berubah.
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 
@@ -244,7 +246,7 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
 Fase hanya dianggap selesai bila:
 1. Deliverable files ada di lokasi yang dijanjikan.
 2. Record pengukuran (bila ada) lolos validator schema.
-3. `PLANS.md`/`TASKS.md` diperbarui bila keputusan berubah.
+3. `plans.md`/`tasks.md` diperbarui bila keputusan berubah.
 4. Tidak ada berkas hasil ukur baru yang tidak lolos schema.
 5. Build tetap hijau (`ctest`); working tree bersih dari artifacts.
 6. Perubahan lewat **Pull Request** dengan pesan commit konvensional (§10);
@@ -262,7 +264,7 @@ Fase hanya dianggap selesai bila:
     `harness`, `binding-js`, `saq-baseline`, `measurement-schema`, `docs`.
   - Perubahan breaking: `!` setelah type + footer `BREAKING CHANGE:`.
 - Template PR wajib ada di setiap repo: `.github/PULL_REQUEST_TEMPLATE.md` (task
-  `TASKS.md` PW-1). Deskripsi PR boleh Indonesia; seksi template sebagai berikut:
+  `tasks.md` PW-1). Deskripsi PR boleh Indonesia; seksi template sebagai berikut:
 
   ```markdown
   ## Rationale
@@ -282,7 +284,7 @@ Fase hanya dianggap selesai bila:
        - [ ] scalar <-> fast-path differential test green
        - [ ] Doxygen @cite added for new core code
        - [ ] Conventional Commits followed
-       - [ ] PLANS.md / TASKS.md updated if a decision changed -->
+       - [ ] plans.md / tasks.md updated if a decision changed -->
   ```
 
 - Artifacts hasil ukur tetap di `out/` (gitignored); PR me-refer path + hasil

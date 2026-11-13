@@ -6,7 +6,7 @@
 > call-site di ND-5, benchmark acceptance di ND-6, kesimpulan di ND-7.
 > Semua klaim tentang perilaku yang sudah ada bersumber file:line pada
 > `ze_json` `d45beb7` dan `saq-report` `0340a72`; dasar audit:
-> [`docs/research/ondemand-direction-audit.md`](../research/ondemand-direction-audit.md).
+> [`docs/research/audit-2026-11-12.md`](../research/audit-2026-11-12.md).
 >
 > Keputusan pemilik korpus (2026-11-12): **korpus tetap `saq_payload_v1`** —
 > tidak diganti, tidak diregenerasi; Workload D memakai server `saq-report`
