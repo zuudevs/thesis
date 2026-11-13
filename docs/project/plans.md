@@ -230,7 +230,11 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   (E1 antar-era confounded — wasm era lama tak terekam sidecarnya).
   Chart di-regenerate (`nd10-summary-map`, `nd10-acceptance`); laporan
   `reports/nd10-runtime-control.md`. Lanjut: countermeasure O1 (slot
-  reuse, ABI v4 thin-call — disetujui pemilik, lazy decode).
+  reuse, ABI v4 thin-call — disetujui pemilik, lazy decode). **ND-9
+  tereksekusi 2026-11-13/14** (`reports/nd9-cost-diagnosis.md`): s2-open
+  mendominasi jalur count (~88–90%), boundary ABI ≈ 0 → kandidat fase D
+  bergeser ke open-path (instrumentasi core lanjutan); O1-7 menyasar
+  materialisasi A/B.
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 
