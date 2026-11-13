@@ -86,9 +86,10 @@ else {
     Write-Host '[warn] no CMakeCache.txt next to the artifact - build-type check skipped'
 }
 
-# 2. ABI exports: the full v3 surface from include/ze_json/abi/cabi.hpp
-#    (3 core + 5 scanner + 13 parser). A v2-era artifact (9 symbols) fails
-#    here by design - the parser surface is part of the deployed contract.
+# 2. ABI exports: the full v4 surface from include/ze_json/abi/cabi.hpp
+#    (3 core + 5 scanner + 13 parser + 4 thin step, O1-7 - additive). A
+#    v2-era artifact (9 symbols) fails here by design - the parser surface
+#    is part of the deployed contract.
 # NB: Windows PowerShell 5.1 has no Encoding::Latin1 - use code page 28591.
 $Blob = [System.Text.Encoding]::GetEncoding(28591).GetString(
     [System.IO.File]::ReadAllBytes($Wasm))
@@ -102,14 +103,17 @@ $RequiredExports = @(
     'ze_parser_open', 'ze_parser_root', 'ze_parser_close',
     'ze_container_begin', 'ze_array_next', 'ze_object_next', 'ze_object_field',
     'ze_value_kind', 'ze_get_string', 'ze_get_number', 'ze_get_bool',
-    'ze_is_null', 'ze_count_elements'
+    'ze_is_null', 'ze_count_elements',
+    # thin step surface (4, O1-7 v4 additive)
+    'ze_container_begin4', 'ze_array_next4', 'ze_object_next4',
+    'ze_object_field4'
 )
 foreach ($Name in $RequiredExports) {
     if ($Blob.IndexOf($Name, [System.StringComparison]::Ordinal) -lt 0) {
         throw "missing ABI export: $Name"
     }
 }
-Write-Host "[ok] ABI exports: $($RequiredExports.Count) required symbols present (v3)"
+Write-Host "[ok] ABI exports: $($RequiredExports.Count) required symbols present (v4)"
 
 # 3. SIMD really used (v128.* in disassembly) - fails for a scalar-only build.
 $Objdump = Join-Path $env:TOOLCHAINS_DIR 'llvm\bin\llvm-objdump.exe'

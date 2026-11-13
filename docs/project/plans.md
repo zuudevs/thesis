@@ -234,7 +234,13 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   tereksekusi 2026-11-13/14** (`reports/nd9-cost-diagnosis.md`): s2-open
   mendominasi jalur count (~88–90%), boundary ABI ≈ 0 → kandidat fase D
   bergeser ke open-path (instrumentasi core lanjutan); O1-7 menyasar
-  materialisasi A/B.
+  materialisasi A/B. **Loop O1 tereksekusi 2026-11-14** — O1-4
+  (`reports/R5-9-kind-mirror.md`, +7,5–11,5%), O1-5
+  (`reports/R5-10-frame-decode.md`, +7,5–16,5%), O1-7
+  (`reports/R5-11-thin-step.md`, +27,4–45,1%) semua DITERIMA (ze_json
+  PR #38/#39/#40; wasm kini v4 `c5b42b7d…`); kumulatif ~1,6–2,1× jalur A
+  (narasi antar-window). Follow-up: re-measure matriks ND-6 pasca-O1
+  (keputusan pemilik).
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 
