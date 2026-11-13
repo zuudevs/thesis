@@ -182,4 +182,23 @@ run self-contained, bukan klaim).
 4. Angka = dev device; server SAQ belum tersedia (site-aware runner siap,
    protokol identik saat akses ada). Perbandingan lintas run_id di tabel
    adalah **narasi riset**, bukan bukti — bukti = speedup dalam satu run.
+   *(Update 2026-11-13: server SAQ kini tereksekusi — lihat §11; kalimat
+   "belum tersedia" di limitasi ini superseded oleh eksekusi tersebut.)*
+
+## 11. Hasil eksekusi site `saq_server` (2026-11-13, ND-8)
+
+Matriks §2–§6 dijalankan penuh di server SAQ (runner, protokol, dan korpus
+identik): Fase D jalur produksi (cache Mongo) = **1.30×** (p95 1.46×) —
+**acceptance ≥1.5× TIDAK tercapai di site ini**, sementara verdict dev
+(§10) tetap sah sebagai bukti dalam-run. Matriks diagnostik: A 0.035–0.039×,
+B 0.056–0.091×, C kalah di semua store (dev: menang schedules/assistants).
+Dekomposisi komponen menunjukkan baseline V8 membaik −30…−44% (searah
+Node 26 / V8 14.6) sementara jalur ze yang dominan per-panggilan ABI mundur
++33…+41% — dua variabel berubah sekaligus (mesin + runtime), atribusi
+kausal menunggu isolasi satu variabel. Kandidat perbaikan tetap sesuai §7
+(slot reuse, ABI v4 batch, lazy decode) — wajib diukur ulang (O1-11).
+Catatan kepatuhan: root server `dirty` (§3.9) dan nama file record saat
+batch masih hardcode `-dev_device` (field `site` benar; harness telah
+diperbaiki). Rincian lengkap + tabel per store:
+[`reports/nd6-server-phase-matrix.md`](../../reports/nd6-server-phase-matrix.md).
 

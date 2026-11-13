@@ -819,6 +819,24 @@
   gap fidelity korpus; file-store 0.91× I/O-bound; L1 count-only; H4/H5
   belum diuji; angka dev device). Tidak ada hasil dimanufaktur; semua angka
   dari record tervalidasi `reports/nd6/` (6/6 PASS).
+- [x] **ND-8** — Eksekusi matriks ND-6 di server SAQ (`site=saq_server`,
+  2026-11-13, eksekusi pemilik; runbook §5): 10 record **PASS** validator
+  (4 fase ND-6 + 6 harness P5-style), korpus `saq_payload_v1` sha256
+  identik dev. **Verdict: acceptance ≥1.5× TIDAK tercapai di site ini** —
+  fase D jalur produksi (cache Mongo) = **1.30×** (p95 1.46×) vs verdict
+  dev 2.85×/3.00×; file-store 0.95× (konsisten). Diagnostik: A 0.035–0.039×,
+  B 0.056–0.091×, C kalah semua store (dua kemenangan L1 di dev —
+  schedules 1.57×/assistants 1.50× — hilang). Dekomposisi: baseline V8
+  membaik −30…−44% (searah Node 26/V8 14.6), jalur ze dominan per-panggilan
+  ABI mundur +33…+41% — dua variabel berubah sekaligus (mesin + runtime);
+  atribusi kausal menunggu isolasi satu variabel (Node 24 di server ATAU
+  Node 26 di dev) + re-run dari tree bersih (root server `dirty`,
+  protokol §3.9). Kandidat tetap sesuai plan doc §7: slot reuse, ABI v4
+  batch, lazy decode (O1-11). Fix harness: nama file record pakai `${SITE}`
+  (sebelumnya hardcode `-dev_device`; field `site` di record tetap benar).
+  Rincian: `reports/nd6-server-phase-matrix.md` + plan doc §11.
+  Limitasi verdict: perbandingan lintas situs = narasi riset (bukan bukti);
+  bukti tetap speedup dalam satu run per site.
 
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
