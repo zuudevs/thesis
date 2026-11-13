@@ -870,6 +870,29 @@
   36 parity checks PASS validator). **Eksekusi penuh menunggu tree
   bersih** (dev `utils/typ/` milik pemilik; gate fail-fast).
 
+## P8 — Chart progres benchmark & pelengkapan Bab 3 (2026-11-13)
+
+- [x] **P8-1** — Chart ringkas **2 figur** dari record tervalidasi
+  `reports/nd6/**` (fairness gate in-situ, reutilisasi loader
+  `nd6_charts.py`): `nd6-summary-map` (heatmap speedup 10 jalur × 2 site —
+  A, B, C per-store, D-mongo, D-file; hijau >1× unggul / merah <1× perlu
+  perbaikan) dan `nd6-acceptance` (fase D: dev 2,85×/3,01× vs server 1,30×,
+  garis target 1,5×, marker p95). Script
+  `scripts/analyze_measurement/nd6_summary_chart.py` → master `out/charts/`
+  + arsip SVG `reports/charts/`; label vintage runtime sampai fresh run
+  ND-10. PR: `docs/p8-benchmark-charts` (dibuka 2026-11-13).
+- [x] **P8-2** — Isi Bab 3
+  `thesis-proposal/pages/bab_3/001-tempat_dan_waktu_penelitian.typ`
+  (tbl-hw/tbl-sw) dari introspeksi riil 2026-11-13 (i5-9400 6C/6T 2,90 GHz;
+  8 GB DDR4 @2133; SSD NVMe 128 GB + HDD 2 TB; I219-V + AC 3165; Windows 11
+  Education build 26300; Node 26.13.1 identik dev/server; MongoDB 8.2.7;
+  Clang 23.1.5; CMake 4.4.5/Ninja 1.13.2/vcpkg 2026.10.16; gbench 1.9.5;
+  gtest 1.18.0; ZenBook UX425UAZ pendamping) — PR submodule
+  `docs/bab3-measurement-env` (dibuka 2026-11-13).
+- [ ] **P8-3 (DEFERRED)** — Fresh run ND-10 E1/E2 (Node 26 matched, tree
+  bersih, gate fail-fast) **hanya atas instruksi eksplisit pemilik** →
+  regenerate chart + sinkron verdict/angka.
+
 ## PW — Alur kerja Git (berlaku di semua repo: root v5, ze_json, saq-report)
 
 - [x] **PW-1** — Buat `.github/PULL_REQUEST_TEMPLATE.md` di ketiga repo (root v5,
@@ -899,8 +922,8 @@
   AUD-1 2026-11-13: Node dev = v26.13.1 (V8 14.6.202.34-node.40) — V8 kini
   identik dengan server; verdict dev lama 2.85×/3.00× = histori Node
   24.19.0 (berlabel runtime), tak reproducible tanpa memasang Node 24 lagi.**
-- Site server (`server-lanjut`, i5-9400, Node 26.13.0) **aktif** via SSH
-  (`scripts/ssh-remote-saq/`, workspace `D:\SKRIPSI\RAFI\sources`); runner
+- Site server (`server-lanjut`, i5-9400, Node 26.13.1) **aktif** via SSH
+  (`scripts/ssh-remote/saq-remote.py`, workspace `D:\SKRIPSI\RAFI\sources`); runner
   site-aware (`--site=dev_device|saq_server`) dengan prosedur identik; run
   acceptance wajib tree bersih — harness fail-fast bila tracked changes
   (`--allow-dirty` = label exploratory, bukan bukti acceptance).
