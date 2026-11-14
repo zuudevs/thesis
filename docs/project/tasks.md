@@ -190,8 +190,16 @@
   bahasan skripsi. Laporan lengkap: `reports/P4-bottleneck-report.md`.
   Perbaikan kecil tambahan: rekaman `InsufficientBuffer` di jalur serial
   kini diteruskan (sebelumnya diabaikan diam-diam).
-- [ ] **P4-3** — Optimasi scanner/number parser/UTF-8 validator via tabel
-  `lookups.hpp` (codegen paper-driven, `@cite` DOI).
+- [x] **P4-3** — Optimasi scanner/number parser/UTF-8 validator via tabel
+  `lookups.hpp` (codegen paper-driven, `@cite` DOI). **DITUTUP 2026-11-14**:
+  C3 (UTF-8 SIMD pshufb) DITOLAK — `utf8_seq_advance` hanya menyala pada
+  lead ≥0x80 dan profil byte-class seluruh korpus terukur
+  (`scripts/corpus/ascii_profile.py`, daftar dokumen dari MANIFEST + guard
+  byte-count) menunjukkan non-ASCII ≤0,195% (saq 0,000%, backslash 0%);
+  validasi UTF-8 juga hidup di `scan_string` (traversal/decode), bukan di
+  `scanner8` → ceiling di jalur count ≈ 0 (ND-13: dominasi di s2-open).
+  Kandidat adopsi ulang hanya bila workload bergeser non-ASCII-heavy.
+  Laporan: `reports/P4-3-closure.md`.
   - **C1 (string-class table) DITOLAK dengan bukti sandwich** (2026-11-10):
     dispatch `kJsonStringClass` di `scan_string`/`decode_interior` kalah —
     load-tabel melawan chain 4-branch terprediksi. Back-to-back satu window
@@ -540,6 +548,24 @@
   **Arah fase D: optimasi scanner**, bukan carve/match. Run server
   pending (SSH unreachable; pola ND-12 — tanpa boot app). Laporan:
   `reports/nd13-open-decomposition.md`; arsip `reports/nd13/`.
+- [ ] **O2-1** — `scanner8` string-interior fast skip (keluarga O2 =
+  optimasi scanner, dasar verdict ND-13): jalur interior string dalam
+  loop scan diganti loop bebas-tabel (2 compare prediktable `'\\'`/`'"'`
+  per byte) — mayoritas byte payload kini tidak membayar load
+  `kJsonCharClass` + 2 masked test; tabel hanya di jalur luar-string.
+  Semantik identik (dangling escape, error precedence, isi dst) — gate
+  diferensial byte-identity vs `reference_scan` + json_checker + edge
+  (escape di ujung, `\"` beruntun, unicode escape, string panjang) +
+  native-sanitize + wasm differential 71×5. Ukur: nd13 `--probe`
+  (`s2b-scan` + fused `s2-open`) satu run per site, protokol identik
+  baseline `zuu-20261114113218-f6c3f3e`; satu perubahan per pengukuran
+  (skill cpp-highperf-json); kontrol layout bila regres di stage lain
+  (pelajaran C1). Versi: perf tanpa kontrak baru = core PATCH 0.3.1
+  (tag `core/0.3.1`; js tidak dibump).
+- [ ] **O2-2 (kondisional)** — SWAR interior skip 8-byte (deteksi
+  quote/backslash per blok) — hanya bila O2-1 diterima dan profil
+  menunjukkan interior masih dominan; P4-2 mengharuskan diukur, bukan
+  diasumsikan (varian vektor kalah di segmen pendek).
 - [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
   count `decode_interior` saat `cap >= inner_len` (invariant output
   decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%
