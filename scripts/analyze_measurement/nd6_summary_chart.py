@@ -104,17 +104,38 @@ CONFIRM_ND10 = [
     "zuu-20261113173308-5a90545",            # dev confirm
     "server-lanjut-20261113174349-5a90545",  # server confirm
 ]
+# post-o1 (ND-12, 2026-11-14): fresh matrix AFTER the accepted O1 loop —
+# root 7fb2ae4, ze_json fe877f2 (ABI v4), wasm c5b42b7d byte-identical both
+# sites, Node 26.13.1, clean trees (dev .vscode owner edit stashed during
+# the run, popped after; server .vscode stash from ND-10 still held).
+RUNS_POST_O1 = {
+    ("A", "dev_device"): "zuu-20261114022724-7fb2ae4",
+    ("B", "dev_device"): "zuu-20261114022727-7fb2ae4",
+    ("C", "dev_device"): "zuu-20261114022730-7fb2ae4",
+    ("D", "dev_device"): "zuu-20261114022954-7fb2ae4",
+    ("A", "saq_server"): "server-lanjut-20261114023810-7fb2ae4",
+    ("B", "saq_server"): "server-lanjut-20261114023812-7fb2ae4",
+    ("C", "saq_server"): "server-lanjut-20261114023813-7fb2ae4",
+    ("D", "saq_server"): "server-lanjut-20261114024229-7fb2ae4",
+}
+CONFIRM_POST_O1 = [
+    "zuu-20261114022956-7fb2ae4",            # dev confirm
+    "server-lanjut-20261114024230-7fb2ae4",  # server confirm
+]
 
-VINTAGE = "nd10"
+VINTAGE = "post-o1"
 for _a in sys.argv[1:]:
     if _a.startswith("--vintage="):
         VINTAGE = _a.split("=", 1)[1]
-if VINTAGE not in ("nd6", "nd10"):
-    raise SystemExit("vintage must be nd6 or nd10")
+if VINTAGE not in ("nd6", "nd10", "post-o1"):
+    raise SystemExit("vintage must be nd6, nd10 or post-o1")
 
-RUNS = RUNS_ND6 if VINTAGE == "nd6" else RUNS_ND10
-CONFIRM_RUNS = CONFIRM_ND6 if VINTAGE == "nd6" else CONFIRM_ND10
-PREFIX = VINTAGE  # output filename prefix: nd6-* / nd10-*
+_RUNS_BY_VINTAGE = {"nd6": RUNS_ND6, "nd10": RUNS_ND10, "post-o1": RUNS_POST_O1}
+_CONFIRMS_BY_VINTAGE = {
+    "nd6": CONFIRM_ND6, "nd10": CONFIRM_ND10, "post-o1": CONFIRM_POST_O1}
+RUNS = _RUNS_BY_VINTAGE[VINTAGE]
+CONFIRM_RUNS = _CONFIRMS_BY_VINTAGE[VINTAGE]
+PREFIX = VINTAGE  # output filename prefix: nd6-* / nd10-* / post-o1-*
 
 PAIRS = {
     "A": ("A/{d}/v8-parse", "A/{d}/ze-parse"),
@@ -227,10 +248,15 @@ def draw_map(cells):
             "dev_device\n2026-11-12 · Node 24.19.0 (V8 13.6)",
             "saq_server\n2026-11-13 · Node 26.13.0 (V8 14.6)\n* git dirty → exploratory",
         ]
-    else:
+    elif VINTAGE == "nd10":
         site_labels = [
             "dev_device\nNode 26.13.1 (V8 14.6) · tree bersih",
             "saq_server\nNode 26.13.1 (V8 14.6) · tree bersih",
+        ]
+    else:
+        site_labels = [
+            "dev_device\npasca-O1 (v4) · tree bersih",
+            "saq_server\npasca-O1 (v4) · tree bersih",
         ]
     zlog = lambda v: math.log10(v)  # noqa: E731
     z = [[zlog(cells[(r["key"], s)]["speedup"]) for s in SITES] for r in ROWS]
@@ -277,7 +303,7 @@ def draw_map(cells):
                 "A/B = median lintas 6 store (bracket = min–max).\n"
                 "Fase D dev = run utama post-cache-bytes (run konfirmasi 3,00× ada di figur acceptance). Sumber: record PASS reports/nd6/. "
                 "*Server git dirty = exploratory. Vintage runtime campuran (dev Node 24, server Node 26).")
-    else:
+    elif VINTAGE == "nd10":
         title = "ze_json vs baseline V8 — peta speedup ND-10 (kontrol runtime + mesin)"
         sub = ("Fresh run 2026-11-13 · Node 26.13.1 identik di kedua site · wasm 35b7f773 byte-identik · tree bersih · "
                "hijau = unggul (>1×) · merah = perlu perbaikan (<1×)")
@@ -285,6 +311,14 @@ def draw_map(cells):
                 "A/B = median lintas 6 store (bracket = min–max).\n"
                 "E1: verdict era Node 24 (2,85×/3,00×) tidak reproducible di Node 26 — komparasi antar-era confounded "
                 "(wasm era lama 7e26044f tak terekam sidecarnya). Sumber: record PASS reports/nd10/.")
+    else:
+        title = "ze_json vs baseline V8 — peta speedup pasca-O1 (ND-12, countermeasure terpasang)"
+        sub = ("Fresh run 2026-11-14 · ABI v4 (O1-4+O1-5+O1-7) · wasm c5b42b7d byte-identik · Node 26.13.1 · tree bersih · "
+               "hijau = unggul (>1×) · merah = perlu perbaikan (<1×)")
+        foot = ("Speedup = median V8 / median ze dalam pasangan in-situ (fairness gate: satu run_id, korpus sha256 sama, status ok). "
+                "A/B = median lintas 6 store (bracket = min–max).\n"
+                "Window ini mesin lebih lambat absolut (editor berjalan) — rasio in-window yang menjadi bukti. "
+                "Fase D file-store warm page-cache (confounder dinyatakan). Sumber: record PASS reports/nd12/.")
     fig.suptitle(title, fontsize=13, fontweight="bold", y=0.99)
     fig.text(0.5, 0.955, sub, ha="center", fontsize=9.5, color="#37474f")
     fig.text(0.5, 0.012, foot, ha="center", fontsize=7.8, color="#555555")
@@ -300,8 +334,11 @@ def draw_acceptance(nd6, log_rows):
     if VINTAGE == "nd6":
         rt_dev = "2026-11-12 · Node 24.19.0 (V8 13.6)"
         rt_srv = "2026-11-13 · Node 26.13.0 · git dirty (exploratory)"
-    else:
+    elif VINTAGE == "nd10":
         rt_dev = "2026-11-13 · Node 26.13.1 · tree bersih"
+        rt_srv = rt_dev
+    else:
+        rt_dev = "2026-11-14 · pasca-O1 (ABI v4) · tree bersih"
         rt_srv = rt_dev
     if VINTAGE == "nd6":
         spec = [
@@ -373,12 +410,18 @@ def draw_acceptance(nd6, log_rows):
                    "saq-report (bukan HTTP end-to-end).")
         acc_foot = ("Baseline repo.read().length (V8) vs ze repo.readCount() (structural count, wasm64 C-ABI) dalam satu run_id.\n"
                     "File-store fallback: lihat peta (I/O-bound). Vintage runtime campuran (dev Node 24, server Node 26).")
-    else:
+    elif VINTAGE == "nd10":
         acc_title = "ND-10 fase D — acceptance jalur produksi (kontrol runtime + mesin)"
         acc_sub = ("Node 26.13.1 identik di kedua site · wasm 35b7f773 byte-identik · tree bersih · "
                    "target ≥ 1,5× TIDAK tercapai di kedua site.")
         acc_foot = ("Baseline repo.read().length (V8) vs ze repo.readCount() (structural count, wasm64 C-ABI) dalam satu run_id.\n"
                     "E1: verdict era Node 24 (2,85×/3,00×) turun ~1,4× di Node 26 → runtime V8 14.6 = penyebab dominan kompresi (wasm era lama tak terekam sidecarnya → confounded).")
+    else:
+        acc_title = "Pasca-O1 fase D — acceptance jalur produksi (ND-12)"
+        acc_sub = ("ABI v4 (O1-4+O1-5+O1-7) · wasm c5b42b7d byte-identik · Node 26.13.1 · tree bersih · "
+                   "fase D tak tersentuh loop O1 (konsisten ND-9).")
+        acc_foot = ("Baseline repo.read().length (V8) vs ze repo.readCount() (structural count, wasm64 C-ABI) dalam satu run_id.\n"
+                    "File-store warm page-cache (confounder dinyatakan). Window mesin lebih lambat absolut — rasio in-window yang menjadi bukti.")
     fig.suptitle(acc_title, fontsize=13, fontweight="bold", y=0.99)
     fig.text(0.5, 0.935, acc_sub, ha="center", fontsize=9, color="#37474f")
     fig.text(0.5, 0.015, acc_foot, ha="center", fontsize=7.8, color="#555555")
@@ -404,8 +447,9 @@ def write_csv(name, fieldnames, rows):
 
 def main():
     recs = base.load_records()
-    if VINTAGE == "nd10":
-        base.RECORDS_DIR = os.path.join(base.ROOT, "reports", "nd10")
+    extra_dirs = {"nd10": ["nd10"], "post-o1": ["nd12", "nd10"]}.get(VINTAGE, [])
+    for extra in extra_dirs:
+        base.RECORDS_DIR = os.path.join(base.ROOT, "reports", extra)
         recs = base.load_records() + recs
     nd6 = base.nd6_phase_records(recs)
     print(f"loaded {len(recs)} records ({len(nd6)} ND-6 phase records)")

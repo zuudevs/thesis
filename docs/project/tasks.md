@@ -496,6 +496,18 @@
   (sumber lama rusak). Motivasi: drift antar-window sandwich ~11%
   (state identik terukur 29,39 vs 26,14). Laporan:
   `reports/R5-12-o1-ladder.md`.
+- [x] **ND-12** — Re-measure matriks ND-6 pasca-O1 (2026-11-14, instruksi
+  pemilik; dev + server, tree bersih, wasm v4 `c5b42b7d…` byte-identik,
+  root `7fb2ae4`, 10 record PASS `reports/nd12/`). **Verdict: countermeasure
+  O1 menutup sebagian gap fase A/B** — A 0,04×→**0,05×/0,06×** (+25–50%
+  relatif; server kini menyamai/Melebihi dev), B 0,09×→**0,13×/0,13×**
+  (+40%); fase C stabil (assistants 1,05× tetap satu-satunya menang);
+  **fase D tak berubah 1,48×/1,13×** — konsisten ND-9 (count path tak
+  tersentuh O1; kini s2-open-bound) → acceptance ≥1,5× belum tercapai,
+  kandidat berikutnya = open-path instrumentasi / ND-11 HTTP. Chart
+  vintage `post-o1` baru di `nd6_summary_chart.py` (nd6/nd10 histori).
+  Confounder dinyatakan: window dev lebih lambat absolut (editor);
+  file-store dev warm page-cache. Laporan: `reports/nd12-post-o1-matrix.md`.
 - [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
   count `decode_interior` saat `cap >= inner_len` (invariant output
   decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%
