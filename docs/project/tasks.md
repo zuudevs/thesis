@@ -508,6 +508,21 @@
   vintage `post-o1` baru di `nd6_summary_chart.py` (nd6/nd10 histori).
   Confounder dinyatakan: window dev lebih lambat absolut (editor);
   file-store dev warm page-cache. Laporan: `reports/nd12-post-o1-matrix.md`.
+- [x] **R5-13** — Version registry dua lapis + backfill provenance
+  (2026-11-14, instruksi pemilik): core = `project(VERSION)`
+  (`CMakeLists.txt`+`vcpkg.json`, nomor ABI mengikuti via generated
+  `ze_json/core/version.hpp` → `ze_abi_version()` = 2026000200), js =
+  `ZE_JSON_JS_VERSION` (`ModuleRegistry.cmake`, package.json digenerate
+  berisi `coreVersion`/`coreSemver`); bump core 0.1.2→0.2.0 + js 0.2.0
+  (PR ze_json #41); harness (`nd6_bench`/`nd9`/`harness.mjs`) menulis
+  `library.js_version/core_version/abi_version` (schema opsional, validator
+  PASS); aturan bump+tag wajib (kecuali komentar/docs/whitespace) =
+  AGENTS.md §9 baru; backfill `scripts/measurement-schema/registry_fill.py`
+  → sidecar `reports/registry/` (195 run unik: 192 git / 3 inferred /
+  0 unknown; diskriminator loaded-artifact = peta sha artifact
+  `35b7f773…→3`, `c5b42b7d…→4`, `19baac8c…→2026000200` — mengoreksi label
+  hardcoded "v3" pada ND-10/ND-12; native = js/abi N/A). Laporan:
+  `reports/R5-13-version-registry.md`.
 - [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
   count `decode_interior` saat `cap >= inner_len` (invariant output
   decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%

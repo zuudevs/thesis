@@ -6,9 +6,22 @@ $env:CORPUS_DIR       = "$ProjectRoot\corpus"
 $env:OUT_DIR          = "$ProjectRoot\out"
 $env:VCPKG_VISUAL_STUDIO_PATH = "$env:TOOLCHAINS_DIR\MSVC"
 
-# Auto-detect MSVC version folder
+# Auto-detect MSVC version folder; when the portable .toolchains/MSVC is not
+# installed on this machine, fall back to a system-wide VS/BuildTools instance
+# (dev device has MSVC BuildTools under Program Files (x86) — the portable
+# layout is the server-side standard, see .vscode/settings.json).
 $MsvcToolsBase = "$env:TOOLCHAINS_DIR\MSVC\VC\Tools\MSVC"
 $MsvcBinDir = ""
+if (-not (Test-Path $MsvcToolsBase)) {
+    $SystemVs = Get-ChildItem "C:\Program Files (x86)\Microsoft Visual Studio" -Directory -ErrorAction SilentlyContinue |
+        Get-ChildItem -Directory -ErrorAction SilentlyContinue |
+        Where-Object { Test-Path "$($_.FullName)\VC\Auxiliary\Build\vcvarsall.bat" } |
+        Select-Object -First 1
+    if ($SystemVs) {
+        $env:VCPKG_VISUAL_STUDIO_PATH = $SystemVs.FullName
+        $MsvcToolsBase = "$($SystemVs.FullName)\VC\Tools\MSVC"
+    }
+}
 if (Test-Path $MsvcToolsBase) {
     $MsvcVersionFolder = Get-ChildItem -Path $MsvcToolsBase -Directory | Select-Object -First 1
     if ($MsvcVersionFolder) {

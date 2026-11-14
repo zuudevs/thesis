@@ -48,6 +48,18 @@
           "type": "string",
           "minLength": 1
         },
+        "js_version": {
+          "type": "string",
+          "description": "ZE_JSON_JS_VERSION (bindings/js semver, independent registry); ze_json records only."
+        },
+        "core_version": {
+          "type": "string",
+          "description": "core semver (CMake project VERSION); ze_json records only."
+        },
+        "abi_version": {
+          "type": "integer",
+          "description": "ze_abi_version() value = ZE_JSON_CORE_VERSION_NUMBER; ze_json records only."
+        },
         "language_runtime": {
           "type": "string",
           "minLength": 1

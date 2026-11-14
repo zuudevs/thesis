@@ -87,7 +87,7 @@ Direktif on-demand 7 stage (ND-1…ND-7) selesai pada main `3947bcd` (verdict
 
 ### Added
 
-- `README.md` (root), `CHANGELOG.md` (root — file ini), index README per
+- `README.md` (root), `CHANGELOG.md`, index README per
   folder docs (`project/`, `architecture/`, `measurement/`, `research/`,
   `development/`), dan `reports/README.md` (indeks 15 laporan).
 - ADR thesis: `docs/adr/` — 0001 (arah on-demand), 0004 (korpus

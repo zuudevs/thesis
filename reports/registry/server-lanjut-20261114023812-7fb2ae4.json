@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "version_registry",
+  "run_id": "server-lanjut-20261114023812-7fb2ae4",
+  "site": "saq_server",
+  "phase": null,
+  "generator": "registry_fill.py",
+  "library": {
+    "name": "ze_json"
+  },
+  "git_commit": {
+    "ze_json": "fe877f2",
+    "ze_json_source": "library.version pin",
+    "saq_report": "8c7f2d4"
+  },
+  "versions": {
+    "js_version": "0.1.2",
+    "core_version": "0.1.2",
+    "abi_version": 4,
+    "wasm_sha256": "c5b42b7d1782294e3dbb1db984f05b8121ce71c42943c75e5d8cfd3e19f6c4fd"
+  },
+  "source": "git",
+  "source_paths": [
+    "reports\\nd12\\server-lanjut-20261114023812-7fb2ae4-nd6-b-saq_server.record.json"
+  ],
+  "resolved_at": "2026-11-14T17:31:06+07:00",
+  "notes": []
+}
