@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "zuu-20261114012833-fe877f2",
+  "site": "dev_device",
+  "generator": "node_harness",
+  "library": {
+    "name": "ze_json",
+    "version": "0.1.2",
+    "language_runtime": "node 26.13.1 (wasm64 C-ABI parser, ABI v3)"
+  },
+  "git_commit": {
+    "hash": "fe877f2",
+    "dirty": true,
+    "repo": "ze_json"
+  },
+  "host": {
+    "hostname": "zuu",
+    "os": "Windows_NT",
+    "os_version": "10.0.26200 (Windows 11 Home Single Language)",
+    "arch": "x86_64",
+    "cpu_model": "AMD Ryzen 5 5500U with Radeon Graphics",
+    "cpu_cores": 12,
+    "cpu_freq": "2.10 GHz",
+    "ram_gb": 7.4,
+    "toolchain": "node 26.13.1 (v8 14.6.202.34-node.40)"
+  },
+  "corpus": {
+    "name": "synthetic_1k",
+    "document_count": 1,
+    "total_bytes": 1024,
+    "max_document_bytes": 1024,
+    "sha256": "8cefb403460248b3bad6c92b3ec97a7932bfac4df225adb12ef74e1cbe9fbc65"
+  },
+  "config": {
+    "date_utc": "2026-11-14T01:28:34Z",
+    "iterations": 4050,
+    "warmup_runs": 1,
+    "repeats": 5,
+    "cpu_pinning": false,
+    "threads": 1,
+    "notes": "generator=node_harness; min_time_ms=200; warmup_ms=300; gc_between_repeats=false; repo=ze_json"
+  },
+  "results": [
+    {
+      "name": "ze-parser/wasm-parse-full/synthetic_1k",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze-wasm64 parser (P7-7): full V8-shaped materialization of every corpus document through the wasm64 C-ABI parser (ZeParser.parse), tree fully built — the ze_json counterpart of the v8 body-parse baseline",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00004939103703703704,
+        "seconds_stddev": 0.0000022251182403589804,
+        "bytes_per_second": 20732506.57264251,
+        "documents_per_second": 20246.5884498462,
+        "cpu_seconds": 0.000049263305602886644
+      },
+      "extras": {
+        "bytes_per_op": 1024,
+        "iterations_median": 4050,
+        "rss_bytes_snapshot": 61444096
+      }
+    }
+  ]
+}

@@ -485,6 +485,17 @@
   materialisasi A/B, bukan fase D. **Follow-up: re-measure matriks
   ND-6 pasca-O1 (keputusan pemilik; protokol ND-10 siap).** Laporan:
   `reports/R5-11-thin-step.md`.
+- [x] **O1-8** — Ladder kumulatif satu window (R5-12, 2026-11-14): 4
+  state (d9e25ac → +O1-4 → +O1-5 → +O1-7) × 6 korpus, 3+3 pasangan
+  interleaved (median-of-6; interferensi pass-1 `synthetic_1mb`
+  terdilusi) + 2 run V8 referensi di window sama; swap sha256
+  terverifikasi. **Kumulatif 1,36×–1,53× monotonic semua korpus**
+  (saq 21,0→30,9 MB/s; gap V8 ~26×→~18×). 156 record PASS diarsip
+  **committed** `reports/o1-loop/` (chart reproducible tanpa `out/`);
+  chart `o1-cumulative` + CSV; script `o1_cumulative_chart.py` di-rewrite
+  (sumber lama rusak). Motivasi: drift antar-window sandwich ~11%
+  (state identik terukur 29,39 vs 26,14). Laporan:
+  `reports/R5-12-o1-ladder.md`.
 - [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
   count `decode_interior` saat `cap >= inner_len` (invariant output
   decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%

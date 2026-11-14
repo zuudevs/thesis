@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "zuu-20261114012925-8c7f2d4",
+  "site": "dev_device",
+  "generator": "node_harness",
+  "library": {
+    "name": "saq_baseline",
+    "version": "node-builtin (saq-report@8c7f2d4)",
+    "language_runtime": "node 26.13.1 (v8 14.6.202.34-node.40)"
+  },
+  "git_commit": {
+    "hash": "8c7f2d4",
+    "dirty": false,
+    "repo": "saq_report"
+  },
+  "host": {
+    "hostname": "zuu",
+    "os": "Windows_NT",
+    "os_version": "10.0.26200 (Windows 11 Home Single Language)",
+    "arch": "x86_64",
+    "cpu_model": "AMD Ryzen 5 5500U with Radeon Graphics",
+    "cpu_cores": 12,
+    "cpu_freq": "2.10 GHz",
+    "ram_gb": 7.4,
+    "toolchain": "node 26.13.1 (v8 14.6.202.34-node.40)"
+  },
+  "corpus": {
+    "name": "synthetic_1mb",
+    "document_count": 1,
+    "total_bytes": 1048576,
+    "max_document_bytes": 1048576,
+    "sha256": "2bd707a2a4aea7a65726396ef4226421efd6000ba6d0609337bbb951ab9318d5"
+  },
+  "config": {
+    "date_utc": "2026-11-14T01:29:30Z",
+    "iterations": 48,
+    "warmup_runs": 1,
+    "repeats": 5,
+    "cpu_pinning": false,
+    "threads": 1,
+    "notes": "generator=node_harness; min_time_ms=200; warmup_ms=300; gc_between_repeats=false; repo=saq_report"
+  },
+  "results": [
+    {
+      "name": "v8/body-parse/synthetic_1mb",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "v8 baseline (P2): JSON.parse over the corpus documents as delivered by express.json() body parsing",
+        "basis_papers": [
+          "10.48550_arXiv.1902.08318",
+          "10.1145_2807591.2807644"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.004194779166666667,
+        "seconds_stddev": 0.00005603306317701435,
+        "bytes_per_second": 249971681.0678353,
+        "documents_per_second": 238.39157206328898,
+        "cpu_seconds": 0.004184100418410042
+      },
+      "extras": {
+        "bytes_per_op": 1048576,
+        "iterations_median": 48,
+        "rss_bytes_snapshot": 89886720
+      }
+    }
+  ]
+}
