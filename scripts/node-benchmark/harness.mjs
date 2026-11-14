@@ -413,7 +413,10 @@ const ENGINES = {
       return {
         name: 'ze_json',
         version: pkg.version,
-        language_runtime: `node ${process.versions.node} (wasm64 C-ABI, ABI v${ABI_VERSION_BINDING})`,
+        js_version: pkg.version,
+        core_version: pkg.coreSemver,
+        abi_version: pkg.coreVersion,
+        language_runtime: `node ${process.versions.node} (wasm64 C-ABI, ABI ${pkg.coreVersion})`,
       };
     },
     makeContexts: (scannerMode) => makeWasmContexts(scannerMode),
@@ -428,7 +431,10 @@ const ENGINES = {
       return {
         name: 'ze_json',
         version: pkg.version,
-        language_runtime: `node ${process.versions.node} (wasm64 C-ABI parser, ABI v${ABI_VERSION_BINDING})`,
+        js_version: pkg.version,
+        core_version: pkg.coreSemver,
+        abi_version: pkg.coreVersion,
+        language_runtime: `node ${process.versions.node} (wasm64 C-ABI parser, ABI ${pkg.coreVersion})`,
       };
     },
     makeContexts: () => ({

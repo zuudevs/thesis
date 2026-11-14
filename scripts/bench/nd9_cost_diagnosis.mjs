@@ -357,9 +357,13 @@ const MEAS_DIR = path.join(OUT_DIR, 'measurements');
 fs.mkdirSync(RAW_DIR, { recursive: true });
 fs.mkdirSync(MEAS_DIR, { recursive: true });
 
-const zeVersion = (() => {
-    try { return require(path.join(ROOT, 'ze_json', 'package.json')).version; }
-    catch { return '0.0.0-unknown'; }
+const zePkg = (() => {
+    try {
+        return require(path.join(ROOT, 'ze_json', 'bindings', 'js',
+            'package.json'));
+    }
+    catch { return { version: '0.0.0-unknown', coreVersion: null,
+        coreSemver: '0.0.0-unknown' }; }
 })();
 
 // Identity of the actually-loaded wasm artifact (cross-site byte-identity).
@@ -382,7 +386,7 @@ const metadata = {
         cpu_cores: os.cpus().length,
         ram_gb: Number((os.totalmem() / 2 ** 30).toFixed(1)),
         toolchain: `node ${process.version} (v8 ${process.versions.v8}) `
-            + `+ ze_json wasm64 ABI v3`,
+            + `+ ze_json wasm64 (ABI ${zePkg.coreVersion})`,
     },
     git: {
         root: { hash: ROOT_HASH, dirty: DIRTY },
@@ -451,10 +455,13 @@ const record = {
     generator: 'node_harness',
     library: {
         name: 'ze_json',
-        version: `${zeVersion} (ze_json@${zeHash}${zeDirty ? '-dirty' : ''}, `
+        version: `${zePkg.version} (ze_json@${zeHash}${zeDirty ? '-dirty' : ''}, `
             + `saq-report@${saqHash}${saqDirty ? '-dirty' : ''})`,
         language_runtime: `node ${process.version} (v8 ${process.versions.v8}) `
-            + `+ wasm64 C-ABI v3`,
+            + `+ wasm64 C-ABI`,
+        js_version: zePkg.version,
+        core_version: zePkg.coreSemver,
+        abi_version: zePkg.coreVersion,
         ...(WASM_SHA256 ? { artifact_sha256: WASM_SHA256 } : {}),
     },
     git_commit: {
