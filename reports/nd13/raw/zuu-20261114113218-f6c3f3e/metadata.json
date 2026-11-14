@@ -1,0 +1,62 @@
+{
+  "run_id": "zuu-20261114113218-f6c3f3e",
+  "experiment": "ND-13 s2-open decomposition probe (nd9 harness)",
+  "site": "dev_device",
+  "generator": "node_harness",
+  "cmd": "node scripts/bench/nd9_cost_diagnosis.mjs --rounds 15 --warmup 3 --cycles 4 --abi-calls 4096 --site dev_device --probe",
+  "host": {
+    "hostname": "zuu",
+    "os": "Windows_NT 10.0.26200",
+    "arch": "x64",
+    "cpu_model": "AMD Ryzen 5 5500U with Radeon Graphics         ",
+    "cpu_cores": 12,
+    "ram_gb": 7.4,
+    "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 (ABI 2026000300)"
+  },
+  "git": {
+    "root": {
+      "hash": "f6c3f3e",
+      "dirty": false
+    },
+    "ze_json": {
+      "hash": "22e939c",
+      "dirty": false
+    },
+    "saq_report": {
+      "hash": "8c7f2d4",
+      "dirty": false
+    },
+    "untracked_owner_files_ignored": []
+  },
+  "corpus": {
+    "dir": "D:\\kuliah_\\7_semester\\skripsi\\v5\\corpus\\benchmarks\\saq_payload_v1",
+    "manifest_sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1",
+    "document_count": 6,
+    "total_bytes": 88381
+  },
+  "artifact": {
+    "wasm_path": "D:\\kuliah_\\7_semester\\skripsi\\v5\\ze_json\\bindings\\js\\ze_json.wasm",
+    "wasm_sha256": "8ec2d3cd4ade29d7f143c7fb6fea2a7148043aad48ed16f8bd0762eb9c828b40"
+  },
+  "gate": {
+    "clean": true,
+    "dirty_repos": [],
+    "exploratory": false
+  },
+  "protocol": {
+    "rounds": 15,
+    "warmup": 3,
+    "cycles_per_round": 4,
+    "stage_order": "fixed by data dependency (s1->s4); document order rotated per round",
+    "alternating": true,
+    "outlier_trimming": false,
+    "gc_exposed": false,
+    "abi_calls_per_boundary_sample": 4096
+  },
+  "gc_at_start": {
+    "minor": 0,
+    "major": 0,
+    "other": 0
+  },
+  "date_utc": "2026-11-14T11:32:18Z"
+}

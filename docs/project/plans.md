@@ -252,6 +252,12 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   `library.js_version/core_version/abi_version` standar di schema,
   aturan bump+tag wajib di AGENTS §9, dan backfill histori
   `reports/registry/` (195 run: 192 git / 3 inferred / 0 unknown).
+  **ND-13 tereksekusi 2026-11-14 (dev; server pending)**
+  (`reports/nd13-open-decomposition.md`): dekomposisi `s2-open` via ekspor
+  standalone `ze_match_pass` (ABI v5, core/js 0.3.0, tag `core/0.3.0`+
+  `js/0.3.0`, wasm `8ec2d3cd…`) + mode `--probe` di nd9 — **scan 82–92%
+  dari open** (match 7–15%, carve ~2%) → kandidat fase D = scanner;
+  run server menyusul saat reachable.
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 

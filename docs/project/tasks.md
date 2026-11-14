@@ -523,6 +523,23 @@
   `35b7f773…→3`, `c5b42b7d…→4`, `19baac8c…→2026000200` — mengoreksi label
   hardcoded "v3" pada ND-10/ND-12; native = js/abi N/A). Laporan:
   `reports/R5-13-version-registry.md`.
+- [x] **ND-13** — Dekomposisi sub-stage `s2-open` (2026-11-14, lanjutan
+  instruksi pemilik "lanjut s2-open dulu"; ND-11 HTTP ditunda ke Senin):
+  wasm freestanding tanpa clock in-module → dekomposisi via ekspor
+  standalone setara diukur clock JS (`nd9 --probe`): `s2a-carve` =
+  `ze_alloc(3*len*8+64)`, `s2b-scan` = `ze_scanner8`, `s2c-match` =
+  `ze_match_pass` (ABI v5 baru — loop pairing diekstrak dari
+  `Document::open` jadi `ondemand::match_pass`, satu sumber); fused open
+  tetap bound produksi, tanpa force-subtract. Bump core/js 0.3.0 + tag
+  `core/0.3.0`/`js/0.3.0` (PR ze_json #42, merged `22e939c`, abi
+  `2026000300`, wasm `8ec2d3cd…`, gate 26 ekspor; ctest 6/6 release +
+  sanitize, differential/smoke/lazy PASS). Run dev `zuu-20261114113218-
+  f6c3f3e` (tree bersih, 738 parity checks, validator PASS): **scan
+  mendominasi s2-open 82–92%** di KB-scale, match 7–15%, carve ~0,3 µs
+  flat; Σ sub ≈ fused (1,02–1,16×; 1,96× di 360 B = call-boundary).
+  **Arah fase D: optimasi scanner**, bukan carve/match. Run server
+  pending (SSH unreachable; pola ND-12 — tanpa boot app). Laporan:
+  `reports/nd13-open-decomposition.md`; arsip `reports/nd13/`.
 - [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
   count `decode_interior` saat `cap >= inner_len` (invariant output
   decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%

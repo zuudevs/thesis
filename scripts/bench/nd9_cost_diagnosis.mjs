@@ -17,6 +17,19 @@
  * s5-boundary (per round, not per document): micro-loop abiVersion() x N —
  *   the JS/BigInt boxing floor per plain ABI call, 0 arguments.
  *
+ * --probe (ND-13 open decomposition): three EXTRA sub-stage entries measured
+ * per cycle, AFTER the fused s1..s4 cycle (untimed setup + one untimed
+ * resetHeap; the fused path is untouched). Each maps to an equivalent
+ * standalone call on the same bump heap the fused open uses:
+ *   s2a-carve  ze_alloc(3*len*8 + 64)   [the exact arena footprint open carves]
+ *   s2b-scan   ze_scanner8(src,len,dst) [the same scanner Document::open runs]
+ *   s2c-match  ze_match_pass(...)       [ABI v5: open's pairing pass, standalone]
+ * They are BOUNDS/equivalents reported side by side with the fused s2-open,
+ * never force-subtracted: wasm64 is freestanding (no in-module clock), so
+ * the decomposition is timed from the harness clock over standalone calls.
+ * Differential guard per cycle: ze_match_pass paired count MUST equal the
+ * number of ']' + '}' closers in the index stream (V8-independent).
+ *
  * Protocol (mirrors nd6_bench): warmup untimed, 15 independent rounds,
  * document order rotated per round (stage order cannot rotate — data
  * dependency), NO outlier trimming, GC observer counts reported,
@@ -62,6 +75,7 @@ const WARMUP = Number(arg('warmup', 3));
 const CYCLES = Number(arg('cycles', 4)); // bracket samples averaged per round
 const ABI_CALLS = Number(arg('abi-calls', 4096)); // s5 micro-loop length
 const SITE = arg('site', 'dev_device');
+const PROBE = argv.includes('--probe'); // ND-13 s2-open decomposition
 const CORPUS_DIR = path.resolve(arg('corpus',
     path.join(ROOT, 'corpus', 'benchmarks', 'saq_payload_v1')));
 const OUT_DIR = process.env.OUT_DIR || path.join(ROOT, 'out');
@@ -138,6 +152,9 @@ const RATIONALE = {
     's3-count': 'Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).',
     's4-close': 'Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).',
     's5-boundary': 'Stage 5: JS/BigInt boxing floor per plain ABI call (abiVersion x 4096 micro-loop, 0 args) — the cross-boundary cost every parser call pays.',
+    's2a-carve': 'Probe s2a (ND-13): ze_alloc(3*len*8 + 64) — the exact arena footprint ze_parser_open carves (cabi.cpp), timed standalone from the harness clock (wasm64 freestanding: no in-module clock). EQUIVALENT call, not the in-place event: a lower-bound proxy for the carve sub-stage, reported beside the fused s2-open bound; never force-subtracted.',
+    's2b-scan': 'Probe s2b (ND-13): ze_scanner8 — the same scanner Document::open runs via structural_scan static dispatch, timed standalone. Lower-bound proxy for the scan sub-stage; the fused open stays the production bound (no force-subtract).',
+    's2c-match': 'Probe s2c (ND-13): ze_match_pass (ABI v5) — Document::open\'s LIFO bracket-pairing pass replayed standalone (ondemand::match_pass, one source of truth). Lower-bound proxy for the match sub-stage; includes one visible call boundary (s5-boundary is the per-call floor). No force-subtract.',
 };
 
 // EKSEKUSI ------------------------------------------------------------------
@@ -148,6 +165,9 @@ let SINK; // anti dead-code elimination
 let parityChecks = 0;
 
 const STAGES = ['s1-copy', 's2-open', 's3-count', 's4-close'];
+// ND-13 probe sub-stages (measured only with --probe, per cycle, after s4).
+const PROBE_STAGES = ['s2a-carve', 's2b-scan', 's2c-match'];
+const ALL_STAGES = PROBE ? STAGES.concat(PROBE_STAGES) : STAGES;
 
 /** One timed stage bracket; returns {dt: ms, out: stage value}. */
 const bracket = (fn) => {
@@ -195,6 +215,61 @@ function runCycle(doc, sums) {
         binding.resetHeap();
     }).dt;
 
+    if (PROBE) {
+        // ND-13 s2-open decomposition: equivalent standalone calls on the
+        // SAME bump heap the fused open used. Setup allocs + writeBytes are
+        // UNTIMED (input cost already measured as s1-copy); one untimed
+        // resetHeap at the end keeps the per-cycle clean-heap contract.
+        const len = doc.bytes.length;
+        const capEntries = len; // scanner/match entries upper bound (per-byte)
+        const capBytes = len * 8; // 64-bit entries on wasm64
+        const arenaBytes = len * 8 * 3 + 64; // exact ze_parser_open footprint
+        const pSrc = binding.alloc(len);
+        binding.writeBytes(pSrc, doc.bytes);
+        const pIdx = binding.alloc(capBytes);
+        const pMatch = binding.alloc(capBytes);
+        const pStack = binding.alloc(capBytes);
+
+        // s2a: arena carve proxy — the exact open footprint, one bump alloc.
+        sums['s2a-carve'] += bracket(() => {
+            SINK = binding.alloc(arenaBytes);
+        }).dt;
+
+        // s2b: structural scan proxy — the scanner open dispatches (scanner8).
+        let n;
+        sums['s2b-scan'] += bracket(() => {
+            const s = binding.scan('scanner8', pSrc, len, pIdx, capEntries);
+            if (!s.ok) throw new Error(`probe scan failed: ${s.error}`);
+            n = s.count;
+        }).dt;
+
+        // s2c: bracket-pairing proxy — open's pass via the v5 export.
+        let paired;
+        sums['s2c-match'] += bracket(() => {
+            const m = binding.matchPass(pSrc, len, pIdx, n, pMatch, pStack,
+                capBytes);
+            if (!m.ok) throw new Error(`probe match failed: ${m.error}`);
+            paired = m.value;
+        }).dt;
+
+        // Differential guard (untimed): every valid-JSON closer pairs, so
+        // the paired count MUST equal the closers in the index stream —
+        // computed from the same stream ze_match_pass consumed, judged
+        // against doc.bytes (V8-independent).
+        const idxs = binding.readIndices(pIdx, n);
+        let closers = 0;
+        for (let j = 0; j < idxs.length; j += 1) {
+            const b = doc.bytes[idxs[j]];
+            if (b === 0x5d || b === 0x7d) closers += 1;
+        }
+        if (paired !== closers) {
+            throw new Error(`probe parity guard FAILED: ${doc.name} `
+                + `paired=${paired} closers_in_index_stream=${closers}`);
+        }
+        parityChecks += 1;
+        binding.resetHeap(); // rewind the probe allocs (untimed)
+    }
+
     return count;
 }
 
@@ -207,11 +282,13 @@ function runCycle(doc, sums) {
 function measureRounds() {
     const cellOf = new Map(DOCS.map((d) => [d.name, {
         's1-copy': [], 's2-open': [], 's3-count': [], 's4-close': [], counts: [],
+        ...(PROBE ? { 's2a-carve': [], 's2b-scan': [], 's2c-match': [] } : {}),
     }]));
     const boundarySamples = [];
 
     const warmSums = new Map(DOCS.map((d) => [d.name,
-        { 's1-copy': 0, 's2-open': 0, 's3-count': 0, 's4-close': 0 }]));
+        { 's1-copy': 0, 's2-open': 0, 's3-count': 0, 's4-close': 0,
+          ...(PROBE ? { 's2a-carve': 0, 's2b-scan': 0, 's2c-match': 0 } : {}) }]));
     for (let w = 0; w < WARMUP; w += 1) { // warmup untimed (pola nd6)
         for (const doc of DOCS) runCycle(doc, warmSums.get(doc.name));
         SINK = binding.abiVersion();
@@ -225,7 +302,8 @@ function measureRounds() {
         const order = DOCS.slice(off).concat(DOCS.slice(0, off));
         for (const doc of order) {
             const cell = cellOf.get(doc.name);
-            const sums = { 's1-copy': 0, 's2-open': 0, 's3-count': 0, 's4-close': 0 };
+            const sums = { 's1-copy': 0, 's2-open': 0, 's3-count': 0, 's4-close': 0,
+                ...(PROBE ? { 's2a-carve': 0, 's2b-scan': 0, 's2c-match': 0 } : {}) };
             for (let c = 0; c < CYCLES; c += 1) {
                 const count = runCycle(doc, sums);
                 if (count !== doc.rootChildren) {
@@ -235,7 +313,7 @@ function measureRounds() {
                 cell.counts.push(count);
                 parityChecks += 1;
             }
-            for (const stage of STAGES) {
+            for (const stage of ALL_STAGES) {
                 cell[stage].push(Number((sums[stage] / CYCLES).toPrecision(9)));
             }
         }
@@ -251,7 +329,7 @@ function measureRounds() {
 
     for (const doc of DOCS) {
         const cell = cellOf.get(doc.name);
-        for (const stage of STAGES) {
+        for (const stage of ALL_STAGES) {
             rawRounds.push({
                 doc: doc.name,
                 stage,
@@ -275,6 +353,10 @@ const STAGE_ABI = {
     's3-count': { abi_calls: 2, note: 'parserRoot + countElements' },
     's4-close': { abi_calls: 2, note: 'closeParser + resetHeap' },
     's5-boundary': { abi_calls: ABI_CALLS, note: `micro-loop x${ABI_CALLS}, 0 args` },
+    // ND-13 probe sub-stages (--probe only): equivalent standalone calls.
+    's2a-carve': { abi_calls: 1, note: 'ze_alloc(3*len*8+64), carve proxy' },
+    's2b-scan': { abi_calls: 1, note: 'ze_scanner8, scan proxy (same dispatch as open)' },
+    's2c-match': { abi_calls: 1, note: 'ze_match_pass, match proxy (open\'s pass standalone)' },
 };
 
 function pushStageResult(doc, stage, roundsMs) {
@@ -372,12 +454,14 @@ const WASM_SHA256 = wasmSha256(WASM_PATH);
 
 const metadata = {
     run_id: RUN_ID,
-    experiment: 'ND-9 cost diagnosis',
+    experiment: PROBE
+        ? 'ND-13 s2-open decomposition probe (nd9 harness)'
+        : 'ND-9 cost diagnosis',
     site: SITE,
     generator: 'node_harness',
     cmd: `node scripts/bench/nd9_cost_diagnosis.mjs --rounds ${ROUNDS} `
         + `--warmup ${WARMUP} --cycles ${CYCLES} --abi-calls ${ABI_CALLS} `
-        + `--site ${SITE}`,
+        + `--site ${SITE}${PROBE ? ' --probe' : ''}`,
     host: {
         hostname: HOSTNAME,
         os: `${os.type()} ${os.release()}`,
@@ -436,7 +520,7 @@ const { cellOf, boundarySamples } = measureRounds();
 
 for (const doc of DOCS) {
     const cell = cellOf.get(doc.name);
-    for (const stage of STAGES) pushStageResult(doc, stage, cell[stage]);
+    for (const stage of ALL_STAGES) pushStageResult(doc, stage, cell[stage]);
 }
 pushStageResult(null, 's5-boundary', boundarySamples);
 
@@ -485,7 +569,7 @@ const record = {
         cpu_pinning: false,
         threads: 1,
         exploratory: GATE.exploratory,
-        notes: `ND-9 cost diagnosis (5 stages, ${parityChecks} parity checks); `
+        notes: `ND-9 cost diagnosis (${ALL_STAGES.length + 1} stages, ${parityChecks} parity checks); `
             + `stage order fixed by data dependency s1->s4, document order `
             + `rotated per round; no outlier trimming; bracket gaps excluded `
             + `(stage times = per-stage averages over ${CYCLES} cycles/round; `
@@ -493,6 +577,14 @@ const record = {
             + `s5-boundary = per-call floor over a ${ABI_CALLS}-call micro-loop. `
             + `gc_exposed=${Boolean(global.gc)}; gc(minor=${gcCounts.minor - gcAtStart.minor}, `
             + `major=${gcCounts.major - gcAtStart.major}); raw: out/raw/${RUN_ID}/.`
+            + (PROBE
+                ? ` ND-13 PROBE on: s2a-carve/s2b-scan/s2c-match = equivalent `
+                  + `standalone calls (ze_alloc footprint / ze_scanner8 / `
+                  + `ze_match_pass v5) timed per cycle from the harness clock `
+                  + `— LOWER-BOUND proxies beside the fused s2-open bound, `
+                  + `NEVER force-subtracted; match guard: paired == closers `
+                  + `in the index stream.`
+                : '')
             + (GATE.exploratory
                 ? ` EXPLORATORY run (tracked changes: ${GATE.dirtyRepos.join(', ')}; `
                   + `--allow-dirty) — NOT acceptance evidence.`
