@@ -257,7 +257,13 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   standalone `ze_match_pass` (ABI v5, core/js 0.3.0, tag `core/0.3.0`+
   `js/0.3.0`, wasm `8ec2d3cd…`) + mode `--probe` di nd9 — **scan 82–92%
   dari open** (match 7–15%, carve ~2%) → kandidat fase D = scanner;
-  run server menyusul saat reachable.
+  run server menyusul saat reachable. **O2-1 tereksekusi 2026-11-15**
+  (`reports/O2-1-interior-skip.md`): interior fast skip `scanner8`
+  bebas-tabel — **s2-open −50,5%** (sandwich back-to-back, 0,1829 →
+  0,0906 ms Σmedian), core 0.3.1 (tag `core/0.3.1`, wasm `1d8960c9…`);
+  P4-3 ditutup (C3 UTF-8 SIMD ditolak, `reports/P4-3-closure.md`).
+  Lanjut: ND-6 pasca-O2 + run server O2-1 + O2-2 (SWAR interior,
+  kondisional).
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 
