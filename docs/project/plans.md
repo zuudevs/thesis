@@ -245,7 +245,13 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   0,05×/0,06× (+25–50% relatif), B 0,13×/0,13× (+40%), C stabil,
   D 1,48×/1,13× (tak berubah, konsisten ND-9); acceptance ≥1,5× belum
   tercapai → jalur berikutnya open-path / ND-11 HTTP. Chart vintage
-  `post-o1` ditambahkan.
+  `post-o1` ditambahkan. **R5-13 tereksekusi 2026-11-14**
+  (`reports/R5-13-version-registry.md`): dua registry versi mandiri
+  (core = `project(VERSION)` + nomor ABI otomatis 2026000200; js =
+  `ZE_JSON_JS_VERSION`), bump core/js 0.2.0 (ze_json PR #41), field
+  `library.js_version/core_version/abi_version` standar di schema,
+  aturan bump+tag wajib di AGENTS §9, dan backfill histori
+  `reports/registry/` (195 run: 192 git / 3 inferred / 0 unknown).
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 

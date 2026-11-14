@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "version_registry",
+  "run_id": "zuu-20261109035547-3211b7d",
+  "site": "dev_device",
+  "phase": null,
+  "generator": "registry_fill.py",
+  "library": {
+    "name": "ze_json"
+  },
+  "git_commit": {
+    "ze_json": "3211b7d",
+    "ze_json_source": "run_id suffix (cmake-generated RUN_ID)",
+    "saq_report": null
+  },
+  "versions": {
+    "js_version": "0.1.0",
+    "core_version": "0.1.0",
+    "abi_version": null,
+    "wasm_sha256": null
+  },
+  "source": "inferred",
+  "source_paths": [
+    "out\\measurements\\zuu-20261109035547-3211b7d_checker_batch_record.json",
+    "out\\measurements\\zuu-20261109035547-3211b7d_saq_payload_v1_record.json",
+    "out\\measurements\\zuu-20261109035547-3211b7d_synthetic_100k_record.json",
+    "out\\measurements\\zuu-20261109035547-3211b7d_synthetic_10k_record.json",
+    "out\\measurements\\zuu-20261109035547-3211b7d_synthetic_1k_record.json",
+    "out\\measurements\\zuu-20261109035547-3211b7d_synthetic_1mb_record.json"
+  ],
+  "resolved_at": "2026-11-14T17:31:07+07:00",
+  "notes": [
+    "partial resolution at ze_json@3211b7d",
+    "core_version from legacy library.version (native record: plain semver = core semver)"
+  ]
+}

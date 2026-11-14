@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "version_registry",
+  "run_id": "zuu-20261111222226-2fb661f",
+  "site": "dev_device",
+  "phase": null,
+  "generator": "registry_fill.py",
+  "library": {
+    "name": "ze_json"
+  },
+  "git_commit": {
+    "ze_json": "2fb661f",
+    "ze_json_source": "run_id suffix (cmake-generated RUN_ID)",
+    "saq_report": null
+  },
+  "versions": {
+    "js_version": "0.1.0",
+    "core_version": "0.1.0",
+    "abi_version": 3,
+    "wasm_sha256": null
+  },
+  "source": "git",
+  "source_paths": [
+    "out\\measurements\\zuu-20261111222226-2fb661f_checker_batch_record.json",
+    "out\\measurements\\zuu-20261111222226-2fb661f_saq_payload_v1_record.json",
+    "out\\measurements\\zuu-20261111222226-2fb661f_synthetic_100k_record.json",
+    "out\\measurements\\zuu-20261111222226-2fb661f_synthetic_10k_record.json",
+    "out\\measurements\\zuu-20261111222226-2fb661f_synthetic_1k_record.json",
+    "out\\measurements\\zuu-20261111222226-2fb661f_synthetic_1mb_record.json"
+  ],
+  "resolved_at": "2026-11-14T17:31:10+07:00",
+  "notes": []
+}

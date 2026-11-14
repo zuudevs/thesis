@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "version_registry",
+  "run_id": "zuu-20261114013428-fe877f2",
+  "site": "dev_device",
+  "phase": null,
+  "generator": "registry_fill.py",
+  "library": {
+    "name": "ze_json"
+  },
+  "git_commit": {
+    "ze_json": "fe877f2",
+    "ze_json_source": "run_id suffix (cmake-generated RUN_ID)",
+    "saq_report": null
+  },
+  "versions": {
+    "js_version": "0.1.2",
+    "core_version": "0.1.2",
+    "abi_version": 4,
+    "wasm_sha256": null
+  },
+  "source": "git",
+  "source_paths": [
+    "reports\\o1-loop\\zuu-20261114013428-fe877f2_checker_batch_record.json",
+    "reports\\o1-loop\\zuu-20261114013428-fe877f2_saq_payload_v1_record.json",
+    "reports\\o1-loop\\zuu-20261114013428-fe877f2_synthetic_100k_record.json",
+    "reports\\o1-loop\\zuu-20261114013428-fe877f2_synthetic_10k_record.json",
+    "reports\\o1-loop\\zuu-20261114013428-fe877f2_synthetic_1k_record.json",
+    "reports\\o1-loop\\zuu-20261114013428-fe877f2_synthetic_1mb_record.json",
+    "out\\measurements\\zuu-20261114013428-fe877f2_checker_batch_record.json",
+    "out\\measurements\\zuu-20261114013428-fe877f2_saq_payload_v1_record.json",
+    "out\\measurements\\zuu-20261114013428-fe877f2_synthetic_100k_record.json",
+    "out\\measurements\\zuu-20261114013428-fe877f2_synthetic_10k_record.json",
+    "out\\measurements\\zuu-20261114013428-fe877f2_synthetic_1k_record.json",
+    "out\\measurements\\zuu-20261114013428-fe877f2_synthetic_1mb_record.json"
+  ],
+  "resolved_at": "2026-11-14T17:31:13+07:00",
+  "notes": []
+}

@@ -217,10 +217,12 @@
 |---|---|
 | Rencana & tugas | `docs/project/plans.md`, `docs/project/tasks.md` |
 | Preset build | `ze_json/CMakePresets.json` |
-| Modul toolchain / wasm | `ze_json/cmake/modules/*` (`toolchain.cmake` — native chainload & wasm) |
+| Modul toolchain / wasm | `ze_json/cmake/modules/*` (`Toolchains.cmake` — native chainload & wasm) |
 | Env / bootstrap | `scripts/env/activate.ps1`, `scripts/bootstraps/ze_json.bat` |
 | Build wasm64 terverifikasi | `scripts/build-wasm.ps1` (`-Fresh`/`-SkipGates`/`-VerifyOnly`) |
 | Codegen tabel | `ze_json/scripts/GenerateLookups.py` |
+| Registry versi (core & js) | `ze_json/CMakeLists.txt` + `ze_json/cmake/modules/ModuleRegistry.cmake` (+ `cmake/templates/ValidateVersion.py.in`) |
+| Backfill versi record | `scripts/measurement-schema/registry_fill.py` → sidecar `reports/registry/` |
 | Korpus JSON_checker | `corpus/test/json_checker/` + `InstallJsonChecker.py` |
 | Literatur (paper) | `out/rag/<DOI>.chunks.json` |
 | Bibliografi | `assets/bib/cites.bib`; validasi tahun `scripts/eval-cite/` |
@@ -250,3 +252,34 @@ Scope: root `v5`, `ze_json`, `saq-report` (serta submodul dokumen bila nanti dis
   tervalidasi + path exhibit raw + status validator + hash baseline vs candidate.
 - Artifacts hasil ukur tidak di-commit (`out/` gitignored); bila perlu arsip
   permanen, salin record tervalidasi ke `reports/` (di-commit, provenance verbatim).
+
+## 9. Versioning & release (wajib)
+
+`ze_json` punya **dua registry versi mandiri** — keduanya dijaga sinkron oleh
+`cmake/templates/ValidateVersion.py` (PRE_BUILD):
+
+- **Core**: `project(VERSION)` di `ze_json/CMakeLists.txt` (+ `vcpkg.json`
+  wajib sama). Nomor ABI `ze_abi_version()` mengikuti registry ini otomatis
+  (generated `ze_json/core/version.hpp` → `ZE_JSON_VERSION` =
+  `ZE_JSON_CORE_VERSION_NUMBER`).
+- **bindings/js**: `ZE_JSON_JS_VERSION` di
+  `ze_json/cmake/modules/ModuleRegistry.cmake`; `bindings/js/package.json`
+  **DIGENERATE** dari `cmake/templates/package.json.in` (jangan edit manual) —
+  membawa `version` (js), `coreVersion` (= `ze_abi_version()`), `coreSemver`.
+
+**Kewajiban bump versi + tag** pada setiap perubahan (SemVer):
+
+| Jenis perubahan | Registry yang dibump | Tag | Semver |
+|---|---|---|---|
+| Kode core C++ (`include/`, `src/`, cmake core, tabel lookups) | core (`CMakeLists.txt` + `vcpkg.json`) | `core/X.Y.Z` | MAJOR = signature/packing/semantik ABI; MINOR = ekspor/fitur additive; PATCH = fix/perf tanpa kontrak baru |
+| `bindings/js` (`ze_json.mjs`, tests/benchmarks binding) | js (`ModuleRegistry.cmake`) | `js/X.Y.Z` | MAJOR = perubahan API JS; MINOR = additive; PATCH = fix |
+| Keduanya sekali PR | keduanya | keduanya | — |
+| Komentar/Doxygen, docs `.md`, reformat whitespace, CI yml tanpa menyentuh kode versi-able | ❌ tidak wajib | ❌ tidak | tanpa perlu alasan khusus |
+
+- Tag dipasang pada **commit merge di `main`** setelah PR lulus (bukan di
+  branch); format **`core/X.Y.Z`** dan **`js/X.Y.Z`** (dua registry → dua tag).
+- Checklist PR wajib menyatakan: "bump versi? tag? — ya/tidak + alasan".
+- Record pengukuran membawa `library.js_version` / `library.core_version` /
+  `library.abi_version` (standar sejak R5-13); histori yang kekurangan field
+  di-backfill via `python scripts/measurement-schema/registry_fill.py` →
+  sidecar `reports/registry/<run_id>.json` (exhibit verbatim tidak disentuh).

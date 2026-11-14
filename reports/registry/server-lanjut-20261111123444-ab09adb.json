@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "version_registry",
+  "run_id": "server-lanjut-20261111123444-ab09adb",
+  "site": "saq_server",
+  "phase": null,
+  "generator": "registry_fill.py",
+  "library": {
+    "name": "ze_json"
+  },
+  "git_commit": {
+    "ze_json": "ab09adb",
+    "ze_json_source": "run_id suffix (cmake-generated RUN_ID)",
+    "saq_report": null
+  },
+  "versions": {
+    "js_version": "0.1.0",
+    "core_version": "0.1.0",
+    "abi_version": 3,
+    "wasm_sha256": null
+  },
+  "source": "git",
+  "source_paths": [
+    "reports\\nd6\\server-lanjut-20261111\\server-lanjut-20261111123444-ab09adb_checker_batch_record.json",
+    "reports\\nd6\\server-lanjut-20261111\\server-lanjut-20261111123444-ab09adb_saq_payload_v1_record.json",
+    "reports\\nd6\\server-lanjut-20261111\\server-lanjut-20261111123444-ab09adb_synthetic_100k_record.json",
+    "reports\\nd6\\server-lanjut-20261111\\server-lanjut-20261111123444-ab09adb_synthetic_10k_record.json",
+    "reports\\nd6\\server-lanjut-20261111\\server-lanjut-20261111123444-ab09adb_synthetic_1k_record.json",
+    "reports\\nd6\\server-lanjut-20261111\\server-lanjut-20261111123444-ab09adb_synthetic_1mb_record.json",
+    "out\\measurements\\server-lanjut-20261111123444-ab09adb_checker_batch_record.json",
+    "out\\measurements\\server-lanjut-20261111123444-ab09adb_saq_payload_v1_record.json",
+    "out\\measurements\\server-lanjut-20261111123444-ab09adb_synthetic_100k_record.json",
+    "out\\measurements\\server-lanjut-20261111123444-ab09adb_synthetic_10k_record.json",
+    "out\\measurements\\server-lanjut-20261111123444-ab09adb_synthetic_1k_record.json",
+    "out\\measurements\\server-lanjut-20261111123444-ab09adb_synthetic_1mb_record.json"
+  ],
+  "resolved_at": "2026-11-14T17:31:06+07:00",
+  "notes": [
+    "partial resolution at ze_json@ab09adb"
+  ]
+}

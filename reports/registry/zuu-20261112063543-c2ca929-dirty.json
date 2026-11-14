@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "version_registry",
+  "run_id": "zuu-20261112063543-c2ca929-dirty",
+  "site": "dev_device",
+  "phase": null,
+  "generator": "registry_fill.py",
+  "library": {
+    "name": "ze_json"
+  },
+  "git_commit": {
+    "ze_json": "14592a0",
+    "ze_json_source": "library.version pin",
+    "saq_report": "7930009"
+  },
+  "versions": {
+    "js_version": "0.1.0",
+    "core_version": "0.1.0",
+    "abi_version": 3,
+    "wasm_sha256": null
+  },
+  "source": "git",
+  "source_paths": [
+    "out\\measurements\\zuu-20261112063543-c2ca929-dirty-nd6-a-dev_device.record.json"
+  ],
+  "resolved_at": "2026-11-14T17:31:12+07:00",
+  "notes": [
+    "partial resolution at ze_json@14592a0"
+  ]
+}
