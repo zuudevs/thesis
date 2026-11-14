@@ -548,7 +548,7 @@
   **Arah fase D: optimasi scanner**, bukan carve/match. Run server
   pending (SSH unreachable; pola ND-12 — tanpa boot app). Laporan:
   `reports/nd13-open-decomposition.md`; arsip `reports/nd13/`.
-- [ ] **O2-1** — `scanner8` string-interior fast skip (keluarga O2 =
+- [x] **O2-1** — `scanner8` string-interior fast skip (keluarga O2 =
   optimasi scanner, dasar verdict ND-13): jalur interior string dalam
   loop scan diganti loop bebas-tabel (2 compare prediktable `'\\'`/`'"'`
   per byte) — mayoritas byte payload kini tidak membayar load
@@ -556,12 +556,18 @@
   Semantik identik (dangling escape, error precedence, isi dst) — gate
   diferensial byte-identity vs `reference_scan` + json_checker + edge
   (escape di ujung, `\"` beruntun, unicode escape, string panjang) +
-  native-sanitize + wasm differential 71×5. Ukur: nd13 `--probe`
-  (`s2b-scan` + fused `s2-open`) satu run per site, protokol identik
-  baseline `zuu-20261114113218-f6c3f3e`; satu perubahan per pengukuran
-  (skill cpp-highperf-json); kontrol layout bila regres di stage lain
-  (pelajaran C1). Versi: perf tanpa kontrak baru = core PATCH 0.3.1
-  (tag `core/0.3.1`; js tidak dibump).
+  native-sanitize + wasm differential 71×5. **DITERIMA 2026-11-15**
+  (sandwich back-to-back satu window, tree bersih, core PATCH 0.3.1,
+  tag `core/0.3.1`, merge `0aacd82`, wasm `1d8960c9…`; baseline 0.3.0
+  rebuild byte-identik `8ec2d3cd…`): fused `s2-open` 0,1829 →
+  **0,0906 ms (−50,5%)**, scan 0,1729 → 0,0847 (−51,0%); per dokumen
+  −30,5%..−54,1% (terbesar di 39 KB), konsisten pair lintas-window
+  (−38,7%) dan jauh di luar band drift (~11%). Bonus build fix:
+  deklarasi cross-compile wasm pindah ke toolchain file
+  (`ZUU_WASM_TOOLCHAIN`) — configure wasm64 fresh Windows kini benar
+  (sebelumnya turun jadi host build saat re-detection → GTest REQUIRED
+  gagal). Laporan: `reports/O2-1-interior-skip.md`; arsip
+  `reports/o2-1/`. Follow-up: re-measure ND-6 pasca-O2 + run server.
 - [ ] **O2-2 (kondisional)** — SWAR interior skip 8-byte (deteksi
   quote/backslash per blok) — hanya bila O2-1 diterima dan profil
   menunjukkan interior masih dominan; P4-2 mengharuskan diukur, bukan
