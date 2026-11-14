@@ -240,7 +240,12 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   (`reports/R5-11-thin-step.md`, +27,4–45,1%) semua DITERIMA (ze_json
   PR #38/#39/#40; wasm kini v4 `c5b42b7d…`); kumulatif ~1,6–2,1× jalur A
   (narasi antar-window). Follow-up: re-measure matriks ND-6 pasca-O1
-  (keputusan pemilik).
+  (keputusan pemilik). **ND-12 tereksekusi 2026-11-14**
+  (`reports/nd12-post-o1-matrix.md`): matriks pasca-O1 (ABI v4) — A
+  0,05×/0,06× (+25–50% relatif), B 0,13×/0,13× (+40%), C stabil,
+  D 1,48×/1,13× (tak berubah, konsisten ND-9); acceptance ≥1,5× belum
+  tercapai → jalur berikutnya open-path / ND-11 HTTP. Chart vintage
+  `post-o1` ditambahkan.
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 

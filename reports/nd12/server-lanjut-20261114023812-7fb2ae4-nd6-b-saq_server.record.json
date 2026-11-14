@@ -1,0 +1,442 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "server-lanjut-20261114023812-7fb2ae4",
+  "site": "saq_server",
+  "generator": "node_harness",
+  "library": {
+    "name": "ze_json",
+    "version": "0.0.0-unknown (ze_json@fe877f2, saq-report@8c7f2d4)",
+    "language_runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI v3",
+    "artifact_sha256": "c5b42b7d1782294e3dbb1db984f05b8121ce71c42943c75e5d8cfd3e19f6c4fd"
+  },
+  "git_commit": {
+    "hash": "7fb2ae4",
+    "dirty": false,
+    "repo": "v5"
+  },
+  "host": {
+    "hostname": "server-lanjut",
+    "os": "Windows_NT 10.0.26300",
+    "arch": "x64",
+    "cpu_model": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz",
+    "cpu_cores": 6,
+    "ram_gb": 7.9,
+    "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 ABI v3"
+  },
+  "corpus": {
+    "name": "saq_payload_v1",
+    "document_count": 6,
+    "total_bytes": 88381,
+    "max_document_bytes": 39209,
+    "sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1"
+  },
+  "config": {
+    "date_utc": "2026-11-14T02:38:12Z",
+    "iterations": 30,
+    "warmup_runs": 3,
+    "repeats": 15,
+    "cpu_pinning": false,
+    "threads": 1,
+    "exploratory": false,
+    "notes": "ND-6 phase B; alternating rounds; no outlier trimming; gc_exposed=false; gc(minor=0, major=0); raw: out/raw/server-lanjut-20261114023812-7fb2ae4/; per-result detail in extras (seconds_median/p95, binding_calls, index_count, consumed/skipped — kumulatif GC sejak start fase). Baseline=V8 (engine=v8), candidate=ze_json wasm64_cabi — same run_id; phase D measures through the saq-report repository layer (binding calls not observable there: extras.binding_calls=null)."
+  },
+  "results": [
+    {
+      "name": "B/courses/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000930177778,
+        "seconds_stddev": 0.00000182518,
+        "bytes_per_second": 429272779,
+        "documents_per_second": 107506.331
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00000838,
+        "seconds_p95": 0.00001266,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 14,
+        "skipped_fields": 85,
+        "total_fields": 99,
+        "doc_bytes": 3993
+      }
+    },
+    {
+      "name": "B/courses/ze-project-selective",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L2 project(shape) C++-side — membayar hanya field shape; konsumen identik v8-selective (isolasi mekanisme L2 vs L1).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000881424444,
+        "seconds_stddev": 0.0000438995,
+        "bytes_per_second": 45301670.8,
+        "documents_per_second": 11345.2719
+      },
+      "extras": {
+        "path": "ze-project-selective",
+        "seconds_median": 0.00007684,
+        "seconds_p95": 0.000144041,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 1812,
+        "index_count": 0,
+        "consumed_fields": 14,
+        "skipped_fields": 85,
+        "total_fields": 99,
+        "doc_bytes": 3993
+      }
+    },
+    {
+      "name": "B/assistants/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000123073333,
+        "seconds_stddev": 0.00000140517,
+        "bytes_per_second": 456150804,
+        "documents_per_second": 81252.3699
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00001153,
+        "seconds_p95": 0.000014744,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 25,
+        "skipped_fields": 126,
+        "total_fields": 151,
+        "doc_bytes": 5614
+      }
+    },
+    {
+      "name": "B/assistants/ze-project-selective",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L2 project(shape) C++-side — membayar hanya field shape; konsumen identik v8-selective (isolasi mekanisme L2 vs L1).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000936911111,
+        "seconds_stddev": 0.00000562035,
+        "bytes_per_second": 59920305.5,
+        "documents_per_second": 10673.3711
+      },
+      "extras": {
+        "path": "ze-project-selective",
+        "seconds_median": 0.00009151,
+        "seconds_p95": 0.000102748667,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 1812,
+        "index_count": 0,
+        "consumed_fields": 25,
+        "skipped_fields": 126,
+        "total_fields": 151,
+        "doc_bytes": 5614
+      }
+    },
+    {
+      "name": "B/lecturers/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000707666667,
+        "seconds_stddev": 6.05837e-7,
+        "bytes_per_second": 506170513,
+        "documents_per_second": 141309.468
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00000682,
+        "seconds_p95": 0.000008389,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 15,
+        "skipped_fields": 76,
+        "total_fields": 91,
+        "doc_bytes": 3582
+      }
+    },
+    {
+      "name": "B/lecturers/ze-project-selective",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L2 project(shape) C++-side — membayar hanya field shape; konsumen identik v8-selective (isolasi mekanisme L2 vs L1).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000563744444,
+        "seconds_stddev": 0.00000314124,
+        "bytes_per_second": 63539428.8,
+        "documents_per_second": 17738.534
+      },
+      "extras": {
+        "path": "ze-project-selective",
+        "seconds_median": 0.0000547,
+        "seconds_p95": 0.0000622766667,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 1812,
+        "index_count": 0,
+        "consumed_fields": 15,
+        "skipped_fields": 76,
+        "total_fields": 91,
+        "doc_bytes": 3582
+      }
+    },
+    {
+      "name": "B/schedules/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000679373333,
+        "seconds_stddev": 0.00000134933,
+        "bytes_per_second": 577134811,
+        "documents_per_second": 14719.4473
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.0000675,
+        "seconds_p95": 0.000070426,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 120,
+        "skipped_fields": 841,
+        "total_fields": 961,
+        "doc_bytes": 39209
+      }
+    },
+    {
+      "name": "B/schedules/ze-project-selective",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L2 project(shape) C++-side — membayar hanya field shape; konsumen identik v8-selective (isolasi mekanisme L2 vs L1).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000489472,
+        "seconds_stddev": 0.0000229986,
+        "bytes_per_second": 80104684.2,
+        "documents_per_second": 2043.01778
+      },
+      "extras": {
+        "path": "ze-project-selective",
+        "seconds_median": 0.00047486,
+        "seconds_p95": 0.000527956,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 312,
+        "index_count": 0,
+        "consumed_fields": 120,
+        "skipped_fields": 841,
+        "total_fields": 961,
+        "doc_bytes": 39209
+      }
+    },
+    {
+      "name": "B/reports/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000053136,
+        "seconds_stddev": 0.0000013029,
+        "bytes_per_second": 670411774,
+        "documents_per_second": 18819.6326
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00005284,
+        "seconds_p95": 0.00005485,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 60,
+        "skipped_fields": 600,
+        "total_fields": 660,
+        "doc_bytes": 35623
+      }
+    },
+    {
+      "name": "B/reports/ze-project-selective",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L2 project(shape) C++-side — membayar hanya field shape; konsumen identik v8-selective (isolasi mekanisme L2 vs L1).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000331130667,
+        "seconds_stddev": 0.000013421,
+        "bytes_per_second": 107579888,
+        "documents_per_second": 3019.95587
+      },
+      "extras": {
+        "path": "ze-project-selective",
+        "seconds_median": 0.00032422,
+        "seconds_p95": 0.00035919,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 312,
+        "index_count": 0,
+        "consumed_fields": 60,
+        "skipped_fields": 600,
+        "total_fields": 660,
+        "doc_bytes": 35623
+      }
+    },
+    {
+      "name": "B/globalConfig/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000238155556,
+        "seconds_stddev": 6.47746e-7,
+        "bytes_per_second": 151161706,
+        "documents_per_second": 419893.627
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00000222,
+        "seconds_p95": 0.00000325033333,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 5,
+        "skipped_fields": 9,
+        "total_fields": 14,
+        "doc_bytes": 360
+      }
+    },
+    {
+      "name": "B/globalConfig/ze-project-selective",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L2 project(shape) C++-side — membayar hanya field shape; konsumen identik v8-selective (isolasi mekanisme L2 vs L1).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00001605,
+        "seconds_stddev": 0.0000044121,
+        "bytes_per_second": 22429906.5,
+        "documents_per_second": 62305.296
+      },
+      "extras": {
+        "path": "ze-project-selective",
+        "seconds_median": 0.0000143866667,
+        "seconds_p95": 0.000025144,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 1812,
+        "index_count": 0,
+        "consumed_fields": 5,
+        "skipped_fields": 9,
+        "total_fields": 14,
+        "doc_bytes": 360
+      }
+    }
+  ]
+}
