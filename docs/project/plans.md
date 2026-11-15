@@ -272,7 +272,11 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   scan wasm saq −26,4% (sandwich), native gbench menang di SEMUA family
   (saq −36,3%, synthetic −25,8..−49,9%); core 0.3.2 (`core/0.3.2`,
   wasm `9795f2e8…`). Komposisi open pasca-O2: match ~21% → kandidat O2
-  berikutnya = pass pairing. Lanjut: sesi server terpadu (ND-13 + ND-14
+  berikutnya = pass pairing. **Refresh 0.3.2 + chart (addendum ND-14
+  §7)**: matriks di-refresh di core 0.3.2 — fase D mongo-cache 2,88×
+  (p95 3,25×); vintage chart `post-o2` (server panel = PENDING) +
+  `o2-ladder` (dua window sandwich); 16 chart tak terpakai dihapus.
+  Lanjut: sesi server terpadu (ND-13 + ND-14
   server) + ND-11 Senin.
 
 ## 6. Paper kunci (mapping DOI → penggunaan)

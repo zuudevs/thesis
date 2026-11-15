@@ -122,17 +122,33 @@ CONFIRM_POST_O1 = [
     "zuu-20261114022956-7fb2ae4",            # dev confirm
     "server-lanjut-20261114024230-7fb2ae4",  # server confirm
 ]
+# post-o2 (ND-14 refresh, 2026-11-15): fresh dev matrix AFTER O2-1 + O2-2 —
+# root 6d87bf3, ze_json 01a143f (core 0.3.2), wasm 9795f2e8 (abi
+# 2026000302), Node 26.13.1, clean trees. SAQ_SERVER = PENDING (SSH
+# unreachable all session): the server entries stay None until the
+# terpadu server session runs — build_cells renders those cells as
+# "pending" instead of failing, so the dev story ships now and the
+# chart refreshes when the server numbers land.
+RUNS_POST_O2 = {
+    ("A", "dev_device"): "zuu-20261115071747-6d87bf3",
+    ("B", "dev_device"): "zuu-20261115075332-6d87bf3",
+    ("C", "dev_device"): "zuu-20261115080838-6d87bf3",
+    ("D", "dev_device"): "zuu-20261115080840-6d87bf3",
+}
+CONFIRM_POST_O2 = []  # single run per phase; confirm rides the server session
 
-VINTAGE = "post-o1"
+VINTAGE = "post-o2"
 for _a in sys.argv[1:]:
     if _a.startswith("--vintage="):
         VINTAGE = _a.split("=", 1)[1]
-if VINTAGE not in ("nd6", "nd10", "post-o1"):
-    raise SystemExit("vintage must be nd6, nd10 or post-o1")
+if VINTAGE not in ("nd6", "nd10", "post-o1", "post-o2"):
+    raise SystemExit("vintage must be nd6, nd10, post-o1 or post-o2")
 
-_RUNS_BY_VINTAGE = {"nd6": RUNS_ND6, "nd10": RUNS_ND10, "post-o1": RUNS_POST_O1}
+_RUNS_BY_VINTAGE = {"nd6": RUNS_ND6, "nd10": RUNS_ND10, "post-o1": RUNS_POST_O1,
+                    "post-o2": RUNS_POST_O2}
 _CONFIRMS_BY_VINTAGE = {
-    "nd6": CONFIRM_ND6, "nd10": CONFIRM_ND10, "post-o1": CONFIRM_POST_O1}
+    "nd6": CONFIRM_ND6, "nd10": CONFIRM_ND10, "post-o1": CONFIRM_POST_O1,
+    "post-o2": CONFIRM_POST_O2}
 RUNS = _RUNS_BY_VINTAGE[VINTAGE]
 CONFIRM_RUNS = _CONFIRMS_BY_VINTAGE[VINTAGE]
 PREFIX = VINTAGE  # output filename prefix: nd6-* / nd10-* / post-o1-*
@@ -164,7 +180,9 @@ SITES = ["dev_device", "saq_server"]
 # ---------------------------------------------------------------------------
 
 def pick_record(nd6, phase, site):
-    prefix = RUNS[(phase, site)]
+    prefix = RUNS.get((phase, site))
+    if prefix is None:
+        return None  # site PENDING for this vintage (e.g. post-o2 server)
     matches = [r for r in nd6 if r["site"] == site and r["run_id"].startswith(prefix)]
     if len(matches) != 1:
         raise SystemExit(f"pinned run {prefix} ({phase}/{site}): "
@@ -220,6 +238,9 @@ def build_cells(nd6, log_rows):
     for row in ROWS:
         for site in SITES:
             rec = pick_record(nd6, row["phase"], site)
+            if rec is None:
+                cells[(row["key"], site)] = {"pending": True}
+                continue
             if row["kind"] == "d":
                 items = [x for x in d_speedups(rec, log_rows)
                          if x["doc"] == row["path"]]
@@ -253,13 +274,19 @@ def draw_map(cells):
             "dev_device\nNode 26.13.1 (V8 14.6) · tree bersih",
             "saq_server\nNode 26.13.1 (V8 14.6) · tree bersih",
         ]
+    elif VINTAGE == "post-o2":
+        site_labels = [
+            "dev_device\npasca-O2 (core 0.3.2) · tree bersih\n2026-11-15 · Node 26.13.1",
+            "saq_server\nPENDING — sesi server menyusul\n(SSH unreachable 2026-11-15)",
+        ]
     else:
         site_labels = [
             "dev_device\npasca-O1 (v4) · tree bersih",
             "saq_server\npasca-O1 (v4) · tree bersih",
         ]
     zlog = lambda v: math.log10(v)  # noqa: E731
-    z = [[zlog(cells[(r["key"], s)]["speedup"]) for s in SITES] for r in ROWS]
+    z = [[zlog(cells[(r["key"], s)].get("speedup", 1.0)) for s in SITES]
+         for r in ROWS]  # pending cells render neutral (1.0x, gray text)
     norm = TwoSlopeNorm(vmin=math.log10(0.03), vcenter=0.0, vmax=math.log10(3.2))
     cmap = colormaps["RdYlGn"]
 
@@ -269,6 +296,10 @@ def draw_map(cells):
     for i, row in enumerate(ROWS):
         for j, site in enumerate(SITES):
             cell = cells[(row["key"], site)]
+            if cell.get("pending"):
+                ax.text(j, i, "—\npending", ha="center", va="center",
+                        fontsize=10, color="#90a4ae", style="italic")
+                continue
             v = cell["speedup"]
             rgba = cmap(norm(zlog(v)))
             lum = 0.299 * rgba[0] + 0.587 * rgba[1] + 0.114 * rgba[2]
@@ -311,6 +342,14 @@ def draw_map(cells):
                 "A/B = median lintas 6 store (bracket = min–max).\n"
                 "E1: verdict era Node 24 (2,85×/3,00×) tidak reproducible di Node 26 — komparasi antar-era confounded "
                 "(wasm era lama 7e26044f tak terekam sidecarnya). Sumber: record PASS reports/nd10/.")
+    elif VINTAGE == "post-o2":
+        title = "ze_json vs baseline V8 — peta speedup pasca-O2 (ND-14 refresh, scanner O2-1+O2-2)"
+        sub = ("Fresh run 2026-11-15 · core 0.3.2 (O2-1 interior skip + O2-2 SWAR) · wasm 9795f2e8 · Node 26.13.1 · tree bersih · "
+               "hijau = unggul (>1×) · merah = perlu perbaikan (<1×)")
+        foot = ("Speedup = median V8 / median ze dalam pasangan in-situ (fairness gate: satu run_id, korpus sha256 sama, status ok). "
+                "A/B = median lintas 6 store (bracket = min–max).\n"
+                "Fase D dev mongo-cache 2,88× ≥ target 1,5× — acceptance dev tercapai (0,3.0 era: 1,48×; 0.3.1: 2,40×). "
+                "Panel server PENDING — refresh chart setelah sesi server. Sumber: record PASS reports/nd14/.")
     else:
         title = "ze_json vs baseline V8 — peta speedup pasca-O1 (ND-12, countermeasure terpasang)"
         sub = ("Fresh run 2026-11-14 · ABI v4 (O1-4+O1-5+O1-7) · wasm c5b42b7d byte-identik · Node 26.13.1 · tree bersih · "
@@ -337,6 +376,9 @@ def draw_acceptance(nd6, log_rows):
     elif VINTAGE == "nd10":
         rt_dev = "2026-11-13 · Node 26.13.1 · tree bersih"
         rt_srv = rt_dev
+    elif VINTAGE == "post-o2":
+        rt_dev = "2026-11-15 · pasca-O2 (core 0.3.2) · tree bersih"
+        rt_srv = "PENDING (sesi server menyusul)"
     else:
         rt_dev = "2026-11-14 · pasca-O1 (ABI v4) · tree bersih"
         rt_srv = rt_dev
@@ -346,6 +388,10 @@ def draw_acceptance(nd6, log_rows):
             (RUNS[("D", "saq_server")], f"server · run utama\n{rt_srv}"),
             *[(rid, f"dev · konfirmasi\n{rt_dev}") for rid in CONFIRM_RUNS],
         ]
+    elif VINTAGE == "post-o2":
+        spec = [
+            (RUNS[("D", "dev_device")], "dev · utama\n(pasca-O2-1 + O2-2)"),
+        ]  # server PENDING — bar muncul setelah sesi server
     else:
         spec = [
             (RUNS[("D", "dev_device")], "dev · utama"),
@@ -416,6 +462,12 @@ def draw_acceptance(nd6, log_rows):
                    "target ≥ 1,5× TIDAK tercapai di kedua site.")
         acc_foot = ("Baseline repo.read().length (V8) vs ze repo.readCount() (structural count, wasm64 C-ABI) dalam satu run_id.\n"
                     "E1: verdict era Node 24 (2,85×/3,00×) turun ~1,4× di Node 26 → runtime V8 14.6 = penyebab dominan kompresi (wasm era lama tak terekam sidecarnya → confounded).")
+    elif VINTAGE == "post-o2":
+        acc_title = "Pasca-O2 fase D — acceptance jalur produksi (ND-14 refresh, dev)"
+        acc_sub = ("core 0.3.2 (O2-1 + O2-2) · wasm 9795f2e8 · Node 26.13.1 · tree bersih · "
+                   "2,88× ≥ target 1,5× — ACCEPTANCE DEV TERCAPAI.")
+        acc_foot = ("Baseline repo.read().length (V8) vs ze repo.readCount() (structural count, wasm64 C-ABI) dalam satu run_id.\n"
+                    "Tren: 1,48× (0.2-era) → 2,40× (0.3.1, O2-1) → 2,88× (0.3.2, +O2-2) · server PENDING (sesi server menyusul).")
     else:
         acc_title = "Pasca-O1 fase D — acceptance jalur produksi (ND-12)"
         acc_sub = ("ABI v4 (O1-4+O1-5+O1-7) · wasm c5b42b7d byte-identik · Node 26.13.1 · tree bersih · "
@@ -447,7 +499,8 @@ def write_csv(name, fieldnames, rows):
 
 def main():
     recs = base.load_records()
-    extra_dirs = {"nd10": ["nd10"], "post-o1": ["nd12", "nd10"]}.get(VINTAGE, [])
+    extra_dirs = {"nd10": ["nd10"], "post-o1": ["nd12", "nd10"],
+                  "post-o2": ["nd14", "nd12", "nd10"]}.get(VINTAGE, [])
     for extra in extra_dirs:
         base.RECORDS_DIR = os.path.join(base.ROOT, "reports", extra)
         recs = base.load_records() + recs
@@ -463,6 +516,8 @@ def main():
     for row in ROWS:
         for site in SITES:
             cell = cells[(row["key"], site)]
+            if cell.get("pending"):
+                continue  # site PENDING for this vintage: no CSV rows yet
             for it in cell["items"]:
                 map_rows.append({
                     "row": row["key"], "label": row["label"], "site": site,
@@ -497,9 +552,12 @@ def main():
 
     print("\n== summary map ==")
     for row in ROWS:
-        d = cells[(row["key"], "dev_device")]["speedup"]
-        s = cells[(row["key"], "saq_server")]["speedup"]
-        print(f"{row['label']:<44} dev {d:6.2f}x   server {s:6.2f}x")
+        d = cells[(row["key"], "dev_device")].get("speedup")
+        s_cell = cells[(row["key"], "saq_server")]
+        s = s_cell.get("speedup") if not s_cell.get("pending") else None
+        d_txt = f"{d:6.2f}x" if d is not None else "pending"
+        s_txt = f"{s:6.2f}x" if s is not None else "PENDING"
+        print(f"{row['label']:<44} dev {d_txt}   server {s_txt}")
     print("\n== acceptance ==")
     for b in bars:
         p95 = f"{b['p95']:.2f}x" if b["p95"] else "n/a"

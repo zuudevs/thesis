@@ -594,6 +594,13 @@
   engine). File-store tetap <1× (0,95×; window COLD). Laporan:
   `reports/nd14-post-o2-matrix.md`. Follow-up: sesi server terpadu
   (ND-13 + ND-14 server) saat reachable; O2-2 GO terbatas.
+  **Refresh 0.3.2 (addendum §7)**: setelah O2-2 diterima, matriks
+  di-refresh di core 0.3.2 (4 run `…-6d87bf3`, validator PASS) —
+  **fase D mongo-cache 2,88×** (p95 3,25×; ze 0,0709 ms); 2,40×→2,88×
+  lintas-window = narasi (bukti per-langkah = sandwich). Chart vintage
+  `post-o2` + ladder O2 (`o2-ladder`, dua window sandwich eksplisit);
+  housekeeping: 16 chart tak terpakai dihapus, arsip SVG
+  `reports/charts/`.
 - [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
   count `decode_interior` saat `cap >= inner_len` (invariant output
   decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%
