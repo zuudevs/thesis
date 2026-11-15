@@ -568,10 +568,28 @@
   (sebelumnya turun jadi host build saat re-detection → GTest REQUIRED
   gagal). Laporan: `reports/O2-1-interior-skip.md`; arsip
   `reports/o2-1/`. Follow-up: re-measure ND-6 pasca-O2 + run server.
-- [ ] **O2-2 (kondisional)** — SWAR interior skip 8-byte (deteksi
-  quote/backslash per blok) — hanya bila O2-1 diterima dan profil
-  menunjukkan interior masih dominan; P4-2 mengharuskan diukur, bukan
-  diasumsikan (varian vektor kalah di segmen pendek).
+- [ ] **O2-2 (kondisional, GO terbatas)** — SWAR interior skip 8-byte
+  (deteksi quote/backslash per blok). **GO/NO-GO terukur 2026-11-15**
+  (`scripts/corpus/interior_histogram.py`, mesin state string identik
+  scanner8): korpus acceptance `saq_payload_v1` bw_p50 = 24 B, 91,0%
+  byte interior di run ≥8 B → GO; synthetic bw_p50 = 6 B, 34% ≥8 B →
+  risiko regress di gbench ladder. Keputusan: implement + ukur, terima
+  hanya bila saq menang dan synthetic tidak regress melebihi noise
+  (aturan "terima hanya jika menang", O1-9/C1). Baseline = core 0.3.1
+  (wasm `1d8960c9…`); core PATCH 0.3.2 bila diterima. Data:
+  `reports/nd14-post-o2-matrix.md` §4.
+- [x] **ND-14** — Re-measure matriks ND-6 pasca-O2 (2026-11-15, dev;
+  server pending): core 0.3.1 (wasm `1d8960c9…`), tree bersih, satu
+  run_id per fase, 4 record validator PASS `reports/nd14/`. **Verdict:
+  fase D mongo-cache v8/ze 1,48× → 2,40× — acceptance ≥1,5× TERCAPAI
+  di dev** (koreksi drift v8 +34% lintas window → 1,79×, tetap lulus);
+  ze-side −17,1% (0,1404→0,1164 ms). Fase A stabil ~0,05× (O2-1
+  terdilusi di materialisasi penuh), B window noise, C campuran
+  (schedules 0,90×→1,50×). Konfounder: delta absolut lintas-window
+  tidak diinterpretasi (A semua −26..−57%, B semua +22..+119% kedua
+  engine). File-store tetap <1× (0,95×; window COLD). Laporan:
+  `reports/nd14-post-o2-matrix.md`. Follow-up: sesi server terpadu
+  (ND-13 + ND-14 server) saat reachable; O2-2 GO terbatas.
 - [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
   count `decode_interior` saat `cap >= inner_len` (invariant output
   decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%

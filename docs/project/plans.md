@@ -262,8 +262,13 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   bebas-tabel — **s2-open −50,5%** (sandwich back-to-back, 0,1829 →
   0,0906 ms Σmedian), core 0.3.1 (tag `core/0.3.1`, wasm `1d8960c9…`);
   P4-3 ditutup (C3 UTF-8 SIMD ditolak, `reports/P4-3-closure.md`).
-  Lanjut: ND-6 pasca-O2 + run server O2-1 + O2-2 (SWAR interior,
-  kondisional).
+  **ND-14 tereksekusi 2026-11-15 (dev; server pending)**
+  (`reports/nd14-post-o2-matrix.md`): matriks pasca-O2 — **fase D
+  mongo-cache 1,48× → 2,40×, acceptance ≥1,5× TERCAPAI di dev**
+  (koreksi drift 1,79×); fase A/B/C stabil (O2-1 terdilusi di
+  materialisasi penuh). O2-2 GO terbatas (histogram interior: saq
+  bw_p50 24 B/91% ≥8 B; synthetic 6 B/34%). Lanjut: sesi server
+  terpadu (ND-13 + ND-14 server) + O2-2 + ND-11 Senin.
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 
