@@ -1,0 +1,1422 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "zuu-20261115034403-26e2bfa",
+  "site": "dev_device",
+  "generator": "node_harness",
+  "library": {
+    "name": "ze_json",
+    "version": "0.3.0 (ze_json@01a143f, saq-report@8c7f2d4)",
+    "language_runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+    "js_version": "0.3.0",
+    "core_version": "0.3.2",
+    "abi_version": 2026000302,
+    "artifact_sha256": "9795f2e80a4a5e2cfe980d89f5a911a6796cb69ac91e3815928a78c9845fe373"
+  },
+  "git_commit": {
+    "hash": "26e2bfa",
+    "dirty": false,
+    "repo": "v5"
+  },
+  "host": {
+    "hostname": "zuu",
+    "os": "Windows_NT 10.0.26200",
+    "arch": "x64",
+    "cpu_model": "AMD Ryzen 5 5500U with Radeon Graphics         ",
+    "cpu_cores": 12,
+    "ram_gb": 7.4,
+    "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 (ABI 2026000302)"
+  },
+  "corpus": {
+    "name": "saq_payload_v1",
+    "document_count": 6,
+    "total_bytes": 88381,
+    "max_document_bytes": 39209,
+    "sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1"
+  },
+  "config": {
+    "date_utc": "2026-11-15T03:44:03Z",
+    "iterations": 4,
+    "warmup_runs": 3,
+    "repeats": 15,
+    "cpu_pinning": false,
+    "threads": 1,
+    "exploratory": false,
+    "notes": "ND-9 cost diagnosis (8 stages, 738 parity checks); stage order fixed by data dependency s1->s4, document order rotated per round; no outlier trimming; bracket gaps excluded (stage times = per-stage averages over 4 cycles/round; s2-open is an INSEPARABLE bound over arena carve + scan + match); s5-boundary = per-call floor over a 4096-call micro-loop. gc_exposed=false; gc(minor=0, major=0); raw: out/raw/zuu-20261115034403-26e2bfa/. ND-13 PROBE on: s2a-carve/s2b-scan/s2c-match = equivalent standalone calls (ze_alloc footprint / ze_scanner8 / ze_match_pass v5) timed per cycle from the harness clock — LOWER-BOUND proxies beside the fused s2-open bound, NEVER force-subtracted; match guard: paired == closers in the index stream."
+  },
+  "results": [
+    {
+      "name": "nd9/s1-copy/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 9.96666667e-7,
+        "seconds_stddev": 3.25815e-7,
+        "bytes_per_second": 4006354520,
+        "documents_per_second": 1003344.48
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 8.75e-7,
+        "seconds_p95": 0.0000016225,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000489833333,
+        "seconds_stddev": 0.00000215407,
+        "bytes_per_second": 815175230,
+        "documents_per_second": 204151.072
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 0.000004275,
+        "seconds_p95": 0.00000737,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000001185,
+        "seconds_stddev": 3.86954e-7,
+        "bytes_per_second": 3369620250,
+        "documents_per_second": 843881.857
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 0.000001025,
+        "seconds_p95": 0.0000020925,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 5.33333333e-7,
+        "seconds_stddev": 1.96991e-7,
+        "bytes_per_second": 7486875000,
+        "documents_per_second": 1875000
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 5e-7,
+        "seconds_p95": 8.05e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s2a-carve/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2a (ND-13): ze_alloc(3*len*8 + 64) — the exact arena footprint ze_parser_open carves (cabi.cpp), timed standalone from the harness clock (wasm64 freestanding: no in-module clock). EQUIVALENT call, not the in-place event: a lower-bound proxy for the carve sub-stage, reported beside the fused s2-open bound; never force-subtracted.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 3.03333333e-7,
+        "seconds_stddev": 1.41676e-7,
+        "bytes_per_second": 13163736300,
+        "documents_per_second": 3296703.3
+      },
+      "extras": {
+        "stage": "s2a-carve",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 2.5e-7,
+        "seconds_p95": 5.2e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_alloc(3*len*8+64), carve proxy"
+      }
+    },
+    {
+      "name": "nd9/s2b-scan/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2b (ND-13): ze_scanner8 — the same scanner Document::open runs via structural_scan static dispatch, timed standalone. Lower-bound proxy for the scan sub-stage; the fused open stays the production bound (no force-subtract).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000482666667,
+        "seconds_stddev": 0.00000227537,
+        "bytes_per_second": 827279006,
+        "documents_per_second": 207182.32
+      },
+      "extras": {
+        "stage": "s2b-scan",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 0.00000395,
+        "seconds_p95": 0.0000082675,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_scanner8, scan proxy (same dispatch as open)"
+      }
+    },
+    {
+      "name": "nd9/s2c-match/courses",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2c (ND-13): ze_match_pass (ABI v5) — Document::open's LIFO bracket-pairing pass replayed standalone (ondemand::match_pass, one source of truth). Lower-bound proxy for the match sub-stage; includes one visible call boundary (s5-boundary is the per-call floor). No force-subtract.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000202,
+        "seconds_stddev": 0.00000252159,
+        "bytes_per_second": 1976732670,
+        "documents_per_second": 495049.505
+      },
+      "extras": {
+        "stage": "s2c-match",
+        "doc": "courses",
+        "doc_bytes": 3993,
+        "seconds_median": 0.000001325,
+        "seconds_p95": 0.0000045375,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_match_pass, match proxy (open's pass standalone)"
+      }
+    },
+    {
+      "name": "nd9/s1-copy/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000138333333,
+        "seconds_stddev": 0.00000101938,
+        "bytes_per_second": 4058313250,
+        "documents_per_second": 722891.566
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 8.75e-7,
+        "seconds_p95": 0.0000035775,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000006755,
+        "seconds_stddev": 0.00000169554,
+        "bytes_per_second": 831088083,
+        "documents_per_second": 148038.49
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 0.00000605,
+        "seconds_p95": 0.00001046,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000120166667,
+        "seconds_stddev": 3.48505e-7,
+        "bytes_per_second": 4671844660,
+        "documents_per_second": 832177.531
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 0.00000105,
+        "seconds_p95": 0.00000185,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 5.41666667e-7,
+        "seconds_stddev": 1.67995e-7,
+        "bytes_per_second": 10364307700,
+        "documents_per_second": 1846153.85
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 5e-7,
+        "seconds_p95": 9.125e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s2a-carve/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2a (ND-13): ze_alloc(3*len*8 + 64) — the exact arena footprint ze_parser_open carves (cabi.cpp), timed standalone from the harness clock (wasm64 freestanding: no in-module clock). EQUIVALENT call, not the in-place event: a lower-bound proxy for the carve sub-stage, reported beside the fused s2-open bound; never force-subtracted.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 2.65e-7,
+        "seconds_stddev": 7.17635e-8,
+        "bytes_per_second": 21184905700,
+        "documents_per_second": 3773584.91
+      },
+      "extras": {
+        "stage": "s2a-carve",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 2.25e-7,
+        "seconds_p95": 4.075e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_alloc(3*len*8+64), carve proxy"
+      }
+    },
+    {
+      "name": "nd9/s2b-scan/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2b (ND-13): ze_scanner8 — the same scanner Document::open runs via structural_scan static dispatch, timed standalone. Lower-bound proxy for the scan sub-stage; the fused open stays the production bound (no force-subtract).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000613666667,
+        "seconds_stddev": 0.00000156207,
+        "bytes_per_second": 914828897,
+        "documents_per_second": 162954.916
+      },
+      "extras": {
+        "stage": "s2b-scan",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 0.0000055,
+        "seconds_p95": 0.0000100175,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_scanner8, scan proxy (same dispatch as open)"
+      }
+    },
+    {
+      "name": "nd9/s2c-match/assistants",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2c (ND-13): ze_match_pass (ABI v5) — Document::open's LIFO bracket-pairing pass replayed standalone (ondemand::match_pass, one source of truth). Lower-bound proxy for the match sub-stage; includes one visible call boundary (s5-boundary is the per-call floor). No force-subtract.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000175333333,
+        "seconds_stddev": 3.54832e-7,
+        "bytes_per_second": 3201901140,
+        "documents_per_second": 570342.205
+      },
+      "extras": {
+        "stage": "s2c-match",
+        "doc": "assistants",
+        "doc_bytes": 5614,
+        "seconds_median": 0.0000016,
+        "seconds_p95": 0.0000025875,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_match_pass, match proxy (open's pass standalone)"
+      }
+    },
+    {
+      "name": "nd9/s1-copy/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000001615,
+        "seconds_stddev": 0.00000248168,
+        "bytes_per_second": 2217956660,
+        "documents_per_second": 619195.046
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 9.5e-7,
+        "seconds_p95": 0.0000046125,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000507833333,
+        "seconds_stddev": 0.00000213168,
+        "bytes_per_second": 705349524,
+        "documents_per_second": 196914.998
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 0.00000415,
+        "seconds_p95": 0.00001033,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000112666667,
+        "seconds_stddev": 1.82452e-7,
+        "bytes_per_second": 3179289940,
+        "documents_per_second": 887573.964
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 0.000001025,
+        "seconds_p95": 0.0000014775,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 7e-7,
+        "seconds_stddev": 6.61186e-7,
+        "bytes_per_second": 5117142860,
+        "documents_per_second": 1428571.43
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 5.25e-7,
+        "seconds_p95": 0.0000014525,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s2a-carve/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2a (ND-13): ze_alloc(3*len*8 + 64) — the exact arena footprint ze_parser_open carves (cabi.cpp), timed standalone from the harness clock (wasm64 freestanding: no in-module clock). EQUIVALENT call, not the in-place event: a lower-bound proxy for the carve sub-stage, reported beside the fused s2-open bound; never force-subtracted.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 2.75e-7,
+        "seconds_stddev": 5.16398e-8,
+        "bytes_per_second": 13025454500,
+        "documents_per_second": 3636363.64
+      },
+      "extras": {
+        "stage": "s2a-carve",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 2.5e-7,
+        "seconds_p95": 3.575e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_alloc(3*len*8+64), carve proxy"
+      }
+    },
+    {
+      "name": "nd9/s2b-scan/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2b (ND-13): ze_scanner8 — the same scanner Document::open runs via structural_scan static dispatch, timed standalone. Lower-bound proxy for the scan sub-stage; the fused open stays the production bound (no force-subtract).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000004355,
+        "seconds_stddev": 0.00000139045,
+        "bytes_per_second": 822502870,
+        "documents_per_second": 229621.125
+      },
+      "extras": {
+        "stage": "s2b-scan",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 0.000003725,
+        "seconds_p95": 0.00000672,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_scanner8, scan proxy (same dispatch as open)"
+      }
+    },
+    {
+      "name": "nd9/s2c-match/lecturers",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2c (ND-13): ze_match_pass (ABI v5) — Document::open's LIFO bracket-pairing pass replayed standalone (ondemand::match_pass, one source of truth). Lower-bound proxy for the match sub-stage; includes one visible call boundary (s5-boundary is the per-call floor). No force-subtract.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000146333333,
+        "seconds_stddev": 3.85559e-7,
+        "bytes_per_second": 2447835990,
+        "documents_per_second": 683371.298
+      },
+      "extras": {
+        "stage": "s2c-match",
+        "doc": "lecturers",
+        "doc_bytes": 3582,
+        "seconds_median": 0.000001275,
+        "seconds_p95": 0.000002115,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_match_pass, match proxy (open's pass standalone)"
+      }
+    },
+    {
+      "name": "nd9/s1-copy/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000237,
+        "seconds_stddev": 4.88723e-7,
+        "bytes_per_second": 16543881900,
+        "documents_per_second": 421940.928
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 0.000002275,
+        "seconds_p95": 0.00000329,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000406583333,
+        "seconds_stddev": 0.00000822096,
+        "bytes_per_second": 964353351,
+        "documents_per_second": 24595.2039
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 0.000036575,
+        "seconds_p95": 0.00005527,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000001315,
+        "seconds_stddev": 3.68646e-7,
+        "bytes_per_second": 29816730000,
+        "documents_per_second": 760456.274
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 0.000001175,
+        "seconds_p95": 0.0000019,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 5.63333333e-7,
+        "seconds_stddev": 1.378e-7,
+        "bytes_per_second": 69601775100,
+        "documents_per_second": 1775147.93
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 5.25e-7,
+        "seconds_p95": 7.725e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s2a-carve/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2a (ND-13): ze_alloc(3*len*8 + 64) — the exact arena footprint ze_parser_open carves (cabi.cpp), timed standalone from the harness clock (wasm64 freestanding: no in-module clock). EQUIVALENT call, not the in-place event: a lower-bound proxy for the carve sub-stage, reported beside the fused s2-open bound; never force-subtracted.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 4.4e-7,
+        "seconds_stddev": 6.79877e-7,
+        "bytes_per_second": 89111363600,
+        "documents_per_second": 2272727.27
+      },
+      "extras": {
+        "stage": "s2a-carve",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 2.5e-7,
+        "seconds_p95": 0.0000011725,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_alloc(3*len*8+64), carve proxy"
+      }
+    },
+    {
+      "name": "nd9/s2b-scan/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2b (ND-13): ze_scanner8 — the same scanner Document::open runs via structural_scan static dispatch, timed standalone. Lower-bound proxy for the scan sub-stage; the fused open stays the production bound (no force-subtract).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000339166667,
+        "seconds_stddev": 0.00000708144,
+        "bytes_per_second": 1156039310,
+        "documents_per_second": 29484.0295
+      },
+      "extras": {
+        "stage": "s2b-scan",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 0.00003135,
+        "seconds_p95": 0.0000458475,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_scanner8, scan proxy (same dispatch as open)"
+      }
+    },
+    {
+      "name": "nd9/s2c-match/schedules",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2c (ND-13): ze_match_pass (ABI v5) — Document::open's LIFO bracket-pairing pass replayed standalone (ondemand::match_pass, one source of truth). Lower-bound proxy for the match sub-stage; includes one visible call boundary (s5-boundary is the per-call floor). No force-subtract.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00001649,
+        "seconds_stddev": 0.0000341154,
+        "bytes_per_second": 2377744090,
+        "documents_per_second": 60642.8138
+      },
+      "extras": {
+        "stage": "s2c-match",
+        "doc": "schedules",
+        "doc_bytes": 39209,
+        "seconds_median": 0.000006775,
+        "seconds_p95": 0.0000515375,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_match_pass, match proxy (open's pass standalone)"
+      }
+    },
+    {
+      "name": "nd9/s1-copy/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000228333333,
+        "seconds_stddev": 3.66136e-7,
+        "bytes_per_second": 15601313900,
+        "documents_per_second": 437956.204
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 0.0000023,
+        "seconds_p95": 0.00000289,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00003255,
+        "seconds_stddev": 0.0000068588,
+        "bytes_per_second": 1094408600,
+        "documents_per_second": 30721.9662
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 0.000030025,
+        "seconds_p95": 0.00004809,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000508,
+        "seconds_stddev": 3.54283e-7,
+        "bytes_per_second": 7012401570,
+        "documents_per_second": 196850.394
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 0.000004975,
+        "seconds_p95": 0.0000057,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 5.58333333e-7,
+        "seconds_stddev": 7.94075e-8,
+        "bytes_per_second": 63802388100,
+        "documents_per_second": 1791044.78
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 5.5e-7,
+        "seconds_p95": 7.075e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s2a-carve/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2a (ND-13): ze_alloc(3*len*8 + 64) — the exact arena footprint ze_parser_open carves (cabi.cpp), timed standalone from the harness clock (wasm64 freestanding: no in-module clock). EQUIVALENT call, not the in-place event: a lower-bound proxy for the carve sub-stage, reported beside the fused s2-open bound; never force-subtracted.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 2.58333333e-7,
+        "seconds_stddev": 5.21749e-8,
+        "bytes_per_second": 137895484000,
+        "documents_per_second": 3870967.74
+      },
+      "extras": {
+        "stage": "s2a-carve",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 2.25e-7,
+        "seconds_p95": 3.5e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_alloc(3*len*8+64), carve proxy"
+      }
+    },
+    {
+      "name": "nd9/s2b-scan/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2b (ND-13): ze_scanner8 — the same scanner Document::open runs via structural_scan static dispatch, timed standalone. Lower-bound proxy for the scan sub-stage; the fused open stays the production bound (no force-subtract).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000027505,
+        "seconds_stddev": 0.00000375042,
+        "bytes_per_second": 1295146340,
+        "documents_per_second": 36357.026
+      },
+      "extras": {
+        "stage": "s2b-scan",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 0.000026425,
+        "seconds_p95": 0.0000356575,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_scanner8, scan proxy (same dispatch as open)"
+      }
+    },
+    {
+      "name": "nd9/s2c-match/reports",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2c (ND-13): ze_match_pass (ABI v5) — Document::open's LIFO bracket-pairing pass replayed standalone (ondemand::match_pass, one source of truth). Lower-bound proxy for the match sub-stage; includes one visible call boundary (s5-boundary is the per-call floor). No force-subtract.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000005185,
+        "seconds_stddev": 7.52706e-7,
+        "bytes_per_second": 6870395370,
+        "documents_per_second": 192864.031
+      },
+      "extras": {
+        "stage": "s2c-match",
+        "doc": "reports",
+        "doc_bytes": 35623,
+        "seconds_median": 0.000005,
+        "seconds_p95": 0.0000061525,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_match_pass, match proxy (open's pass standalone)"
+      }
+    },
+    {
+      "name": "nd9/s1-copy/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 1: input alloc + copy JS->wasm (ze_alloc x2 + Uint8Array.set; binding L159-169/L371-372) — the fixed input side of every count call.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 8.31666667e-7,
+        "seconds_stddev": 2.63386e-7,
+        "bytes_per_second": 432865731,
+        "documents_per_second": 1202404.81
+      },
+      "extras": {
+        "stage": "s1-copy",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 7.5e-7,
+        "seconds_p95": 0.00000119,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "alloc x2 + Uint8Array.set (direct write, not an ABI export)"
+      }
+    },
+    {
+      "name": "nd9/s2-open/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 2: ze_parser_open — arena carve (3x len*8 upper bound) + Document::open (structural scan + bracket match in ONE pass; document.cpp L234-259). Inseparable: reported as a bound, never decomposed.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000114833333,
+        "seconds_stddev": 2.27755e-7,
+        "bytes_per_second": 313497823,
+        "documents_per_second": 870827.286
+      },
+      "extras": {
+        "stage": "s2-open",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 0.000001075,
+        "seconds_p95": 0.000001525,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "inseparable arena+scan+match bound"
+      }
+    },
+    {
+      "name": "nd9/s3-count/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 3: parserRoot + ze_count_elements — index-walk traversal count through the C-ABI surface (cost per direct child + framing; NOT assumed O(1) per ABI call).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000374833333,
+        "seconds_stddev": 0.00000190736,
+        "bytes_per_second": 96042685.6,
+        "documents_per_second": 266785.238
+      },
+      "extras": {
+        "stage": "s3-count",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 0.000003225,
+        "seconds_p95": 0.0000064375,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "parserRoot + countElements"
+      }
+    },
+    {
+      "name": "nd9/s4-close/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 4: ze_parser_close + ze_reset_heap — slot release + bump rewind (cabi.cpp L118-123/L461-462; no individual free).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 5.5e-7,
+        "seconds_stddev": 1.08397e-7,
+        "bytes_per_second": 654545455,
+        "documents_per_second": 1818181.82
+      },
+      "extras": {
+        "stage": "s4-close",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 5.5e-7,
+        "seconds_p95": 7.275e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 2,
+        "note": "closeParser + resetHeap"
+      }
+    },
+    {
+      "name": "nd9/s2a-carve/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2a (ND-13): ze_alloc(3*len*8 + 64) — the exact arena footprint ze_parser_open carves (cabi.cpp), timed standalone from the harness clock (wasm64 freestanding: no in-module clock). EQUIVALENT call, not the in-place event: a lower-bound proxy for the carve sub-stage, reported beside the fused s2-open bound; never force-subtracted.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 2.48333333e-7,
+        "seconds_stddev": 4.69633e-8,
+        "bytes_per_second": 1449664430,
+        "documents_per_second": 4026845.64
+      },
+      "extras": {
+        "stage": "s2a-carve",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 2.25e-7,
+        "seconds_p95": 3.4e-7,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_alloc(3*len*8+64), carve proxy"
+      }
+    },
+    {
+      "name": "nd9/s2b-scan/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2b (ND-13): ze_scanner8 — the same scanner Document::open runs via structural_scan static dispatch, timed standalone. Lower-bound proxy for the scan sub-stage; the fused open stays the production bound (no force-subtract).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000001315,
+        "seconds_stddev": 3.24268e-7,
+        "bytes_per_second": 273764259,
+        "documents_per_second": 760456.274
+      },
+      "extras": {
+        "stage": "s2b-scan",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 0.0000012,
+        "seconds_p95": 0.0000017925,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_scanner8, scan proxy (same dispatch as open)"
+      }
+    },
+    {
+      "name": "nd9/s2c-match/globalConfig",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Probe s2c (ND-13): ze_match_pass (ABI v5) — Document::open's LIFO bracket-pairing pass replayed standalone (ondemand::match_pass, one source of truth). Lower-bound proxy for the match sub-stage; includes one visible call boundary (s5-boundary is the per-call floor). No force-subtract.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 9.11666667e-7,
+        "seconds_stddev": 1.44299e-7,
+        "bytes_per_second": 394881170,
+        "documents_per_second": 1096892.14
+      },
+      "extras": {
+        "stage": "s2c-match",
+        "doc": "globalConfig",
+        "doc_bytes": 360,
+        "seconds_median": 8.75e-7,
+        "seconds_p95": 0.0000012,
+        "rounds": 15,
+        "cycles_per_round": 4,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": 738,
+        "abi_calls": 1,
+        "note": "ze_match_pass, match proxy (open's pass standalone)"
+      }
+    },
+    {
+      "name": "nd9/s5-boundary",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Stage 5: JS/BigInt boxing floor per plain ABI call (abiVersion x 4096 micro-loop, 0 args) — the cross-boundary cost every parser call pays.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 6.10725912e-8
+      },
+      "extras": {
+        "stage": "s5-boundary",
+        "doc": null,
+        "doc_bytes": 0,
+        "seconds_median": 2.48046875e-8,
+        "seconds_p95": 1.92580566e-7,
+        "rounds": 15,
+        "cycles_per_round": 1,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "parity_checks": null,
+        "abi_calls": 4096,
+        "note": "micro-loop x4096, 0 args"
+      }
+    }
+  ]
+}

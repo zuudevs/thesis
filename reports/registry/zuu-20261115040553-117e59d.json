@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "version_registry",
+  "run_id": "zuu-20261115040553-117e59d",
+  "site": "dev_device",
+  "phase": null,
+  "generator": "registry_fill.py",
+  "library": {
+    "name": "ze_json"
+  },
+  "git_commit": {
+    "ze_json": "0aacd82",
+    "ze_json_source": "library.version pin",
+    "saq_report": "8c7f2d4"
+  },
+  "versions": {
+    "js_version": "0.3.0",
+    "core_version": "0.3.1",
+    "abi_version": 2026000301,
+    "wasm_sha256": "1d8960c9834c687250516112e0e1f72723f220cbc76029591679b9d32ef5f203"
+  },
+  "source": "record",
+  "source_paths": [
+    "out\\measurements\\zuu-20261115040553-117e59d-nd9-cost-dev_device.record.json"
+  ],
+  "resolved_at": "2026-11-15T11:57:39+07:00",
+  "notes": []
+}

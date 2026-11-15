@@ -267,8 +267,13 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   mongo-cache 1,48× → 2,40×, acceptance ≥1,5× TERCAPAI di dev**
   (koreksi drift 1,79×); fase A/B/C stabil (O2-1 terdilusi di
   materialisasi penuh). O2-2 GO terbatas (histogram interior: saq
-  bw_p50 24 B/91% ≥8 B; synthetic 6 B/34%). Lanjut: sesi server
-  terpadu (ND-13 + ND-14 server) + O2-2 + ND-11 Senin.
+  bw_p50 24 B/91% ≥8 B; synthetic 6 B/34%). **O2-2 DITERIMA
+  2026-11-15** (`reports/O2-2-swar-interior.md`): SWAR interior skip —
+  scan wasm saq −26,4% (sandwich), native gbench menang di SEMUA family
+  (saq −36,3%, synthetic −25,8..−49,9%); core 0.3.2 (`core/0.3.2`,
+  wasm `9795f2e8…`). Komposisi open pasca-O2: match ~21% → kandidat O2
+  berikutnya = pass pairing. Lanjut: sesi server terpadu (ND-13 + ND-14
+  server) + ND-11 Senin.
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 
