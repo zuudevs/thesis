@@ -89,3 +89,42 @@ synthetic_1mb      69686    428978    5    9  131       6      34.0%
 - Keputusan O2-2 GO terbatas (§4) tercatat di tasks.md.
 - @cite: `10.1002_spe.3313` (provenance per-run), `10.14778_3115404.3115416`
   (Mison — dasar jalur on-demand yang diukur).
+
+## 7. Addendum — refresh pasca-O2-2 (core 0.3.2, 2026-11-15)
+
+Setelah O2-2 diterima (core 0.3.2, wasm `9795f2e8…`), matriks ND-6
+di-refresh sekali lagi di state baru — pola identik (tree bersih, satu
+run_id per fase, 15×3, validator PASS):
+
+| Fase | run_id | validator |
+|---|---|---|
+| A | `zuu-20261115071747-6d87bf3` | PASS |
+| B | `zuu-20261115075332-6d87bf3` | PASS |
+| C | `zuu-20261115080838-6d87bf3` | PASS |
+| D | `zuu-20261115080840-6d87bf3` | PASS |
+
+- **Fase D mongo-cache: 2,88×** (p95 3,25×) — ze 0,0709 ms (0,2-era
+  0,1404 → 0.3.1 0,1164 → 0.3.2 0,0709). Rasio in-window sah;
+  **2,40× → 2,88× lintas-window = narasi**, bukan bukti peningkatan
+  (bukti per-langkah = sandwich O2-1/O2-2 ter-commit).
+- Fase C membaik di schedules (1,65×) dan assistants (1,17×);
+  A/B tetap di bawah 1× (materialisasi penuh — konsisten).
+- Panel `saq_server` = PENDING (SSH unreachable sepanjang sesi) —
+  menyusul di sesi server terpadu.
+
+Chart (vintage baru `post-o2` di `nd6_summary_chart.py`, panel server
+dirender "pending"; master `out/charts/`, arsip SVG ter-commit di
+`reports/charts/`):
+
+| Figure | Isi |
+|---|---|
+| `post-o2-summary-map.svg` | heatmap speedup pasca-O2 dev + panel server PENDING |
+| `post-o2-acceptance.svg` | fase D dev 2,88× vs target 1,5× + tren 1,48→2,40→2,88 |
+| `o2-ladder.svg` (`scripts/o2_ladder_chart.py`) | ladder s2-open S0 0.3.0 → S1 0.3.1 (O2-1) → S2 0.3.2 (O2-2), dua window sandwich eksplisit; gain dinilai dalam-window |
+| `post-o1-*`, `nd6-*`, `nd10-*` | vintage historis tetap (regenerated) |
+
+Housekeeping chart: 16 file tidak terpakai dihapus (14 chart per-phase
+era ND-6 asli pre-O1 tanpa referensi, `o1_cumulative.png` versi lama
+underscore, `final-throughput.png` pre-O1 yang label-nya menyesatkan);
+diagram (`diagram-*.svg/png`, sumber `.mmd` ada) dan `progress_*`
+dipertahankan.
