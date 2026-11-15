@@ -568,16 +568,20 @@
   (sebelumnya turun jadi host build saat re-detection → GTest REQUIRED
   gagal). Laporan: `reports/O2-1-interior-skip.md`; arsip
   `reports/o2-1/`. Follow-up: re-measure ND-6 pasca-O2 + run server.
-- [ ] **O2-2 (kondisional, GO terbatas)** — SWAR interior skip 8-byte
-  (deteksi quote/backslash per blok). **GO/NO-GO terukur 2026-11-15**
-  (`scripts/corpus/interior_histogram.py`, mesin state string identik
-  scanner8): korpus acceptance `saq_payload_v1` bw_p50 = 24 B, 91,0%
-  byte interior di run ≥8 B → GO; synthetic bw_p50 = 6 B, 34% ≥8 B →
-  risiko regress di gbench ladder. Keputusan: implement + ukur, terima
-  hanya bila saq menang dan synthetic tidak regress melebihi noise
-  (aturan "terima hanya jika menang", O1-9/C1). Baseline = core 0.3.1
-  (wasm `1d8960c9…`); core PATCH 0.3.2 bila diterima. Data:
-  `reports/nd14-post-o2-matrix.md` §4.
+- [x] **O2-2 (GO terbatas)** — SWAR interior skip 8-byte. **DITERIMA
+  2026-11-15** — melampaui kriteria GO terbatas: saq menang **dan**
+  seluruh family synthetic justru menang (kekhawatiran interior pendek
+  bw_p50 6 B tak terbukti). Implementasi: blok SWAR 8-byte di loop
+  interior `scanner8` (`utils::swar_eq` carry-free fix P4-2; resume
+  scalar di lane match pertama; escape lintas blok persis). Sandwich
+  satu window (tree bersih): wasm saq scan 0,0980 → **0,0721 ms
+  (−26,4%)**, fused s2-open 0,1085 → **0,0822 (−24,2%)**; native gbench
+  `BM_Scanner8` saq −36,3%, synthetic −25,8..−49,9%, checker −22,2%
+  (12 record konversi validator PASS). Core PATCH 0.3.2 (tag
+  `core/0.3.2`, merge `01a143f`, wasm `9795f2e8…`, abi 2026000302; js
+  tetap 0.3.0). Komposisi pasca-O2: match ~21% dari open → kandidat
+  O2 berikutnya = pass pairing. Laporan: `reports/O2-2-swar-interior.md`;
+  arsip `reports/o2-2/`.
 - [x] **ND-14** — Re-measure matriks ND-6 pasca-O2 (2026-11-15, dev;
   server pending): core 0.3.1 (wasm `1d8960c9…`), tree bersih, satu
   run_id per fase, 4 record validator PASS `reports/nd14/`. **Verdict:

@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "zuu-20261115041100-117e59d",
+  "site": "dev_device",
+  "generator": "google_benchmark",
+  "library": {
+    "name": "ze_json",
+    "version": "0.3.1",
+    "language_runtime": "C++23 clang 23.1.5 (native-release)"
+  },
+  "git_commit": {
+    "hash": "117e59d",
+    "dirty": false,
+    "repo": "ze_json"
+  },
+  "host": {
+    "hostname": "zuu",
+    "os": "Windows_NT",
+    "os_version": "10.0.26200 (Windows 11 Home Single Language)",
+    "arch": "x86_64",
+    "cpu_model": "AMD Ryzen 5 5500U with Radeon Graphics",
+    "cpu_cores": 12,
+    "cpu_freq": "2.10 GHz",
+    "ram_gb": 7.4,
+    "toolchain": "node 24.19.0 (v8 13.6.233.17-node.51)"
+  },
+  "corpus": {
+    "name": "synthetic_10k",
+    "document_count": 1,
+    "total_bytes": 10240,
+    "max_document_bytes": 10240,
+    "sha256": "09085b8f4cbd5db2a5809fb2dfd0e7ff4a3083586b823fd2dff2bee6ea2e7f3c"
+  },
+  "config": {
+    "date_utc": "2026-11-15T04:53:44Z",
+    "iterations": 56000,
+    "warmup_runs": 0,
+    "repeats": 5,
+    "cpu_pinning": false,
+    "threads": 1,
+    "notes": "source=gbench_synthetic_10k.json; preset=native-release"
+  },
+  "results": [
+    {
+      "name": "BM_Scanner8/synthetic_10k/repeats:5",
+      "engine": "scalar",
+      "status": "ok",
+      "rationale": {
+        "purpose": "O2-2 SWAR interior skip sandwich - BM_Scanner8 family synthetic_10k (0.3.1); decision: accept only if saq wins without synthetic regression (ND-14 histogram GO-limited)",
+        "basis_papers": [
+          "10.1002_spe.2984",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 1.4389958929054307e-05,
+        "seconds_stddev": 3.2049473404021037e-06,
+        "bytes_per_second": 734003200.0,
+        "items_per_second": 108236800.0,
+        "cpu_seconds": 1.4508928571428573e-05
+      },
+      "extras": {}
+    }
+  ]
+}

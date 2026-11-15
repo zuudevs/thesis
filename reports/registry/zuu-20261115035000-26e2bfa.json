@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "version_registry",
+  "run_id": "zuu-20261115035000-26e2bfa",
+  "site": "dev_device",
+  "phase": null,
+  "generator": "registry_fill.py",
+  "library": {
+    "name": "ze_json"
+  },
+  "git_commit": {
+    "ze_json": "26e2bfa",
+    "ze_json_source": "run_id suffix (cmake-generated RUN_ID)",
+    "saq_report": null
+  },
+  "versions": {
+    "js_version": null,
+    "core_version": "0.3.2",
+    "abi_version": null,
+    "wasm_sha256": null
+  },
+  "source": "inferred",
+  "source_paths": [
+    "out\\measurements\\zuu-20261115035000-26e2bfa-gbench-scan8-checker_batch-dev_device.record.json",
+    "out\\measurements\\zuu-20261115035000-26e2bfa-gbench-scan8-saq-dev_device.record.json",
+    "out\\measurements\\zuu-20261115035000-26e2bfa-gbench-scan8-synthetic_100k-dev_device.record.json",
+    "out\\measurements\\zuu-20261115035000-26e2bfa-gbench-scan8-synthetic_10k-dev_device.record.json",
+    "out\\measurements\\zuu-20261115035000-26e2bfa-gbench-scan8-synthetic_1k-dev_device.record.json",
+    "out\\measurements\\zuu-20261115035000-26e2bfa-gbench-scan8-synthetic_1mb-dev_device.record.json"
+  ],
+  "resolved_at": "2026-11-15T11:57:39+07:00",
+  "notes": [
+    "partial resolution at ze_json@26e2bfa",
+    "core_version from legacy library.version (native record: plain semver = core semver)"
+  ]
+}
