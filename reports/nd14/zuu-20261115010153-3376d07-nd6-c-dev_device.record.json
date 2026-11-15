@@ -1,0 +1,445 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "zuu-20261115010153-3376d07",
+  "site": "dev_device",
+  "generator": "node_harness",
+  "library": {
+    "name": "ze_json",
+    "version": "0.3.0 (ze_json@0aacd82, saq-report@8c7f2d4)",
+    "language_runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+    "js_version": "0.3.0",
+    "core_version": "0.3.1",
+    "abi_version": 2026000301,
+    "artifact_sha256": "1d8960c9834c687250516112e0e1f72723f220cbc76029591679b9d32ef5f203"
+  },
+  "git_commit": {
+    "hash": "3376d07",
+    "dirty": false,
+    "repo": "v5"
+  },
+  "host": {
+    "hostname": "zuu",
+    "os": "Windows_NT 10.0.26200",
+    "arch": "x64",
+    "cpu_model": "AMD Ryzen 5 5500U with Radeon Graphics         ",
+    "cpu_cores": 12,
+    "ram_gb": 7.4,
+    "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 (ABI 2026000301)"
+  },
+  "corpus": {
+    "name": "saq_payload_v1",
+    "document_count": 6,
+    "total_bytes": 88381,
+    "max_document_bytes": 39209,
+    "sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1"
+  },
+  "config": {
+    "date_utc": "2026-11-15T01:01:53Z",
+    "iterations": 30,
+    "warmup_runs": 3,
+    "repeats": 15,
+    "cpu_pinning": false,
+    "threads": 1,
+    "exploratory": false,
+    "notes": "ND-6 phase C; alternating rounds; no outlier trimming; gc_exposed=true; gc(minor=0, major=0); raw: out/raw/zuu-20261115010153-3376d07/; per-result detail in extras (seconds_median/p95, binding_calls, index_count, consumed/skipped — kumulatif GC sejak start fase). Baseline=V8 (engine=v8), candidate=ze_json wasm64_cabi — same run_id; phase D measures through the saq-report repository layer (binding calls not observable there: extras.binding_calls=null)."
+  },
+  "results": [
+    {
+      "name": "C/courses/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000109144444,
+        "seconds_stddev": 0.00000182615,
+        "bytes_per_second": 365845465,
+        "documents_per_second": 91621.7042
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00001013,
+        "seconds_p95": 0.000013778,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 14,
+        "skipped_fields": 85,
+        "total_fields": 99,
+        "doc_bytes": 3993
+      }
+    },
+    {
+      "name": "C/courses/ze-l1-traversal",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L1 traversal frame manual (get/count + decode minimal, early-exit) — konsumen identik v8-selective; biaya per-panggilan ABI terlihat.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000153757778,
+        "seconds_stddev": 0.0000057686,
+        "bytes_per_second": 259694180,
+        "documents_per_second": 65037.3604
+      },
+      "extras": {
+        "path": "ze-l1-traversal",
+        "seconds_median": 0.0000128366667,
+        "seconds_p95": 0.000026052,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 2265,
+        "index_count": 906,
+        "consumed_fields": 14,
+        "skipped_fields": 85,
+        "total_fields": 99,
+        "doc_bytes": 3993
+      }
+    },
+    {
+      "name": "C/assistants/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000181817778,
+        "seconds_stddev": 0.00000663828,
+        "bytes_per_second": 308770686,
+        "documents_per_second": 55000.1222
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00001535,
+        "seconds_p95": 0.000032604,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 25,
+        "skipped_fields": 126,
+        "total_fields": 151,
+        "doc_bytes": 5614
+      }
+    },
+    {
+      "name": "C/assistants/ze-l1-traversal",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L1 traversal frame manual (get/count + decode minimal, early-exit) — konsumen identik v8-selective; biaya per-panggilan ABI terlihat.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000155457778,
+        "seconds_stddev": 0.00000288771,
+        "bytes_per_second": 361126994,
+        "documents_per_second": 64326.1479
+      },
+      "extras": {
+        "path": "ze-l1-traversal",
+        "seconds_median": 0.00001497,
+        "seconds_p95": 0.0000214146667,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 2265,
+        "index_count": 906,
+        "consumed_fields": 25,
+        "skipped_fields": 126,
+        "total_fields": 151,
+        "doc_bytes": 5614
+      }
+    },
+    {
+      "name": "C/lecturers/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000889777778,
+        "seconds_stddev": 0.0000010935,
+        "bytes_per_second": 402572428,
+        "documents_per_second": 112387.612
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00000833,
+        "seconds_p95": 0.000010678,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 15,
+        "skipped_fields": 76,
+        "total_fields": 91,
+        "doc_bytes": 3582
+      }
+    },
+    {
+      "name": "C/lecturers/ze-l1-traversal",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L1 traversal frame manual (get/count + decode minimal, early-exit) — konsumen identik v8-selective; biaya per-panggilan ABI terlihat.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000110282222,
+        "seconds_stddev": 0.00000407741,
+        "bytes_per_second": 324803031,
+        "documents_per_second": 90676.4463
+      },
+      "extras": {
+        "path": "ze-l1-traversal",
+        "seconds_median": 0.00000976666667,
+        "seconds_p95": 0.000017146,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 2265,
+        "index_count": 906,
+        "consumed_fields": 15,
+        "skipped_fields": 76,
+        "total_fields": 91,
+        "doc_bytes": 3582
+      }
+    },
+    {
+      "name": "C/schedules/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000084716,
+        "seconds_stddev": 0.0000130475,
+        "bytes_per_second": 462828745,
+        "documents_per_second": 11804.1456
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00008006,
+        "seconds_p95": 0.000106824,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 120,
+        "skipped_fields": 841,
+        "total_fields": 961,
+        "doc_bytes": 39209
+      }
+    },
+    {
+      "name": "C/schedules/ze-l1-traversal",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L1 traversal frame manual (get/count + decode minimal, early-exit) — konsumen identik v8-selective; biaya per-panggilan ABI terlihat.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000548106667,
+        "seconds_stddev": 0.0000035143,
+        "bytes_per_second": 715353459,
+        "documents_per_second": 18244.6239
+      },
+      "extras": {
+        "path": "ze-l1-traversal",
+        "seconds_median": 0.00005348,
+        "seconds_p95": 0.000062802,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 390,
+        "index_count": 156,
+        "consumed_fields": 120,
+        "skipped_fields": 841,
+        "total_fields": 961,
+        "doc_bytes": 39209
+      }
+    },
+    {
+      "name": "C/reports/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000699213333,
+        "seconds_stddev": 0.00000838004,
+        "bytes_per_second": 509472550,
+        "documents_per_second": 14301.7868
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00006884,
+        "seconds_p95": 0.000084126,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 60,
+        "skipped_fields": 600,
+        "total_fields": 660,
+        "doc_bytes": 35623
+      }
+    },
+    {
+      "name": "C/reports/ze-l1-traversal",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L1 traversal frame manual (get/count + decode minimal, early-exit) — konsumen identik v8-selective; biaya per-panggilan ABI terlihat.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000290176,
+        "seconds_stddev": 0.0000918508,
+        "bytes_per_second": 122763426,
+        "documents_per_second": 3446.18438
+      },
+      "extras": {
+        "path": "ze-l1-traversal",
+        "seconds_median": 0.00025954,
+        "seconds_p95": 0.000486138,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 14352,
+        "index_count": 4680,
+        "consumed_fields": 60,
+        "skipped_fields": 600,
+        "total_fields": 660,
+        "doc_bytes": 35623
+      }
+    },
+    {
+      "name": "C/globalConfig/v8-selective",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8: JSON.parse penuh lalu akses subset field yang sama dengan jalur ze — mengisolasi untung lazy pada konsumen selektif.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000003312,
+        "seconds_stddev": 0.00000143882,
+        "bytes_per_second": 108695652,
+        "documents_per_second": 301932.367
+      },
+      "extras": {
+        "path": "v8-selective",
+        "seconds_median": 0.00000294666667,
+        "seconds_p95": 0.00000554666667,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 5,
+        "skipped_fields": 9,
+        "total_fields": 14,
+        "doc_bytes": 360
+      }
+    },
+    {
+      "name": "C/globalConfig/ze-l1-traversal",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "L1 traversal frame manual (get/count + decode minimal, early-exit) — konsumen identik v8-selective; biaya per-panggilan ABI terlihat.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000065336,
+        "seconds_stddev": 0.0000173053,
+        "bytes_per_second": 5509979.18,
+        "documents_per_second": 15305.4977
+      },
+      "extras": {
+        "path": "ze-l1-traversal",
+        "seconds_median": 0.0000591733333,
+        "seconds_p95": 0.0000945593333,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 8607,
+        "index_count": 4077,
+        "consumed_fields": 5,
+        "skipped_fields": 9,
+        "total_fields": 14,
+        "doc_bytes": 360
+      }
+    }
+  ]
+}
