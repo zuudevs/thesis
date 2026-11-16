@@ -284,8 +284,8 @@ function preflightMongoCounts() {
 const path = require('path');
 // Resolusi modul dari node_modules APP (cwd = dir saq-report), bukan dari
 // lokasi file script ini (out/raw/... — tanpa node_modules sendiri).
-const requireFromApp = module.createRequire(path.join(process.cwd(),
-    'package.json'));
+const { createRequire } = require('module');
+const requireFromApp = createRequire(path.join(process.cwd(), 'package.json'));
 requireFromApp('dotenv').config({ path: path.join(process.cwd(), '.env') });
 const { MongoClient } = requireFromApp('mongodb');
 const KEYS = ['assistants', 'courses', 'lecturers', 'schedules', 'reports',
