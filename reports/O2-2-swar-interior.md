@@ -66,7 +66,10 @@ kandidat O2 berikutnya bergeser ke pass pairing (bukan scan).
   artifact tercatat di record + sidecar.
 - gbench = backend **native** (proxy algoritma; backend wasm diukur
   lewat nd9 sandwich saq). Konversi record 12/12 PASS.
-- Site dev; server menyusul (sesi terpadu).
+- Site dev ~~; server menyusul (sesi terpadu)~~ → **akan tuntas di sesi
+  terpadu 2026-11-16**: `reports/nd14-post-o2-matrix.md` §8 (fase D
+  server 2,67×) + `reports/nd13-open-decomposition.md` §5 (match share
+  server 17,5–23,6% → pass pairing relevan kedua site).
 
 ## 5. Deliverables
 

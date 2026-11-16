@@ -11,10 +11,14 @@ disimpan apa adanya di `reports/nd6/` (exhibit, tidak diubah).
 - [`ondemand-saq-evaluation.md`](ondemand-saq-evaluation.md) — **ND-7**:
   evaluasi lengkap jalur on-demand di SAQ; verdict 2.85×/3.00× (fase D,
   cache Mongo) — acceptance ≥1.5× tercapai; hipotesis H1–H5, limitasi jujur.
+  *(Catatan tautan: verdict era Node 24 — status terkini di
+  [`nd14-post-o2-matrix.md`](nd14-post-o2-matrix.md) §8.)*
 - [`nd6-server-phase-matrix.md`](nd6-server-phase-matrix.md) — **ND-8**:
   matriks ND-6 di server SAQ (`saq_server`, Node 26) — fase D **1.30×**
   (p95 1.46×), acceptance ≥1.5× **tidak tercapai di site ini**; dekomposisi
-  komponen + kandidat perbaikan (plan doc §7).
+  komponen + kandidat perbaikan (plan doc §7). *(Catatan tautan: era ABI
+  v4 — saat ini server 2,67× pada core 0.3.2, lihat
+  [`nd14-post-o2-matrix.md`](nd14-post-o2-matrix.md) §8.)*
 - [`nd6/`](nd6/) — arsip record tervalidasi ND-6 (6/6 PASS, verbatim).
 - [`nd6/server-lanjut-20261111/`](nd6/server-lanjut-20261111/) + [`nd6/server-lanjut-20261113/`](nd6/server-lanjut-20261113/) —
   arsip verbatim 52 record server (36 + 16; seluruhnya PASS re-validasi
@@ -66,16 +70,39 @@ disimpan apa adanya di `reports/nd6/` (exhibit, tidak diubah).
 - [`registry/`](registry/) — sidecar versi per run (backfill R5-13;
   exhibit record tidak diubah).
 
-### Direktif ND lanjutan (2026-11-13/14)
+### Direktif ND lanjutan (2026-11-13/16)
 - [`nd9-cost-diagnosis.md`](nd9-cost-diagnosis.md) — **ND-9**: dekomposisi
   biaya parser; s2-open ~88–90%, s5-boundary ≈ 0 (hipotesis boxing-ABI
-  terbantahkan untuk fase D).
+  terbantahkan untuk fase D). Pertanyaan "gap open server menempel ke
+  scan atau match" dijawab [`nd13-open-decomposition.md`](nd13-open-decomposition.md) §5.
 - [`nd10-runtime-control.md`](nd10-runtime-control.md) — **ND-10**: kontrol
   runtime Node 26 matched + wasm byte-identik; kompresi V8 14.6 = penyebab
   dominan.
 - [`nd12-post-o1-matrix.md`](nd12-post-o1-matrix.md) — **ND-12**: matriks
   pasca-O1 (ABI v4); A/B naik (+25–50%/+40%), D tak berubah 1,48×/1,13×
   (s2-open-bound).
+- [`nd13-open-decomposition.md`](nd13-open-decomposition.md) — **ND-13**
+  (dev 2026-11-14 + server 2026-11-16): dekomposisi sub-stage `s2-open`
+  (carve/scan/match) via ekspor standalone ABI v5 `ze_match_pass`; scan
+  dominan (dev 82–92%, server 73–82%), match share server lebih besar
+  (17,5–23,6% vs dev 7–15%) → arah O2 selanjutnya. Arsip `nd13/`.
+- [`nd14-post-o2-matrix.md`](nd14-post-o2-matrix.md) — **ND-14** (dev
+  2026-11-15 + server 2026-11-16): matriks ND-6 pasca-O2 (core 0.3.2) —
+  **fase D mongo-cache ≥1,5× DI KEDUA SITE** (dev 2,88× p95 3,25×;
+  server **2,67×** p95 2,49×); chart vintage `post-o2` terisi penuh.
+  Arsip `nd14/`.
+- Desain Phase E (HTTP end-to-end, belum dieksekusi):
+  [`../docs/measurement/nd11-phase-e-http.md`](../docs/measurement/nd11-phase-e-http.md) —
+  prasyarat "re-run bersih D di server" kini terpenuhi (ND-14 §8).
+
+### Loop O2 — optimasi scanner (2026-11-15/16)
+- [`O2-1-interior-skip.md`](O2-1-interior-skip.md) — `scanner8` interior
+  fast skip bebas-tabel; fused `s2-open` −50,5% (sandwich back-to-back);
+  core `0.3.1`. Arsip `o2-1/`.
+- [`O2-2-swar-interior.md`](O2-2-swar-interior.md) — SWAR interior skip
+  8-byte (GO terbatas, menang semua family); scan wasm saq −26,4%;
+  core `0.3.2`; sisa komposisi open: match ~21% → kandidat pass pairing.
+  Arsip `o2-2/`.
 
 ### Lain-lain
 - [`E3-lto-sandwich.md`](E3-lto-sandwich.md) — LTO sandwich.
