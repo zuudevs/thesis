@@ -36,8 +36,24 @@
  *       kondisi apa manfaat lazy parsing muncul/hilang di boundary aplikasi
  *       penuh (bukan hanya lapisan repository seperti fase D ND-6).
  *       rationale dicerminkan oleh field rationale tiap result di record.
+ *
+ * COEXISTENCE GUARDS (audit 2026-11-17, laporan reports/nd11-coexistence-audit.md):
+ * saat SAQ Production berjalan di host yang sama, harness wajib:
+ *   1. preflight port — kedua port benchmark WAJIB kosong sebelum spawn
+ *      (health-check tidak lagi memercayai "siapa pun yang listen di port");
+ *   2. health = HTTP 200 + boot marker di stdout CHILD KITA
+ *      ("Server berjalan di http://localhost:<port>") — identitas instance
+ *      terikat ke proses, bukan ke port;
+ *   3. child exit saat warmup/ukur = abort void instan;
+ *   4. mode koeksistensi (--coexist-prod-port): preflight count json_store
+ *      (benchmark tidak boleh memicu seed ke DB produksi —
+ *      MongoJsonRepository.init() melakukan upsert bila storeKey kosong)
+ *      + boot-log seed guard (abort void bila child menyebut seed);
+ *   5. kedua child bind 127.0.0.1 via SAQ_BIND_HOST (saq-report boot knob;
+ *      env absen = perilaku produksi eksisting, tidak berubah).
  */
 import fs from 'node:fs';
+import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -68,6 +84,24 @@ const SITE = argValue('--site', 'dev_device');
 const V8_PORT = Number(argValue('--v8-port', 3000));
 const ZE_PORT = Number(argValue('--ze-port', 3001));
 const allowDirty = argv.includes('--allow-dirty');
+// Coexistence mode (audit ND-11, 2026-11-17): --coexist-prod-port menyatakan
+// SAQ Production berjalan di host yang sama (tidak disentuh). Mengaktifkan
+// write-to-production guards (preflight counts + seed guard) dan mencatat
+// provenance koeksistensi di config.coexistence record.
+const PROD_PORT = Number(argValue('--coexist-prod-port', 0));
+const COEXISTENCE = {
+    production_same_host: PROD_PORT > 0,
+    production_port: PROD_PORT > 0 ? PROD_PORT : null,
+    production_untouched: PROD_PORT > 0,
+    wa_production: PROD_PORT > 0 ? 'active (untouched)' : null,
+    cron_production: PROD_PORT > 0 ? 'active (untouched)' : null,
+    benchmark_bind_host: '127.0.0.1',
+    benchmark_whatsapp: 'SAQ_DISABLE_WHATSAPP=1 (both benchmark instances)',
+    write_guard: PROD_PORT > 0
+        ? 'preflight json_store counts + refuse on boot seed marker'
+        : 'off (dev throwaway DB)',
+};
+let PREFLIGHT_COUNTS = null;
 
 const STORE_FILES = ['config_asisten.json', 'config_global.json', 'courses.json',
     'lecturers.json', 'reports.json', 'schedules.json'];
@@ -142,10 +176,15 @@ process.on('exit', killChildren);
 process.on('SIGINT', () => { killChildren(); process.exit(130); });
 
 const bootLog = {};
+let childDied = null; // audit ND-11 R6: kematian child = abort void instan
 function spawnInstance(engine, port) {
     const env = {
         ...process.env, PORT: String(port), SAQ_DISABLE_WHATSAPP: '1',
         SAQ_JSON_ENGINE: engine === 'ze' ? 'ze' : '',
+        // Bind loopback only — instance benchmark tidak boleh reachable dari
+        // jaringan (audit ND-11 R3: endpoint mutasi + static ROOT + lazy-init
+        // WA). Produksi tidak mewarisi env ini (child-only harness).
+        SAQ_BIND_HOST: '127.0.0.1',
     };
     const child = spawn(process.execPath, ['server.js'], {
         cwd: SAQ_DIR, env, stdio: ['ignore', 'pipe', 'pipe'],
@@ -153,25 +192,129 @@ function spawnInstance(engine, port) {
     const lines = [];
     child.stdout.on('data', (d) => lines.push(String(d)));
     child.stderr.on('data', (d) => lines.push(String(d)));
-    child.on('exit', (code) => lines.push(`[exit code=${code}]`));
+    child.on('exit', (code, signal) => {
+        lines.push(`[exit code=${code} signal=${signal}]`);
+        if (!childDied) childDied = { engine, code, signal };
+    });
     children.push(child);
     bootLog[engine] = lines;
     return child;
 }
 
-async function waitHealthy(port, timeoutMs = 120000) {
+/**
+ * Preflight port (audit ND-11 R1/R2): kedua port benchmark WAJIB kosong
+ * SEBELUM spawn. Mencegah (a) EADDRINUSE di child, dan (b) skenario
+ * "mengukur SAQ Production" ketika port yang dipilih kebetulan dipakai
+ * produksi — health-check lama menerima respons HTTP apa pun.
+ * Timeout connect dihitung BUSY (konservatif; port terfilter).
+ */
+function probeBusy(port) {
+    return new Promise((resolve) => {
+        const s = net.connect({ port, host: '127.0.0.1' });
+        let settled = false;
+        const fin = (busy) => {
+            if (!settled) { settled = true; s.destroy(); resolve(busy); }
+        };
+        s.on('connect', () => fin(true));
+        s.on('error', () => fin(false));
+        s.setTimeout(2000, () => fin(true));
+    });
+}
+
+/**
+ * Abort void: tulis exhibit (best-effort), bunuh HANYA child benchmark,
+ * keluar 2 — tanpa record. Dipakai parity mismatch, child exit, seed guard.
+ */
+function failVoid(reason, requests, bodyHashes, bootV8, bootZe) {
+    console.error(`[nd11] VOID: ${reason} — run dibatalkan, tidak ada record.`);
+    try {
+        writeRaw(null, requests, bodyHashes, bootV8, bootZe, reason);
+    } catch (_) { /* exhibit best-effort */ }
+    killChildren();
+    process.exit(2);
+}
+
+/**
+ * Health (audit ND-11 R1): instance dianggap siap HANYA bila
+ * (a) GET /rekap balas 200 dan (b) marker boot milik CHILD KITA
+ * ("Server berjalan di http://localhost:<port>") terlihat di stdout yang
+ * di-capture harness — bukan sekadar "ada yang menjawab di port".
+ */
+async function waitHealthy(engine, port, timeoutMs = 120000) {
     const t0 = performance.now();
+    const marker = `Server berjalan di http://localhost:${port}`;
     for (;;) {
+        if (childDied) {
+            throw new Error(`instance ${engine} exited before healthy `
+                + `(code=${childDied.code} signal=${childDied.signal})`);
+        }
         try {
             const res = await fetch(`http://127.0.0.1:${port}/rekap`);
-            if (res.status === 200) await res.text();
-            return (performance.now() - t0) / 1000;
+            const status = res.status;
+            await res.text(); // drain body agar socket bebas
+            const logText = (bootLog[engine] || []).join('');
+            if (status === 200 && logText.includes(marker)) {
+                return (performance.now() - t0) / 1000;
+            }
         } catch (_) { /* not up yet */ }
         if (performance.now() - t0 > timeoutMs) {
-            throw new Error(`instance port ${port} not healthy within ${timeoutMs} ms`);
+            const markerSeen = (bootLog[engine] || []).join('').includes(marker);
+            throw new Error(`instance ${engine} port ${port} not healthy `
+                + `within ${timeoutMs} ms (boot-marker=${markerSeen})`);
         }
         await new Promise((r) => setTimeout(r, 250));
     }
+}
+
+/**
+ * Preflight Mongo (coexistence only, audit ND-11 R4): bila SAQ Production
+ * berjalan di host yang sama, benchmark instance membaca DB produksi yang
+ * sama (LIVE store). MongoJsonRepository.init() melakukan SEED + upsert ke
+ * json_store bila storeKey kosong — artinya benchmark bisa MENULIS ke DB
+ * produksi bila ada koleksi kosong. Guard ini memverifikasi SEMUA storeKey
+ * sudah terisi SEBELUM spawn (script berjalan dengan node_modules + .env
+ * milik saq-report; URI tidak dicetak). Script disimpan ke RAW_DIR sebagai
+ * bagian exhibit provenance.
+ */
+function preflightMongoCounts() {
+    const scriptPath = path.join(RAW_DIR, 'preflight_json_store_counts.cjs');
+    fs.writeFileSync(scriptPath, `'use strict';
+// ND-11 coexistence preflight (read-only): hitung doc per storeKey di
+// json_store DB produksi; exit 3 bila ada yang kosong (seed-to-prod guard).
+const path = require('path');
+// Resolusi modul dari node_modules APP (cwd = dir saq-report), bukan dari
+// lokasi file script ini (out/raw/... — tanpa node_modules sendiri).
+const { createRequire } = require('module');
+const requireFromApp = createRequire(path.join(process.cwd(), 'package.json'));
+requireFromApp('dotenv').config({ path: path.join(process.cwd(), '.env') });
+const { MongoClient } = requireFromApp('mongodb');
+const KEYS = ['assistants', 'courses', 'lecturers', 'schedules', 'reports',
+    'globalConfig'];
+(async () => {
+    const uri = process.env.MONGO_URL || process.env.MONGO_PUBLIC_URL;
+    if (!uri) { console.error('no Mongo URI in env'); process.exit(3); }
+    const mc = new MongoClient(uri, { serverSelectionTimeoutMS: 8000 });
+    await mc.connect();
+    const col = mc.db().collection('json_store');
+    const counts = {};
+    for (const k of KEYS) counts[k] = await col.countDocuments({ key: k });
+    await mc.close();
+    console.log('COUNTS_JSON=' + JSON.stringify(counts));
+    const empty = KEYS.filter((k) => counts[k] === 0);
+    if (empty.length) {
+        console.error('EMPTY_KEYS=' + empty.join(','));
+        process.exit(3);
+    }
+})().catch((e) => { console.error(String((e && e.message) || e)); process.exit(3); });
+`);
+    const out = String(execSync(`"${process.execPath}" "${scriptPath}"`, {
+        cwd: SAQ_DIR, encoding: 'utf8', windowsHide: true,
+    })).trim();
+    const jsonLine = out.split('\n')
+        .map((l) => l.trim())
+        .find((l) => l.startsWith('COUNTS_JSON='));
+    if (!jsonLine) throw new Error(`no COUNTS_JSON in preflight output: ${out}`);
+    return JSON.parse(jsonLine.slice('COUNTS_JSON='.length));
 }
 
 async function requestOnce(port) {
@@ -212,12 +355,54 @@ async function main() {
         + `warmup=${WARMUP} site=${SITE} ports v8=${V8_PORT} ze=${ZE_PORT}`);
     console.log(`[nd11] run_id=${RUN_ID}`);
 
+    // PREFLIGHT PORT (audit ND-11 R1/R2) — sebelum spawn apa pun.
+    const busyPorts = [];
+    for (const p of [V8_PORT, ZE_PORT]) {
+        if (await probeBusy(p)) busyPorts.push(p);
+    }
+    if (busyPorts.length) {
+        console.error(`[nd11] REFUSED: port sudah terpakai: `
+            + `${busyPorts.join(', ')} — pilih port lain (--v8-port/--ze-port); `
+            + `pemilik port: powershell "Get-NetTCPConnection -State Listen `
+            + `-LocalPort ${busyPorts.join(',')}"`);
+        process.exit(2);
+    }
+    console.log(`[nd11] port preflight OK (v8 ${V8_PORT}, ze ${ZE_PORT} free)`);
+
+    // PREFLIGHT MONGO (coexistence only, audit ND-11 R4) — sebelum spawn:
+    // semua storeKey json_store di DB produksi wajib terisi agar init()
+    // benchmark tidak pernah menulis seed ke produksi.
+    if (PROD_PORT > 0) {
+        try {
+            PREFLIGHT_COUNTS = preflightMongoCounts();
+        } catch (err) {
+            console.error(`[nd11] REFUSED: preflight json_store gagal — `
+                + `${String(err.message).split('\n').filter(Boolean).pop()}`);
+            process.exit(2);
+        }
+        console.log(`[nd11] json_store counts: ${JSON.stringify(PREFLIGHT_COUNTS)}`);
+    }
+
     spawnInstance('v8', V8_PORT);
     spawnInstance('ze', ZE_PORT);
-    const bootV8 = await waitHealthy(V8_PORT);
-    const bootZe = await waitHealthy(ZE_PORT);
+    const bootV8 = await waitHealthy('v8', V8_PORT);
+    const bootZe = await waitHealthy('ze', ZE_PORT);
     console.log(`[nd11] instances healthy (v8 ${bootV8.toFixed(2)}s, `
         + `ze ${bootZe.toFixed(2)}s)`);
+
+    // SEED GUARD layer kedua (coexistence only) — menutup race window antara
+    // preflight counts dan init(): bila CHILD KITA menyebut seed, berarti
+    // koleksi produksi kosong saat init → benchmark menulis ke produksi =
+    // run void. (Log format app: "[MongoDB] Seed '<key>' from JSON file.")
+    if (PROD_PORT > 0) {
+        const seeded = ['v8', 'ze'].filter((k) =>
+            (bootLog[k] || []).join('').includes("[MongoDB] Seed '"));
+        if (seeded.length) {
+            failVoid(`benchmark instance(s) [${seeded.join(', ')}] would seed `
+                + `an empty production collection (write-to-prod guard)`,
+                { v8: [], ze: [] }, new Set(), bootV8, bootZe);
+        }
+    }
 
     const requests = { v8: [], ze: [] };
     const bodyHashes = new Set();
@@ -225,6 +410,11 @@ async function main() {
     // warmup untimed per jalur (JIT + EJS compile + pool koneksi)
     for (let i = 0; i < WARMUP; i++) {
         for (const [engine, port] of [['v8', V8_PORT], ['ze', ZE_PORT]]) {
+            if (childDied) {
+                failVoid(`instance ${childDied.engine} exited (code=`
+                    + `${childDied.code}) during warmup`,
+                    requests, bodyHashes, bootV8, bootZe);
+            }
             await requestOnce(port);
         }
     }
@@ -232,6 +422,11 @@ async function main() {
     // ronde terukur: alternation v8<->ze PER-REQUEST, start offset per ronde
     for (let r = 1; r <= ROUNDS; r++) {
         for (let k = 0; k < PER_ROUND; k++) {
+            if (childDied) {
+                failVoid(`instance ${childDied.engine} exited (code=`
+                    + `${childDied.code}) during measurement round ${r}`,
+                    requests, bodyHashes, bootV8, bootZe);
+            }
             const engine = (r + k) % 2 === 0 ? 'v8' : 'ze';
             const port = engine === 'v8' ? V8_PORT : ZE_PORT;
             const rec = await requestOnce(port);
@@ -247,11 +442,9 @@ async function main() {
     // PARITY GATE — satu hash unik untuk seluruh request (byte-identical HTML)
     if (bodyHashes.size !== 1) {
         const uniq = [...bodyHashes];
-        console.error(`[nd11] PARITY VOID: ${uniq.length} respons berbeda `
-            + `(${uniq.slice(0, 4).join(', ')}…) — run dibatalkan, tidak ada record.`);
-        await writeRaw(null, requests, bodyHashes, bootV8, bootZe);
-        killChildren();
-        process.exit(2);
+        failVoid(`parity: ${uniq.length} respons berbeda `
+            + `(${uniq.slice(0, 4).join(', ')}…)`,
+            requests, bodyHashes, bootV8, bootZe);
     }
     const BODY_SHA = [...bodyHashes][0];
     console.log(`[nd11] parity OK: seluruh respons byte-identik (sha ${BODY_SHA.slice(0, 12)}…)`);
@@ -361,6 +554,7 @@ async function main() {
                 + `applicable across processes (recorded only); `
                 + `raw: out/raw/${RUN_ID}/; git ze_json=${zeHash} `
                 + `saq-report=${saqHash}; dirty=${GATE.exploratory}`,
+            coexistence: COEXISTENCE,
         },
         results: [results.v8, results.ze],
     };
@@ -369,7 +563,8 @@ async function main() {
     killChildren();
 }
 
-async function writeRaw(speedup, requests, bodyHashes, bootV8, bootZe) {
+async function writeRaw(speedup, requests, bodyHashes, bootV8, bootZe,
+    voidReason = null) {
     const exhibit = {
         run_id: RUN_ID,
         site: SITE,
@@ -378,6 +573,9 @@ async function writeRaw(speedup, requests, bodyHashes, bootV8, bootZe) {
             order: 'alternating per-request (round-robin offset per round)',
             trimming: 'none — every request reported',
         },
+        void_reason: voidReason,
+        coexistence: COEXISTENCE,
+        mongo_json_store_counts: PREFLIGHT_COUNTS,
         boot: {
             v8_seconds: bootV8, ze_seconds: bootZe,
             v8_log: (bootLog.v8 || []).join('\n').split('\n').slice(0, 20),

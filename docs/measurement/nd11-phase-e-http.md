@@ -69,5 +69,17 @@ server menyusul. Deviasi protokol dari §3 (semua lebih ketat):
 
 Hasil: median v8 4,397 ms vs ze 4,085 ms → **speedup in-run 1,08×** (p95
 1,035×; paired per-ronde 1,048×) — non-parser ~95% waktu request; verdict
-§3 laporan. **Server run**: skrip identik, store LIVE, boot apa adanya
-(gate WA tidak berlaku — WA aktif sebagai kondisi, dinyatakan).
+§3 laporan. **Server run**: skrip identik, store LIVE, dengan **arsitektur
+koeksistensi** — SAQ Production tetap utuh di host yang sama (port
+produksi, WA + cron AKTIF, tidak disentuh); dua instance benchmark
+(wa/cron nonaktif, bind 127.0.0.1) via preflight + guard hasil audit
+`reports/nd11-coexistence-audit.md`.
+
+## 7. Audit koeksistensi (2026-11-17)
+
+Audit read-only menetapkan verdict **SAFE WITH CHANGES** sebelum server
+run: 4 temuan (health-check menerima status apa pun; tanpa preflight
+port; bind 0.0.0.0 dengan endpoint mutasi + lazy-init WA; seed-on-empty
+menulis ke DB produksi). Hardening E1–E5 diterapkan di harness +
+knob `SAQ_BIND_HOST` (saq-report) — detail risiko/bukti/runbook/acceptance
+criteria di [`../../reports/nd11-coexistence-audit.md`](../../reports/nd11-coexistence-audit.md).

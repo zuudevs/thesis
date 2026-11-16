@@ -294,9 +294,15 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   1,035×; paired per-ronde 1,048×) — non-parser ~95% waktu request
   → keunggulan parser terkompresi dari 2,88×/2,67× (fase D) di
   endpoint render-penuh; parity byte-identical 300 request (1 hash).
-  Laporan: `reports/nd11-phase-e-dev.md`. **Sisa terbuka: server run**
-  (skrip identik, store LIVE, boot apa adanya) + opsional boundary berat
-  (`/rekap/asisten`).
+  Laporan: `reports/nd11-phase-e-dev.md`. **Audit koeksistensi + hardening
+  (ND-11.a, 2026-11-17): SAFE WITH CHANGES → E1–E5 diterapkan** —
+  preflight port, health 200 & boot-marker child, abort child-exit,
+  guard seed-to-prod (`--coexist-prod-port`), knob `SAQ_BIND_HOST`
+  (saq-report `0a62581`), metadata coexistence; laporan
+  `reports/nd11-coexistence-audit.md`. **Sisa terbuka: server run**
+  (skrip identik, store LIVE, arsitektur koeksistensi: produksi utuh
+  dengan WA/cron AKTIF, dua instance benchmark nonaktif WA/cron +
+  bind loopback) + opsional boundary berat (`/rekap/asisten`).
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 

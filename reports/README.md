@@ -101,6 +101,14 @@ disimpan apa adanya di `reports/nd6/` (exhibit, tidak diubah).
   in-run 1,08×** (median; p95 1,035×); non-parser ~95% waktu request →
   keunggulan parser terkompresi dari fase D. Arsip `nd11/`. Server run
   (store LIVE) menyusul.
+- [`nd11-coexistence-audit.md`](nd11-coexistence-audit.md) — **ND-11.a
+  audit koeksistensi (2026-11-17)**: verdict **SAFE WITH CHANGES**
+  sebelum server run berdampingan dengan SAQ Production — 4 temuan
+  berbasis source (health-check tanpa status gate; tanpa preflight
+  port; bind 0.0.0.0 + 20 endpoint mutasi + lazy-init WA; seed-on-empty
+  ke DB produksi) + hardening E1–E5 yang diterapkan (preflight,
+  boot-marker identity, abort child-exit, seed guard, `SAQ_BIND_HOST`)
+  + runbook server + acceptance criteria.
 
 ### Loop O2 — optimasi scanner (2026-11-15/16)
 - [`O2-1-interior-skip.md`](O2-1-interior-skip.md) — `scanner8` interior
