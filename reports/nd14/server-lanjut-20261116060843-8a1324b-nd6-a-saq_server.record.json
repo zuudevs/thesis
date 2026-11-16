@@ -1,0 +1,643 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "server-lanjut-20261116060843-8a1324b",
+  "site": "saq_server",
+  "generator": "node_harness",
+  "library": {
+    "name": "ze_json",
+    "version": "0.3.0 (ze_json@01a143f, saq-report@8c7f2d4)",
+    "language_runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+    "js_version": "0.3.0",
+    "core_version": "0.3.2",
+    "abi_version": 2026000302,
+    "artifact_sha256": "9795f2e80a4a5e2cfe980d89f5a911a6796cb69ac91e3815928a78c9845fe373"
+  },
+  "git_commit": {
+    "hash": "8a1324b",
+    "dirty": false,
+    "repo": "v5"
+  },
+  "host": {
+    "hostname": "server-lanjut",
+    "os": "Windows_NT 10.0.26300",
+    "arch": "x64",
+    "cpu_model": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz",
+    "cpu_cores": 6,
+    "ram_gb": 7.9,
+    "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 (ABI 2026000302)"
+  },
+  "corpus": {
+    "name": "saq_payload_v1",
+    "document_count": 6,
+    "total_bytes": 88381,
+    "max_document_bytes": 39209,
+    "sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1"
+  },
+  "config": {
+    "date_utc": "2026-11-16T06:08:43Z",
+    "iterations": 30,
+    "warmup_runs": 3,
+    "repeats": 15,
+    "cpu_pinning": false,
+    "threads": 1,
+    "exploratory": false,
+    "notes": "ND-6 phase A; alternating rounds; no outlier trimming; gc_exposed=true; gc(minor=0, major=0); raw: out/raw/server-lanjut-20261116060843-8a1324b/; per-result detail in extras (seconds_median/p95, binding_calls, index_count, consumed/skipped — kumulatif GC sejak start fase). Baseline=V8 (engine=v8), candidate=ze_json wasm64_cabi — same run_id; phase D measures through the saq-report repository layer (binding calls not observable there: extras.binding_calls=null)."
+  },
+  "results": [
+    {
+      "name": "A/courses/v8-parse",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8 JSON.parse penuh — batas atas jalur materialisasi.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000729644444,
+        "seconds_stddev": 6.7214e-7,
+        "bytes_per_second": 547252848,
+        "documents_per_second": 137053.055
+      },
+      "extras": {
+        "path": "v8-parse",
+        "seconds_median": 0.00000691333333,
+        "seconds_p95": 0.00000856833333,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 99,
+        "skipped_fields": 0,
+        "total_fields": 99,
+        "doc_bytes": 3993
+      }
+    },
+    {
+      "name": "A/courses/v8-clone",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline klon JSON.parse(JSON.stringify()) — semantik MongoJsonRepository.read() (H1) yang ditanggung server per request.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000920266667,
+        "seconds_stddev": 0.00000121609,
+        "bytes_per_second": 433895972,
+        "documents_per_second": 108664.155
+      },
+      "extras": {
+        "path": "v8-clone",
+        "seconds_median": 0.00000845,
+        "seconds_p95": 0.0000112006667,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 99,
+        "skipped_fields": 0,
+        "total_fields": 99,
+        "doc_bytes": 3993
+      }
+    },
+    {
+      "name": "A/courses/ze-parse",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze_json full materialize via binding — pembanding bawah jalur lazy (probe §13: 14–25x di bawah V8).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000154170222,
+        "seconds_stddev": 0.0000487387,
+        "bytes_per_second": 25899943.2,
+        "documents_per_second": 6486.33689
+      },
+      "extras": {
+        "path": "ze-parse",
+        "seconds_median": 0.0001401,
+        "seconds_p95": 0.000232003333,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 1812,
+        "index_count": 0,
+        "consumed_fields": 99,
+        "skipped_fields": 0,
+        "total_fields": 99,
+        "doc_bytes": 3993
+      }
+    },
+    {
+      "name": "A/assistants/v8-parse",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8 JSON.parse penuh — batas atas jalur materialisasi.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000119846667,
+        "seconds_stddev": 0.00000177418,
+        "bytes_per_second": 468431885,
+        "documents_per_second": 83439.951
+      },
+      "extras": {
+        "path": "v8-parse",
+        "seconds_median": 0.0000128566667,
+        "seconds_p95": 0.0000142093333,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 151,
+        "skipped_fields": 0,
+        "total_fields": 151,
+        "doc_bytes": 5614
+      }
+    },
+    {
+      "name": "A/assistants/v8-clone",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline klon JSON.parse(JSON.stringify()) — semantik MongoJsonRepository.read() (H1) yang ditanggung server per request.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000014178,
+        "seconds_stddev": 0.00000172656,
+        "bytes_per_second": 395965580,
+        "documents_per_second": 70531.8098
+      },
+      "extras": {
+        "path": "v8-clone",
+        "seconds_median": 0.0000132366667,
+        "seconds_p95": 0.0000165176667,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 151,
+        "skipped_fields": 0,
+        "total_fields": 151,
+        "doc_bytes": 5614
+      }
+    },
+    {
+      "name": "A/assistants/ze-parse",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze_json full materialize via binding — pembanding bawah jalur lazy (probe §13: 14–25x di bawah V8).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000201621778,
+        "seconds_stddev": 0.0000222533,
+        "bytes_per_second": 27844214.4,
+        "documents_per_second": 4959.78168
+      },
+      "extras": {
+        "path": "ze-parse",
+        "seconds_median": 0.000192306667,
+        "seconds_p95": 0.000240902667,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 1812,
+        "index_count": 0,
+        "consumed_fields": 151,
+        "skipped_fields": 0,
+        "total_fields": 151,
+        "doc_bytes": 5614
+      }
+    },
+    {
+      "name": "A/lecturers/v8-parse",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8 JSON.parse penuh — batas atas jalur materialisasi.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000620911111,
+        "seconds_stddev": 4.24319e-7,
+        "bytes_per_second": 576894170,
+        "documents_per_second": 161053.649
+      },
+      "extras": {
+        "path": "v8-parse",
+        "seconds_median": 0.00000611333333,
+        "seconds_p95": 0.00000680433333,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 91,
+        "skipped_fields": 0,
+        "total_fields": 91,
+        "doc_bytes": 3582
+      }
+    },
+    {
+      "name": "A/lecturers/v8-clone",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline klon JSON.parse(JSON.stringify()) — semantik MongoJsonRepository.read() (H1) yang ditanggung server per request.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000778844444,
+        "seconds_stddev": 5.94438e-7,
+        "bytes_per_second": 459912121,
+        "documents_per_second": 128395.344
+      },
+      "extras": {
+        "path": "v8-clone",
+        "seconds_median": 0.00000765333333,
+        "seconds_p95": 0.00000863333333,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 91,
+        "skipped_fields": 0,
+        "total_fields": 91,
+        "doc_bytes": 3582
+      }
+    },
+    {
+      "name": "A/lecturers/ze-parse",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze_json full materialize via binding — pembanding bawah jalur lazy (probe §13: 14–25x di bawah V8).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000119493333,
+        "seconds_stddev": 0.0000114445,
+        "bytes_per_second": 29976567.7,
+        "documents_per_second": 8368.66771
+      },
+      "extras": {
+        "path": "ze-parse",
+        "seconds_median": 0.000117676667,
+        "seconds_p95": 0.000137316333,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 1812,
+        "index_count": 0,
+        "consumed_fields": 91,
+        "skipped_fields": 0,
+        "total_fields": 91,
+        "doc_bytes": 3582
+      }
+    },
+    {
+      "name": "A/schedules/v8-parse",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8 JSON.parse penuh — batas atas jalur materialisasi.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000681826667,
+        "seconds_stddev": 0.000017361,
+        "bytes_per_second": 575058177,
+        "documents_per_second": 14666.4842
+      },
+      "extras": {
+        "path": "v8-parse",
+        "seconds_median": 0.00006366,
+        "seconds_p95": 0.00008588,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 961,
+        "skipped_fields": 0,
+        "total_fields": 961,
+        "doc_bytes": 39209
+      }
+    },
+    {
+      "name": "A/schedules/v8-clone",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline klon JSON.parse(JSON.stringify()) — semantik MongoJsonRepository.read() (H1) yang ditanggung server per request.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00008272,
+        "seconds_stddev": 0.00000913099,
+        "bytes_per_second": 473996615,
+        "documents_per_second": 12088.9749
+      },
+      "extras": {
+        "path": "v8-clone",
+        "seconds_median": 0.00007926,
+        "seconds_p95": 0.000103636,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 961,
+        "skipped_fields": 0,
+        "total_fields": 961,
+        "doc_bytes": 39209
+      }
+    },
+    {
+      "name": "A/schedules/ze-parse",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze_json full materialize via binding — pembanding bawah jalur lazy (probe §13: 14–25x di bawah V8).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00118232267,
+        "seconds_stddev": 0.000143568,
+        "bytes_per_second": 33162689.9,
+        "documents_per_second": 845.792801
+      },
+      "extras": {
+        "path": "ze-parse",
+        "seconds_median": 0.00111948,
+        "seconds_p95": 0.001449958,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 312,
+        "index_count": 0,
+        "consumed_fields": 961,
+        "skipped_fields": 0,
+        "total_fields": 961,
+        "doc_bytes": 39209
+      }
+    },
+    {
+      "name": "A/reports/v8-parse",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8 JSON.parse penuh — batas atas jalur materialisasi.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.0000567946667,
+        "seconds_stddev": 0.0000164636,
+        "bytes_per_second": 627224387,
+        "documents_per_second": 17607.2871
+      },
+      "extras": {
+        "path": "v8-parse",
+        "seconds_median": 0.00005088,
+        "seconds_p95": 0.000093268,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 660,
+        "skipped_fields": 0,
+        "total_fields": 660,
+        "doc_bytes": 35623
+      }
+    },
+    {
+      "name": "A/reports/v8-clone",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline klon JSON.parse(JSON.stringify()) — semantik MongoJsonRepository.read() (H1) yang ditanggung server per request.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00006602,
+        "seconds_stddev": 0.00000202494,
+        "bytes_per_second": 539578915,
+        "documents_per_second": 15146.9252
+      },
+      "extras": {
+        "path": "v8-clone",
+        "seconds_median": 0.00006536,
+        "seconds_p95": 0.000068928,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 660,
+        "skipped_fields": 0,
+        "total_fields": 660,
+        "doc_bytes": 35623
+      }
+    },
+    {
+      "name": "A/reports/ze-parse",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze_json full materialize via binding — pembanding bawah jalur lazy (probe §13: 14–25x di bawah V8).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000927822667,
+        "seconds_stddev": 0.0000997318,
+        "bytes_per_second": 38394190.3,
+        "documents_per_second": 1077.79216
+      },
+      "extras": {
+        "path": "ze-parse",
+        "seconds_median": 0.0008841,
+        "seconds_p95": 0.00109286,
+        "rounds": 15,
+        "reps_per_round": 5,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 312,
+        "index_count": 0,
+        "consumed_fields": 660,
+        "skipped_fields": 0,
+        "total_fields": 660,
+        "doc_bytes": 35623
+      }
+    },
+    {
+      "name": "A/globalConfig/v8-parse",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline V8 JSON.parse penuh — batas atas jalur materialisasi.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 9.40222222e-7,
+        "seconds_stddev": 2.38659e-8,
+        "bytes_per_second": 382888206,
+        "documents_per_second": 1063578.35
+      },
+      "extras": {
+        "path": "v8-parse",
+        "seconds_median": 9.33333333e-7,
+        "seconds_p95": 9.80666667e-7,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 14,
+        "skipped_fields": 0,
+        "total_fields": 14,
+        "doc_bytes": 360
+      }
+    },
+    {
+      "name": "A/globalConfig/v8-clone",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Baseline klon JSON.parse(JSON.stringify()) — semantik MongoJsonRepository.read() (H1) yang ditanggung server per request.",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.00000124422222,
+        "seconds_stddev": 3.27836e-8,
+        "bytes_per_second": 289337382,
+        "documents_per_second": 803714.949
+      },
+      "extras": {
+        "path": "v8-clone",
+        "seconds_median": 0.00000124,
+        "seconds_p95": 0.000001303,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 0,
+        "index_count": 0,
+        "consumed_fields": 14,
+        "skipped_fields": 0,
+        "total_fields": 14,
+        "doc_bytes": 360
+      }
+    },
+    {
+      "name": "A/globalConfig/ze-parse",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "ze_json full materialize via binding — pembanding bawah jalur lazy (probe §13: 14–25x di bawah V8).",
+        "basis_papers": [
+          "10.1002_spe.3313",
+          "10.14778_3115404.3115416"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.000019438,
+        "seconds_stddev": 0.00000301752,
+        "bytes_per_second": 18520423.9,
+        "documents_per_second": 51445.622
+      },
+      "extras": {
+        "path": "ze-parse",
+        "seconds_median": 0.0000186466667,
+        "seconds_p95": 0.0000248623333,
+        "rounds": 15,
+        "reps_per_round": 30,
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": 1812,
+        "index_count": 0,
+        "consumed_fields": 14,
+        "skipped_fields": 0,
+        "total_fields": 14,
+        "doc_bytes": 360
+      }
+    }
+  ]
+}

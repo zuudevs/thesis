@@ -82,7 +82,8 @@ synthetic_1mb      69686    428978    5    9  131       6      34.0%
   pertanyaan terbuka berikutnya.
 - Fase D tetap lapisan repository (bukan HTTP end-to-end) — klaim
   "endpoint produksi" tetap menunggu ND-11 (Senin).
-
+- ~~Site dev saja; server menyusul~~ → **server tereksekusi 2026-11-16,
+  lihat addendum §8** — acceptance ≥1,5× kini tercapai DI KEDUA site.
 ## 6. Deliverables
 
 - 4 record tervalidasi + arsip + sidecar; sinkronisasi tasks/plans.
@@ -110,7 +111,7 @@ run_id per fase, 15×3, validator PASS):
 - Fase C membaik di schedules (1,65×) dan assistants (1,17×);
   A/B tetap di bawah 1× (materialisasi penuh — konsisten).
 - Panel `saq_server` = PENDING (SSH unreachable sepanjang sesi) —
-  menyusul di sesi server terpadu.
+  menyusul di sesi server terpadu. **(Terpenuhi 2026-11-16 — addendum §8.)**
 
 Chart (vintage baru `post-o2` di `nd6_summary_chart.py`, panel server
 dirender "pending"; master `out/charts/`, arsip SVG ter-commit di
@@ -128,3 +129,47 @@ era ND-6 asli pre-O1 tanpa referensi, `o1_cumulative.png` versi lama
 underscore, `final-throughput.png` pre-O1 yang label-nya menyesatkan);
 diagram (`diagram-*.svg/png`, sumber `.mmd` ada) dan `progress_*`
 dipertahankan.
+
+## 8. Addendum — panel server (sesi terpadu 2026-11-16, core 0.3.2)
+
+Sesi server terpadu tereksekusi atas server reachable (pola ND-13 §5):
+root server `8a1324b` (ff dari `7fb2ae4`), ze_json `01a143f` (core 0.3.2,
+abi `2026000302`), saq-report `8c7f2d4`, wasm `9795f2e8…` **byte-identik**
+dengan dev (scp + sidecar `.sha256` + certutil re-hash + gate
+`build-wasm.ps1 -VerifyOnly` 26 ekspor v5), Node 26.13.1 identik, tree
+bersih (tracked), korpus manifest sha identik. 5 record **PASS** validator
+(arsip `reports/nd14/` + probe di `reports/nd13/`; sidecar
+`reports/registry/`).
+
+| Fase | run_id | validator |
+|---|---|---|
+| A | `server-lanjut-20261116060843-8a1324b` | PASS |
+| B | `server-lanjut-20261116060900-8a1324b` | PASS |
+| C | `server-lanjut-20261116060915-8a1324b` | PASS |
+| D | `server-lanjut-20261116060933-8a1324b` | PASS |
+
+### Fase D — **ACCEPTANCE SERVER TERCAPAI**
+
+| metrik | ND-12 server (0.2-era, `c5b2b7d…`) | ND-14 server (0.3.2) |
+|---|---:|---:|
+| **mongo-cache v8/ze** | 1,13× | **2,67× ✓** (p95 2,49×) |
+| file-store v8/ze | 0,95× | 0,99× |
+| mongo-cache-v8 (absolut) | — | 0,2147 ms |
+| mongo-cache-ze (absolut) | — | 0,0806 ms |
+
+- Rasio dalam-run **2,67× ≥ 1,5×** — kriteria acceptance kini terpenuhi
+  **di kedua site** (dev 2,88× / server 2,67×; p95 3,25× / 2,49×).
+  File-store tetap <1× (0,99× — I/O-bound, konsisten historis).
+- Fase A 0,05–0,07×, B 0,08–0,14× — materialisasi penuh & L2-project
+  tetap kalah di server (konsisten dev); **fase C kini menang 2 store di
+  server**: schedules **1,50×** dan assistants **1,42×** (era ND-12
+  server: kalah semua; dev refresh: 1,65×/1,17×) — efek O2 pada L1
+  traversal terlihat lintas site; courses 0,86×, lecturers 0,96×,
+  reports 0,31×, globalConfig 0,05×.
+- Chart `post-o2` regenerated dengan panel server terisi
+  (`out/charts/` + arsip `reports/charts/`); acceptance figure kini
+  menampilkan dua bar (dev 2,88× · server 2,67×).
+
+Batas: perbandingan 2,88× vs 2,67× lintas site = **narasi riset** (bukti
+tetap rasio dalam-run per site); ND-11 (HTTP end-to-end) tetap menjadi
+satu-satunya dasar klaim "endpoint produksi".

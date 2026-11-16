@@ -546,8 +546,13 @@
   mendominasi s2-open 82–92%** di KB-scale, match 7–15%, carve ~0,3 µs
   flat; Σ sub ≈ fused (1,02–1,16×; 1,96× di 360 B = call-boundary).
   **Arah fase D: optimasi scanner**, bukan carve/match. Run server
-  pending (SSH unreachable; pola ND-12 — tanpa boot app). Laporan:
-  `reports/nd13-open-decomposition.md`; arsip `reports/nd13/`.
+  **TEREKSEKUSI 2026-11-16** (sesi terpadu; core 0.3.2, wasm `9795f2e8…`
+  byte-identik, root `8a1324b`, 738 parity checks, validator PASS):
+  scan tetap dominan 73–82% KB-scale, **match share lebih besar di
+  server (17,5–23,6% vs dev 7–15%)** — pertanyaan terbuka ND-9
+  ("gap +38% open di server menempel di scan atau match?") terjawab:
+  keduanya; kandidat O2 pass pairing berlaku kedua site. Laporan:
+  `reports/nd13-open-decomposition.md` §5; arsip `reports/nd13/`.
 - [x] **O2-1** — `scanner8` string-interior fast skip (keluarga O2 =
   optimasi scanner, dasar verdict ND-13): jalur interior string dalam
   loop scan diganti loop bebas-tabel (2 compare prediktable `'\\'`/`'"'`
@@ -567,7 +572,8 @@
   (`ZUU_WASM_TOOLCHAIN`) — configure wasm64 fresh Windows kini benar
   (sebelumnya turun jadi host build saat re-detection → GTest REQUIRED
   gagal). Laporan: `reports/O2-1-interior-skip.md`; arsip
-  `reports/o2-1/`. Follow-up: re-measure ND-6 pasca-O2 + run server.
+  `reports/o2-1/`. Follow-up: re-measure ND-6 pasca-O2 (ND-14, done)
+  + run server (done 2026-11-16 — fase D server 2,67×).
 - [x] **O2-2 (GO terbatas)** — SWAR interior skip 8-byte. **DITERIMA
   2026-11-15** — melampaui kriteria GO terbatas: saq menang **dan**
   seluruh family synthetic justru menang (kekhawatiran interior pendek
@@ -583,7 +589,7 @@
   O2 berikutnya = pass pairing. Laporan: `reports/O2-2-swar-interior.md`;
   arsip `reports/o2-2/`.
 - [x] **ND-14** — Re-measure matriks ND-6 pasca-O2 (2026-11-15, dev;
-  server pending): core 0.3.1 (wasm `1d8960c9…`), tree bersih, satu
+  server 2026-11-16): core 0.3.1 (wasm `1d8960c9…`), tree bersih, satu
   run_id per fase, 4 record validator PASS `reports/nd14/`. **Verdict:
   fase D mongo-cache v8/ze 1,48× → 2,40× — acceptance ≥1,5× TERCAPAI
   di dev** (koreksi drift v8 +34% lintas window → 1,79×, tetap lulus);
@@ -592,8 +598,7 @@
   (schedules 0,90×→1,50×). Konfounder: delta absolut lintas-window
   tidak diinterpretasi (A semua −26..−57%, B semua +22..+119% kedua
   engine). File-store tetap <1× (0,95×; window COLD). Laporan:
-  `reports/nd14-post-o2-matrix.md`. Follow-up: sesi server terpadu
-  (ND-13 + ND-14 server) saat reachable; O2-2 GO terbatas.
+  `reports/nd14-post-o2-matrix.md`. O2-2 GO terbatas.
   **Refresh 0.3.2 (addendum §7)**: setelah O2-2 diterima, matriks
   di-refresh di core 0.3.2 (4 run `…-6d87bf3`, validator PASS) —
   **fase D mongo-cache 2,88×** (p95 3,25×; ze 0,0709 ms); 2,40×→2,88×
@@ -601,6 +606,14 @@
   `post-o2` + ladder O2 (`o2-ladder`, dua window sandwich eksplisit);
   housekeeping: 16 chart tak terpakai dihapus, arsip SVG
   `reports/charts/`.
+  **Sesi server terpadu (addendum §8, 2026-11-16)**: matriks A–D +
+  probe ND-13 tereksekusi di `saq_server` (root `8a1324b`, core 0.3.2,
+  wasm `9795f2e8…` byte-identik, 5 record validator PASS, arsip
+  `reports/nd14/`) — **fase D mongo-cache 2,67× (p95 2,49×) ≥ 1,5× —
+  ACCEPTANCE TERCAPAI DI KEDUA SITE** (dev 2,88×); file-store 0,99×;
+  fase C menang schedules 1,50× + assistants 1,42× di server (era
+  ND-12 kalah semua). Panel `post-o2` chart terisi; sisa terbuka =
+  ND-11 HTTP end-to-end.
 - [x] **O1-9 (rencana pemilik #4)** — Fusi scan string C++: skip pass
   count `decode_interior` saat `cap >= inner_len` (invariant output
   decode ≤ `inner_len`). **DITOLAK** — hasil benchmark netral/-2%

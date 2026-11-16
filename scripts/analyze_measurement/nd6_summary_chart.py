@@ -122,20 +122,22 @@ CONFIRM_POST_O1 = [
     "zuu-20261114022956-7fb2ae4",            # dev confirm
     "server-lanjut-20261114024230-7fb2ae4",  # server confirm
 ]
-# post-o2 (ND-14 refresh, 2026-11-15): fresh dev matrix AFTER O2-1 + O2-2 —
-# root 6d87bf3, ze_json 01a143f (core 0.3.2), wasm 9795f2e8 (abi
-# 2026000302), Node 26.13.1, clean trees. SAQ_SERVER = PENDING (SSH
-# unreachable all session): the server entries stay None until the
-# terpadu server session runs — build_cells renders those cells as
-# "pending" instead of failing, so the dev story ships now and the
-# chart refreshes when the server numbers land.
+# post-o2 (ND-14 refresh, 2026-11-15 + terpadu server session 2026-11-16):
+# fresh matrix AFTER O2-1 + O2-2 — root 6d87bf3 (dev) / 8a1324b (server),
+# ze_json 01a143f (core 0.3.2), wasm 9795f2e8 byte-identical both sites
+# (sidecar + scp verify), Node 26.13.1, clean trees. Server entries filled by
+# the terpadu session (ND-13 probe + ND-6 A-D on saq_server, 5 records PASS).
 RUNS_POST_O2 = {
     ("A", "dev_device"): "zuu-20261115071747-6d87bf3",
     ("B", "dev_device"): "zuu-20261115075332-6d87bf3",
     ("C", "dev_device"): "zuu-20261115080838-6d87bf3",
     ("D", "dev_device"): "zuu-20261115080840-6d87bf3",
+    ("A", "saq_server"): "server-lanjut-20261116060843-8a1324b",
+    ("B", "saq_server"): "server-lanjut-20261116060900-8a1324b",
+    ("C", "saq_server"): "server-lanjut-20261116060915-8a1324b",
+    ("D", "saq_server"): "server-lanjut-20261116060933-8a1324b",
 }
-CONFIRM_POST_O2 = []  # single run per phase; confirm rides the server session
+CONFIRM_POST_O2 = []  # single run per phase per site; cross-window = narrative
 
 VINTAGE = "post-o2"
 for _a in sys.argv[1:]:
@@ -277,7 +279,7 @@ def draw_map(cells):
     elif VINTAGE == "post-o2":
         site_labels = [
             "dev_device\npasca-O2 (core 0.3.2) · tree bersih\n2026-11-15 · Node 26.13.1",
-            "saq_server\nPENDING — sesi server menyusul\n(SSH unreachable 2026-11-15)",
+            "saq_server\npasca-O2 (core 0.3.2) · tree bersih\n2026-11-16 · Node 26.13.1",
         ]
     else:
         site_labels = [
@@ -343,13 +345,13 @@ def draw_map(cells):
                 "E1: verdict era Node 24 (2,85×/3,00×) tidak reproducible di Node 26 — komparasi antar-era confounded "
                 "(wasm era lama 7e26044f tak terekam sidecarnya). Sumber: record PASS reports/nd10/.")
     elif VINTAGE == "post-o2":
-        title = "ze_json vs baseline V8 — peta speedup pasca-O2 (ND-14 refresh, scanner O2-1+O2-2)"
-        sub = ("Fresh run 2026-11-15 · core 0.3.2 (O2-1 interior skip + O2-2 SWAR) · wasm 9795f2e8 · Node 26.13.1 · tree bersih · "
-               "hijau = unggul (>1×) · merah = perlu perbaikan (<1×)")
+        title = "ze_json vs baseline V8 — peta speedup pasca-O2 (ND-14, scanner O2-1+O2-2)"
+        sub = ("dev 2026-11-15 + server 2026-11-16 · core 0.3.2 (O2-1 interior skip + O2-2 SWAR) · wasm 9795f2e8 byte-identik · "
+               "Node 26.13.1 · tree bersih · hijau = unggul (>1×) · merah = perlu perbaikan (<1×)")
         foot = ("Speedup = median V8 / median ze dalam pasangan in-situ (fairness gate: satu run_id, korpus sha256 sama, status ok). "
                 "A/B = median lintas 6 store (bracket = min–max).\n"
-                "Fase D dev mongo-cache 2,88× ≥ target 1,5× — acceptance dev tercapai (0,3.0 era: 1,48×; 0.3.1: 2,40×). "
-                "Panel server PENDING — refresh chart setelah sesi server. Sumber: record PASS reports/nd14/.")
+                "Fase D mongo-cache ≥ target 1,5× DI KEDUA SITE (dev 2,88×; server 2,67×; 0.3.0 era: 1,48×/1,13×). "
+                "Sumber: record PASS reports/nd14/ + reports/nd13/.")
     else:
         title = "ze_json vs baseline V8 — peta speedup pasca-O1 (ND-12, countermeasure terpasang)"
         sub = ("Fresh run 2026-11-14 · ABI v4 (O1-4+O1-5+O1-7) · wasm c5b42b7d byte-identik · Node 26.13.1 · tree bersih · "
@@ -378,7 +380,7 @@ def draw_acceptance(nd6, log_rows):
         rt_srv = rt_dev
     elif VINTAGE == "post-o2":
         rt_dev = "2026-11-15 · pasca-O2 (core 0.3.2) · tree bersih"
-        rt_srv = "PENDING (sesi server menyusul)"
+        rt_srv = "2026-11-16 · pasca-O2 (core 0.3.2) · tree bersih"
     else:
         rt_dev = "2026-11-14 · pasca-O1 (ABI v4) · tree bersih"
         rt_srv = rt_dev
@@ -391,7 +393,8 @@ def draw_acceptance(nd6, log_rows):
     elif VINTAGE == "post-o2":
         spec = [
             (RUNS[("D", "dev_device")], "dev · utama\n(pasca-O2-1 + O2-2)"),
-        ]  # server PENDING — bar muncul setelah sesi server
+            (RUNS[("D", "saq_server")], "server · utama\n(pasca-O2-1 + O2-2)"),
+        ]
     else:
         spec = [
             (RUNS[("D", "dev_device")], "dev · utama"),
@@ -463,11 +466,11 @@ def draw_acceptance(nd6, log_rows):
         acc_foot = ("Baseline repo.read().length (V8) vs ze repo.readCount() (structural count, wasm64 C-ABI) dalam satu run_id.\n"
                     "E1: verdict era Node 24 (2,85×/3,00×) turun ~1,4× di Node 26 → runtime V8 14.6 = penyebab dominan kompresi (wasm era lama tak terekam sidecarnya → confounded).")
     elif VINTAGE == "post-o2":
-        acc_title = "Pasca-O2 fase D — acceptance jalur produksi (ND-14 refresh, dev)"
-        acc_sub = ("core 0.3.2 (O2-1 + O2-2) · wasm 9795f2e8 · Node 26.13.1 · tree bersih · "
-                   "2,88× ≥ target 1,5× — ACCEPTANCE DEV TERCAPAI.")
+        acc_title = "Pasca-O2 fase D — acceptance jalur produksi (ND-14, dev + server)"
+        acc_sub = ("core 0.3.2 (O2-1 + O2-2) · wasm 9795f2e8 byte-identik · Node 26.13.1 · tree bersih · "
+                   "2,88× (dev) / 2,67× (server) ≥ target 1,5× — ACCEPTANCE TERCAPAI DI KEDUA SITE.")
         acc_foot = ("Baseline repo.read().length (V8) vs ze repo.readCount() (structural count, wasm64 C-ABI) dalam satu run_id.\n"
-                    "Tren: 1,48× (0.2-era) → 2,40× (0.3.1, O2-1) → 2,88× (0.3.2, +O2-2) · server PENDING (sesi server menyusul).")
+                    "Tren dev: 1,48× (0.2-era) → 2,40× (0.3.1) → 2,88× (0.3.2) · tren server: 1,13× (0.2-era, ND-12) → 2,67× (0.3.2, sesi terpadu 2026-11-16).")
     else:
         acc_title = "Pasca-O1 fase D — acceptance jalur produksi (ND-12)"
         acc_sub = ("ABI v4 (O1-4+O1-5+O1-7) · wasm c5b42b7d byte-identik · Node 26.13.1 · tree bersih · "

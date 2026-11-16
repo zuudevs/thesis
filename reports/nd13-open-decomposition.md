@@ -1,6 +1,7 @@
-# ND-13 — Dekomposisi sub-stage `s2-open` (dev tereksekusi; server pending)
+# ND-13 — Dekomposisi sub-stage `s2-open` (dev + server tereksekusi)
 
-Eksekusi: lanjutan instruksi pemilik "lanjut s2-open dulu" (2026-11-14).
+Eksekusi: lanjutan instruksi pemilik "lanjut s2-open dulu" (2026-11-14);
+server menyusul 2026-11-16 di sesi terpadu (§5).
 Menjawab pertanyaan terbuka ND-9: di dalam 0,14–0,19 ms per `ze_parser_open`
 (dokumen SAQ 3,6–39 KB) — yang mana dominan: **carve** arena
 (`bump_aligned(3×len×8+64)`), **scan** struktural (`structural_scan` →
@@ -94,22 +95,57 @@ menunjukkan dekomposisi konsisten dengan bound, tanpa komponen ganda besar.
 - Proxy sub-stage = **panggilan standalone** dengan call boundary sendiri:
   lower-bound per komponen, ditempel berdampingan dengan bound fused —
   TIDAK force-subtract (metodologi ND-9 diteruskan).
-- Angka ini dev_device saja; server run menyusul (bila server reachable) —
-  pertanyaan spesifik ND-9 "gap +38% open di server menempel di scan atau
-  match?" belum terjawab sampai run server.
+- Angka ini dev_device saja ~~; server run menyusul~~ → server run
+  tereksekusi 2026-11-16 (§5) — pertanyaan ND-9 "gap +38% open di server
+  menempel di scan atau match?" kini terjawab: keduanya, share match
+  lebih besar di server (17,5–23,6% vs dev 7,2–15,2%).
 - Satu run_id per site; semua rasio dalam-run (AGENTS §4/§6).
 - wasm v5 sha `8ec2d3cd…` ≠ wasm ND-9/ND-12 (`19baac8c…`/`c5b42b7d…`) —
   perbandingan antar-run dinyatakan narasi, bukan bukti.
 
-## 5. Server run (pending)
+## 5. Server run (**tereksekusi 2026-11-16**)
 
-Prosedur (pola ND-12 — tanpa boot app, aman di luar Senin): push branch →
-server `git switch feat/nd13-open-decomposition` → scp `ze_json.wasm` +
-`.sha256` (verifikasi sha `8ec2d3cd…`) → `node scripts/bench/
-nd9_cost_diagnosis.mjs --probe --rounds 15 --warmup 3 --cycles 4
---abi-calls 4096 --site saq_server` → pull record. Status: **server
-unreachable saat sesi (SSH timeout 100.67.191.111, 2× dicoba)** — run
-server ditunda sampai mesin reachable; deliverable dev tidak menunggu.
+Prosedur (pola ND-12 — tanpa boot app): root server ff `7fb2ae4` →
+`8a1324b`, submodule `01a143f` (core 0.3.2) / `8c7f2d4`, scp wasm
+`9795f2e8…` + `.sha256` (verifikasi sha dev == certutil server; gate
+`build-wasm.ps1 -VerifyOnly` 26 ekspor v5 di dev), Node 26.13.1 identik,
+tree bersih (tracked). Perhatikan: era core **bergeser** dari 0.3.0 (dev
+run asli) → 0.3.2 (O2-1 + O2-2 masuk) — dekomposisi server mengukur
+scanner pasca-O2; perbandingan absolut lintas-era = narasi, komposisi
+dalam-run tetap sah.
+
+| Sifat | Nilai |
+|---|---|
+| run_id | `server-lanjut-20261116060747-8a1324b` |
+| guard | parity count 360× + guard match 360× + warmup 18× = **738**, 0 gagal |
+| validator | `PASS` |
+| record | `reports/nd13/server-lanjut-20261116060747-8a1324b-nd9-cost-saq_server.record.json` (+ sidecar `reports/registry/`) |
+
+### Hasil server (median per-op, ms; komposisi dalam-run)
+
+| dokumen | bytes | **s2-open (fused)** | s2a-carve | s2b-scan | s2c-match | Σ sub / fused | scan% | match% |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| courses | 3.993 | 0,0047 | 0,0002 | 0,0043 | 0,0013 | 1,23× | 73,4% | 22,7% |
+| assistants | 5.614 | 0,0068 | 0,0002 | 0,0061 | 0,0018 | 1,18× | 75,8% | 21,7% |
+| lecturers | 3.582 | 0,0043 | 0,0002 | 0,0040 | 0,0013 | 1,27× | 72,7% | 23,6% |
+| schedules | 39.209 | 0,0428 | 0,0003 | 0,0371 | 0,0090 | 1,08× | 79,9% | 19,5% |
+| reports | 35.623 | 0,0336 | 0,0003 | 0,0295 | 0,0063 | 1,07× | 81,8% | 17,5% |
+| globalConfig | 360 | 0,0010 | 0,0002 | 0,0011 | 0,0008 | 2,02× | 53,0% | 37,3% |
+
+Per siklus penuh: s1-copy 0,0079 · **s2-open 0,0933** · s3-count 0,0118 ·
+s4-close 0,0029 · s5-boundary ≈ 0 — s2-open tetap ~88% dari Σ (pola ND-9).
+
+### Verdict server — pertanyaan terbuka ND-9 terjawab
+
+Pertanyaan ND-9: *"gap +38% open di server menempel di scan atau
+match?"* → **keduanya, dengan share match lebih besar di server**:
+scan tetap dominan (73–82% pada KB-scale, identik pola dev), tetapi
+porsi match 17,5–23,6% di server vs 7,2–15,2% di dev run 0.3.0 —
+pass pairing memakan share lebih besar pada mesin server. Dampak
+praktis: kandidat optimasi open berikutnya (O2 pass pairing) berlaku
+untuk **kedua site**, bukan dev-saja. (Status: share match masih ~21%
+pasca-O2-2 — kandidat O2 pass pairing tetap terbuka, sudah dicatat di
+O2-2.)
 
 ## 6. Gate kebenaran ze_json v5 (PR #42, merged `22e939c`)
 
