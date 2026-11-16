@@ -276,8 +276,17 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   §7)**: matriks di-refresh di core 0.3.2 — fase D mongo-cache 2,88×
   (p95 3,25×); vintage chart `post-o2` (server panel = PENDING) +
   `o2-ladder` (dua window sandwich); 16 chart tak terpakai dihapus.
-  Lanjut: sesi server terpadu (ND-13 + ND-14
-  server) + ND-11 Senin.
+  **Sesi server terpadu TEREKSEKUSI 2026-11-16** (addendum ND-14
+  §8 + ND-13 §5): probe `s2-open` + matriks A–D di `saq_server` —
+  root `8a1324b`, core 0.3.2, wasm `9795f2e8…` byte-identik
+  (scp+sidecar+gate `-VerifyOnly`), 5 record validator PASS
+  (`reports/nd14/` + `reports/nd13/`). **Fase D mongo-cache 2,67×
+  (p95 2,49×) ≥ 1,5× — ACCEPTANCE TERCAPAI DI KEDUA SITE** (dev
+  2,88×); file-store 0,99×; fase C server menang schedules 1,50×/
+  assistants 1,42×; probe: scan 73–82% dominan, match share server
+  17,5–23,6% (dev 7–15%) — pertanyaan ND-9 terjawab, kandidat O2
+  pass pairing berlaku kedua site. Sisa terbuka: ND-11 (Phase E HTTP
+  end-to-end).
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 

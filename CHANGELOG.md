@@ -1,11 +1,46 @@
-# Changelog — Workspace Skripsi v5
+# Changelog - Workspace Skripsi v5
 
-Riwayat perubahan workspace thesis (root `v5`). Entri berbasis tanggal —
+Riwayat perubahan workspace thesis (root `v5`). Entri berbasis tanggal -
 workspace ini bukan paket yang dirilis; versi dari artefak terkait
 (`ze_json` 0.1.x, npm `@zuudevs/ze-json`) tercatat di changelog masing-masing
 repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## 2026-11-13 — AUD-1: audit artefak & protokol ND-6
+## 2026-11-16 - Sesi server terpadu: ND-13 probe + matriks ND-14 di saq_server
+
+### Added
+
+- 5 record `saq_server` PASS validator + raw exhibit: probe ND-13
+  (`server-lanjut-20261116060747-8a1324b`) + fase A–D ND-6
+  (`…060843/060900/060915/060933-8a1324b`) — root `8a1324b`, ze_json
+  `01a143f` (core 0.3.2, abi `2026000302`), wasm `9795f2e8…`
+  **byte-identik** dev/server (scp + sidecar + gate
+  `build-wasm.ps1 -VerifyOnly` 26 ekspor v5), Node 26.13.1, tree bersih.
+  Arsip `reports/nd14/` (4 record) + `reports/nd13/` (probe) + sidecar
+  `reports/registry/` (5 run).
+- Addendum laporan: `reports/nd14-post-o2-matrix.md` §8 (panel server) +
+  `reports/nd13-open-decomposition.md` §5 (hasil dekomposisi server).
+
+### Changed
+
+- Chart `post-o2` regenerated dengan panel server terisi
+  (`nd6_summary_chart.py`: `RUNS_POST_O2` + label/judul/footnote; arsip
+  `reports/charts/`); CSV `out/charts/data/post-o2-*.csv`.
+- Sinkronisasi `docs/project/tasks.md` (ND-13, ND-14, O2-1 follow-up) +
+  `docs/project/plans.md` (P8-3).
+
+### Verdict
+
+- **Fase D mongo-cache ≥ 1,5× DI KEDUA SITE** — dev 2,88× (p95 3,25×) ·
+  server **2,67×** (p95 2,49×); file-store 0,99× (I/O-bound); fase C
+  server kini menang schedules 1,50× + assistants 1,42× (era ND-12:
+  kalah semua). Fase A/B tetap <1× (konsisten).
+- Pertanyaan terbuka ND-9 terjawab: gap open di server menempel di
+  scan **dan** match (scan 73–82% dominan; share match server
+  17,5–23,6% vs dev 7–15%) → kandidat O2 pass pairing berlaku kedua site.
+- Sisa terbuka: ND-11 (Phase E HTTP end-to-end) — prasyarat "server
+  bersih D dulu" kini terpenuhi.
+
+## 2026-11-13 - AUD-1: audit artefak & protokol ND-6
 
 Audit berbasis source + re-validasi dari file (bukan ringkasan). Tidak ada
 angka benchmark baru; eksekusi ukur berikutnya menunggu tree bersih.
