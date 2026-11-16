@@ -1049,8 +1049,22 @@
   endpoint penuh). Record PASS `reports/nd11/` (sidecar
   `reports/registry/`); laporan `reports/nd11-phase-e-dev.md`; as-built di
   `docs/measurement/nd11-phase-e-http.md` §6. **Server run menyusul**
-  (skrip identik, store LIVE, boot apa adanya) — prasyarat urutan ND-11
-  §5 kini terpenuhi (re-run bersih D server = ND-14 §8).
+  (skrip identik, store LIVE, arsitektur koeksistensi — produksi utuh,
+  WA/cron produksi AKTIF) — prasyarat urutan ND-11 §5 kini terpenuhi
+  (re-run bersih D server = ND-14 §8).
+- [x] **ND-11.a** — Audit koeksistensi + hardening harness **SELESAI
+  2026-11-17**: verdict **SAFE WITH CHANGES** — 4 temuan
+  (health-check menerima status apa pun; tanpa preflight port; bind
+  0.0.0.0 dengan 20 endpoint mutasi + lazy-init WA via
+  `POST /whatsapp/restart`; seed-on-empty `MongoJsonRepository.init()`
+  menulis ke DB produksi). Diterapkan: preflight port wajib kosong +
+  health 200 & boot-marker child + abort child-exit instan; guard
+  seed (preflight count `json_store` + boot-log marker) di mode
+  `--coexist-prod-port`; metadata `config.coexistence`; knob
+  `SAQ_BIND_HOST` (saq-report `0a62581`, env-absen = perilaku
+  produksi eksisting); koreksi dokumen "boot apa adanya". Laporan:
+  `reports/nd11-coexistence-audit.md` (risiko, bukti file:line,
+  runbook, acceptance criteria).
 
 ## P8 — Chart progres benchmark & pelengkapan Bab 3 (2026-11-13)
 

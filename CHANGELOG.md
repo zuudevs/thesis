@@ -5,6 +5,45 @@ workspace ini bukan paket yang dirilis; versi dari artefak terkait
 (`ze_json` 0.1.x, npm `@zuudevs/ze-json`) tercatat di changelog masing-masing
 repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 2026-11-17 - ND-11.a: audit koeksistensi + hardening harness
+
+### Added
+
+- `reports/nd11-coexistence-audit.md` — audit read-only (verdict **SAFE
+  WITH CHANGES**) untuk menjalankan dua instance benchmark ND-11
+  berdampingan dengan SAQ Production di host yang sama: 4 temuan
+  berbasis source code (health-check menerima status HTTP apa pun;
+  tanpa preflight port; bind 0.0.0.0 dengan endpoint mutasi +
+  `express.static(ROOT)` + lazy-init WA via `POST /whatsapp/restart`;
+  seed-on-empty `MongoJsonRepository.init()` menulis ke DB produksi),
+  risk register file:line, runbook server, acceptance criteria.
+- Harness `scripts/bench/nd11_phase_e.mjs`: preflight port wajib
+  kosong sebelum spawn; health = HTTP 200 **dan** boot-marker
+  `Server berjalan di http://localhost:<port>` di stdout **child
+  kita** (identitas terikat proses, bukan port); abort void instan
+  saat child exit; mode koeksistensi `--coexist-prod-port` → preflight
+  count `json_store` (read-only) + boot-log seed guard (benchmark
+  tidak boleh memicu seed ke DB produksi); metadata
+  `config.coexistence` di record + exhibit; kedua child bind
+  127.0.0.1.
+
+### Changed
+
+- `saq-report` — knob boot-level `SAQ_BIND_HOST`
+  (`server.listen(PORT, env || undefined)`, env-absen = perilaku
+  eksisting); pin `0a62581` (PR saq-report).
+- Koreksi dokumen yang bertentangan dengan implementasi: kalimat
+  "boot apa adanya" pada design doc §6 / laporan dev §5 / plans /
+  tasks → arsitektur koeksistensi (produksi utuh, gate pada instance
+  benchmark).
+
+### Notes
+
+- Tidak menyentuh handler/route/template/repository read-path/parity
+  gate/schema record; knob `SAQ_BIND_HOST` satu kelas dengan gate
+  `SAQ_DISABLE_WHATSAPP` (PR saq-report #5) — perilaku produksi tidak
+  berubah.
+
 ## 2026-11-16 - Sesi server terpadu: ND-13 probe + matriks ND-14 di saq_server
 
 ### Added

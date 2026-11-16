@@ -68,9 +68,11 @@ mengukur apa yang benar-benar ditanggung endpoint.
 
 ## 5. Lanjutan
 
-- **Server run (saq_server)**: skrip identik, store LIVE, boot apa adanya
-  (`SAQ_DISABLE_WHATSAPP` tidak berlaku — WA aktif sebagai kondisi
-  produksi, dinyatakan di laporan); urutan sesuai ND-11 §5.
+- **Server run (saq_server)**: skrip identik, store LIVE, **arsitektur
+  koeksistensi** hasil audit 2026-11-17 — SAQ Production utuh di host
+  yang sama (WA + cron AKTIF, tidak disentuh); dua instance benchmark
+  nonaktif WA/cron + bind 127.0.0.1 (`--coexist-prod-port`); lihat
+  `reports/nd11-coexistence-audit.md`.
 - Opsional (keputusan pemilik): boundary lebih berat (`/rekap/asisten`,
   read+enrich penuh) untuk mengukur apakah keunggulan count-only
   bertahan saat decode per-item dominan.
