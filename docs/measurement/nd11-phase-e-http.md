@@ -53,3 +53,21 @@ Bagian yang TIDAK termasuk: database eksternal (store lokal SAQ), browser.
 - Tidak mengubah handler/route/template; tidak menambah cache baru;
   tidak menjalankan E sebelum re-run bersih D server (urutan prioritas:
   server bersih dulu → dev Node 26 → ND-9 → E).
+
+## 6. As-built dev (2026-11-16) — beda dari desain, dicatat
+
+Eksekusi dev (`reports/nd11-phase-e-dev.md`, run
+`zuu-20261116101458-8556513`, record PASS) — implementasi dulu di device,
+server menyusul. Deviasi protokol dari §3 (semua lebih ketat):
+
+| Aspek | Desain §3 | As-built |
+|---|---|---|
+| Alternation | v8↔ze per **ronde** | per **request** (offset rotasi per ronde) |
+| Sampel | 1 request/engine/ronde (n=15) | 20 request/engine/ronde (n=150) — presisi median |
+| Parity | body HTML byte-identik per ronde | **1 hash unik untuk seluruh 300 request** (kedua engine) — lebih ketat |
+| Boot | npm install + 2 instance | + boot gate `SAQ_DISABLE_WHATSAPP=1` (saq-report PR #5 — puppeteer WA + cron dimatikan; handler/route/template tak diubah) + mongod lokal + store korpus anonim (sha per file tercatat) |
+
+Hasil: median v8 4,397 ms vs ze 4,085 ms → **speedup in-run 1,08×** (p95
+1,035×; paired per-ronde 1,048×) — non-parser ~95% waktu request; verdict
+§3 laporan. **Server run**: skrip identik, store LIVE, boot apa adanya
+(gate WA tidak berlaku — WA aktif sebagai kondisi, dinyatakan).

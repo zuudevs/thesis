@@ -91,9 +91,16 @@ disimpan apa adanya di `reports/nd6/` (exhibit, tidak diubah).
   **fase D mongo-cache ≥1,5× DI KEDUA SITE** (dev 2,88× p95 3,25×;
   server **2,67×** p95 2,49×); chart vintage `post-o2` terisi penuh.
   Arsip `nd14/`.
-- Desain Phase E (HTTP end-to-end, belum dieksekusi):
+- Desain Phase E (HTTP end-to-end):
   [`../docs/measurement/nd11-phase-e-http.md`](../docs/measurement/nd11-phase-e-http.md) —
-  prasyarat "re-run bersih D di server" kini terpenuhi (ND-14 §8).
+  prasyarat "re-run bersih D di server" kini terpenuhi (ND-14 §8);
+  **dev tereksekusi** — lihat di bawah.
+- [`nd11-phase-e-dev.md`](nd11-phase-e-dev.md) — **ND-11 Phase E (dev,
+  2026-11-16)**: `GET /rekap` HTTP end-to-end, 2 instance localhost
+  (engine toggle saja), parity byte-identical 300 request — **speedup
+  in-run 1,08×** (median; p95 1,035×); non-parser ~95% waktu request →
+  keunggulan parser terkompresi dari fase D. Arsip `nd11/`. Server run
+  (store LIVE) menyusul.
 
 ### Loop O2 — optimasi scanner (2026-11-15/16)
 - [`O2-1-interior-skip.md`](O2-1-interior-skip.md) — `scanner8` interior

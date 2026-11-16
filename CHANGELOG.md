@@ -40,6 +40,42 @@ repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Sisa terbuka: ND-11 (Phase E HTTP end-to-end) — prasyarat "server
   bersih D dulu" kini terpenuhi.
 
+## 2026-11-16 - ND-11 Phase E (HTTP end-to-end) di dev + sinkronisasi laporan
+
+### Added
+
+- Harness `scripts/bench/nd11_phase_e.mjs` (root) — ukur `GET /rekap`
+  **end-to-end**: 2 instance aplikasi di localhost (v8 vs
+  `SAQ_JSON_ENGINE=ze`, kode+store identik, toggle engine saja),
+  warmup untimed, 15 ronde × 20 request/engine dengan alternation
+  per-request, tanpa trimming; parity gate byte-identical (1 hash unik
+  untuk 300 request — mismatch = run void); record schema v1.0.0 +
+  exhibit per-request. As-built dev di `docs/measurement/nd11-phase-e-http.md` §6.
+- Boot gate `SAQ_DISABLE_WHATSAPP=1` di `saq-report` (PR saq-report #5
+  → `501cc03`) — puppeteer WA + cron reminder dimatikan saat pengukuran;
+  handler/route/template aplikasi tidak diubah.
+- Laporan [`reports/nd11-phase-e-dev.md`](reports/nd11-phase-e-dev.md) +
+  arsip record/exhibit `reports/nd11/` + sidecar `reports/registry/`.
+- Sinkronisasi laporan: `reports/README.md` indeks (ND-13/ND-14/O2-1/O2-2
+  + catatan tautan ND-7/ND-8), klaim "pending" di O2-1/O2-2/ND-14
+  diganti pointer sesi server terpadu (PR #72).
+
+### Changed
+
+- Submodule `saq-report` `8c7f2d4` → `501cc03` (root PR #73).
+- `chore`: ignore `dashboard/` scratch dir (PR #74) — syarat tree bersih
+  untuk acceptance run.
+
+### Verdict
+
+- **Phase E dev: speedup in-run 1,08×** (median v8 4,397 ms vs ze 4,085
+  ms; p95 1,035×; paired per-ronde 1,048×) — non-parser ~95% waktu
+  request → keunggulan parser terkompresi dari 2,88×/2,67× (fase D) di
+  endpoint render-penuh; parity byte-identical 300 request. Temuan
+  menjawab RQ: manfaat muncul di jalur count/read-only, bukan endpoint
+  penuh. Sisa: server run (store LIVE, boot apa adanya) + opsional
+  boundary berat (`/rekap/asisten`).
+
 ## 2026-11-13 - AUD-1: audit artefak & protokol ND-6
 
 Audit berbasis source + re-validasi dari file (bukan ringkasan). Tidak ada
