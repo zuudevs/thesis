@@ -3,6 +3,7 @@
 .cache/
 out/
 data/
+dashboard/
 
 compile_commands.json
 
