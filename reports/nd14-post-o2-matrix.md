@@ -1,7 +1,9 @@
-# ND-14 — Matriks ND-6 pasca-O2 (dev tereksekusi; server pending)
+# ND-14 — Matriks ND-6 pasca-O2 (dev + server tereksekusi)
 
-Tanggal: 2026-11-15. Re-measure matriks 4 fase ND-6 di atas core **0.3.1**
-(O2-1 interior fast skip, wasm `1d8960c9…`) — pola ND-12 (pasca-O1).
+Tanggal: 2026-11-15 (dev; server 2026-11-16). Re-measure matriks 4 fase
+ND-6 di atas core **0.3.1** (O2-1 interior fast skip, wasm `1d8960c9…`),
+refresh di **0.3.2** (O2-2) §7, lalu **sesi server terpadu** §8 — pola
+ND-12 (pasca-O1).
 Pertanyaan acceptance: **rasio fase D ≥1,5× per site** (AGENTS §6).
 
 ## 1. Identitas run (dev, tree bersih)
@@ -119,7 +121,7 @@ dirender "pending"; master `out/charts/`, arsip SVG ter-commit di
 
 | Figure | Isi |
 |---|---|
-| `post-o2-summary-map.svg` | heatmap speedup pasca-O2 dev + panel server PENDING |
+| `post-o2-summary-map.svg` | heatmap speedup pasca-O2 dev + panel server (terisi 2026-11-16, §8) |
 | `post-o2-acceptance.svg` | fase D dev 2,88× vs target 1,5× + tren 1,48→2,40→2,88 |
 | `o2-ladder.svg` (`scripts/o2_ladder_chart.py`) | ladder s2-open S0 0.3.0 → S1 0.3.1 (O2-1) → S2 0.3.2 (O2-2), dua window sandwich eksplisit; gain dinilai dalam-window |
 | `post-o1-*`, `nd6-*`, `nd10-*` | vintage historis tetap (regenerated) |

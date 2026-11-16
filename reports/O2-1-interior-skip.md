@@ -74,15 +74,20 @@ penuh (diferensial byte-identity + sanitize + wasm differential 71×5 +
 - s2-open kini ~0,09 ms Σmedian: komposisi baru = scan ~0,085 (masih
   dominan), match ~0,014, carve ~0,001 — **kandidat O2-2 (SWAR interior
   skip) layak diukur** bila profil menunjukkan interior masih dominan.
-- Kaitan ND-9/ND-10: gap hardware server-vs-dev di open (+38%) akan
-  diuji ulang saat run server pasca-O2.
+- Kaitan ND-9/ND-10: gap hardware server-vs-dev di open (+38%) —
+  **teruji 2026-11-16**: match share naik di server (17,5–23,6% vs
+  7–15% dev) tapi scan tetap dominan 73–82%; lihat
+  `reports/nd13-open-decomposition.md` §5.
 
 ## 4. Batas klaim
 
 - Bukti = perbandingan baseline↔kandidat **run berbeda** (satu kode satu
   run_id) dalam satu window, tree bersih keduanya, preset/korpus/protokol
   identik, artifact sha ter-catat di record — pola P4-2/C2/R5-9.
-- Mesin: `dev_device` saja; server menyusul (saat reachable).
+- Mesin: `dev_device` saja ~~; server menyusul (saat reachable)~~ →
+  diuji di sesi terpadu 2026-11-16: `reports/nd13-open-decomposition.md`
+  §5 (scan tetap dominan 73–82% di server) +
+  `reports/nd14-post-o2-matrix.md` §8 (fase D server 2,67×).
 - `globalConfig` (360 B) −30% tapi tetap call-boundary-dominated
   (Σ sub / fused 1,96× era ND-13) — tidak diekstrapolasi ke payload
   yang lebih kecil.
