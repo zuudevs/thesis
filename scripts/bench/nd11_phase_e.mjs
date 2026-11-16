@@ -282,8 +282,12 @@ function preflightMongoCounts() {
 // ND-11 coexistence preflight (read-only): hitung doc per storeKey di
 // json_store DB produksi; exit 3 bila ada yang kosong (seed-to-prod guard).
 const path = require('path');
-require('dotenv').config({ path: path.join(process.cwd(), '.env') });
-const { MongoClient } = require('mongodb');
+// Resolusi modul dari node_modules APP (cwd = dir saq-report), bukan dari
+// lokasi file script ini (out/raw/... — tanpa node_modules sendiri).
+const requireFromApp = module.createRequire(path.join(process.cwd(),
+    'package.json'));
+requireFromApp('dotenv').config({ path: path.join(process.cwd(), '.env') });
+const { MongoClient } = requireFromApp('mongodb');
 const KEYS = ['assistants', 'courses', 'lecturers', 'schedules', 'reports',
     'globalConfig'];
 (async () => {
