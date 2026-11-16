@@ -285,8 +285,18 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   2,88×); file-store 0,99×; fase C server menang schedules 1,50×/
   assistants 1,42×; probe: scan 73–82% dominan, match share server
   17,5–23,6% (dev 7–15%) — pertanyaan ND-9 terjawab, kandidat O2
-  pass pairing berlaku kedua site. Sisa terbuka: ND-11 (Phase E HTTP
-  end-to-end).
+  pass pairing berlaku kedua site. **ND-11 (Phase E HTTP end-to-end) —
+  dev TEREKSEKUSI 2026-11-16** (instruksi pemilik: implementasi di device
+  dulu, server menyusul): harness `scripts/bench/nd11_phase_e.mjs` + boot
+  gate `SAQ_DISABLE_WHATSAPP` (saq-report PR #5 — handler/route tak
+  diubah); run `zuu-20261116101458-8556513`, record PASS `reports/nd11/`.
+  **Verdict: speedup in-run 1,08×** (median 4,397→4,085 ms; p95
+  1,035×; paired per-ronde 1,048×) — non-parser ~95% waktu request
+  → keunggulan parser terkompresi dari 2,88×/2,67× (fase D) di
+  endpoint render-penuh; parity byte-identical 300 request (1 hash).
+  Laporan: `reports/nd11-phase-e-dev.md`. **Sisa terbuka: server run**
+  (skrip identik, store LIVE, boot apa adanya) + opsional boundary berat
+  (`/rekap/asisten`).
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 

@@ -1032,6 +1032,25 @@
   relevan untuk jalur materialisasi A/B (re-entry per value), bukan fase D.
   Gap hardware terlokalisasi di open (+38% server) — konsisten sisa gap
   ND-10 (1,13× vs 1,45×). Laporan: `reports/nd9-cost-diagnosis.md`.
+- [x] **ND-11 (Phase E, dev)** — HTTP `GET /rekap` **end-to-end**
+  **TEREKSEKUSI 2026-11-16 di dev_device** (implementasi + ukur penuh;
+  instruksi pemilik: implementasi di device dulu, server menyusul):
+  harness `scripts/bench/nd11_phase_e.mjs` (2 instance localhost —
+  v8 port 3000 vs `SAQ_JSON_ENGINE=ze` port 3001, kode + store identik,
+  toggle engine saja), boot gate `SAQ_DISABLE_WHATSAPP=1` (saq-report PR
+  #5 — puppeteer WA + cron dimatikan; handler/route/template aplikasi tak
+  diubah), mongod lokal + store korpus anonim (sha256 per file tercatat),
+  warmup 3, 15 ronde × 20 request/engine, alternation per-request, tanpa
+  trimming, **parity gate byte-identical: 1 hash unik untuk 300 request**.
+  **Verdict: speedup in-run 1,08×** (median 4,397 → 4,085 ms; p95 1,035×;
+  paired per-ronde 1,048×) — non-parser ~95% waktu request → keunggulan
+  parser terkompresi dari 2,88×/2,67× (fase D) di endpoint render-penuh;
+  temuan menjawab RQ (manfaat muncul di jalur count/read-only, bukan
+  endpoint penuh). Record PASS `reports/nd11/` (sidecar
+  `reports/registry/`); laporan `reports/nd11-phase-e-dev.md`; as-built di
+  `docs/measurement/nd11-phase-e-http.md` §6. **Server run menyusul**
+  (skrip identik, store LIVE, boot apa adanya) — prasyarat urutan ND-11
+  §5 kini terpenuhi (re-run bersih D server = ND-14 §8).
 
 ## P8 — Chart progres benchmark & pelengkapan Bab 3 (2026-11-13)
 
