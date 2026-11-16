@@ -299,7 +299,7 @@ const KEYS = ['assistants', 'courses', 'lecturers', 'schedules', 'reports',
     const counts = {};
     for (const k of KEYS) counts[k] = await col.countDocuments({ key: k });
     await mc.close();
-    console.log(JSON.stringify(counts));
+    console.log('COUNTS_JSON=' + JSON.stringify(counts));
     const empty = KEYS.filter((k) => counts[k] === 0);
     if (empty.length) {
         console.error('EMPTY_KEYS=' + empty.join(','));
@@ -310,7 +310,11 @@ const KEYS = ['assistants', 'courses', 'lecturers', 'schedules', 'reports',
     const out = String(execSync(`"${process.execPath}" "${scriptPath}"`, {
         cwd: SAQ_DIR, encoding: 'utf8', windowsHide: true,
     })).trim();
-    return JSON.parse(out);
+    const jsonLine = out.split('\n')
+        .map((l) => l.trim())
+        .find((l) => l.startsWith('COUNTS_JSON='));
+    if (!jsonLine) throw new Error(`no COUNTS_JSON in preflight output: ${out}`);
+    return JSON.parse(jsonLine.slice('COUNTS_JSON='.length));
 }
 
 async function requestOnce(port) {
