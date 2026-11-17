@@ -5,6 +5,52 @@ workspace ini bukan paket yang dirilis; versi dari artefak terkait
 (`ze_json` 0.1.x, npm `@zuudevs/ze-json`) tercatat di changelog masing-masing
 repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 2026-11-17 - Sintesis Phase D ↔ Phase E (audit bukti + rekalkulasi, tanpa eksperimen baru)
+
+### Added
+
+- Script analisis `scripts/analyze_measurement/nd_d_e_synthesis.py` —
+  rekalkulasi independen Phase D (ND-14) + Phase E (ND-11) dari record PASS
+  + exhibit mentah; inferensi level-ronde (bootstrap berpasangan B=10.000
+  seed 20261117, sign test eksak, Wilcoxon exact); rekonsiliasi terhadap
+  record (tol 1e-5/1e-9) — exit 0, rerun deterministik (CSV/PNG/SVG
+  byte-identik).
+- CSV + figur + provenance: `out/charts/data/nd-*.csv`, 4 figur
+  `out/charts/nd-de-*.{png,svg}` (PNG ≥300 DPI + SVG), `fig1-architecture.mmd`,
+  `nd-de-synthesis-provenance.json` (sha256 semua input, timestamp-free).
+- Laporan sintesis `reports/nd11-phase-d-e-synthesis.md`: klasifikasi bukti
+  (primary/supporting/pilot/context), indeks kompresi C deskriptif
+  (dev 2,68/2,77; server 2,35), pemetaan RQ1–RQ3 + H₀/H₁ proposal verbatim,
+  5 klaim berbukti, threats to validity. Arsip aset di `reports/charts/`.
+
+### Changed
+
+- **Koreksi protokol ND-11 Phase E** (dibaca dari source harness
+  `nd11_phase_e.mjs` L423–431): 15 ronde × **20 request/ronde TOTAL**
+  (10 v8 + 10 ze), n=150/engine, 300 total — dokumentasi lama yang menulis
+  "20 request per engine" salah baca field `reps_per_round` (ambiguitas
+  Phase D=2/engine/ronde vs Phase E=20 TOTAL/ronde didokumentasikan).
+  Dikoreksi di `reports/nd11-phase-e-dev.md`, `nd11-phase-e-server.md`,
+  `nd11-coexistence-audit.md`, `docs/measurement/nd11-phase-e-http.md`
+  (status "belum dieksekusi" → TEREKSEKUSI + taut laporan),
+  `docs/project/tasks.md`. Raw/record tidak diubah retroaktif.
+- Verifikasi source `/rekap/asisten` (saq-report `rekapRoutes.js` L58/67–69:
+  `.read()` + enrichment penuh, tanpa `readCount()`/gate engine) —
+  rekomendasi: tidak dijadikan eksperimen lanjutan (butuh kode baru; tidak
+  mengukur sistem eksisting).
+
+### Notes
+
+- Audit validator: 67/67 record arsip PASS; integritas arsip sehat
+  (63 file berbeda-byte vs `out/raw` = EOL-normalized identik; 22 exhibit
+  era ND-10 disimpan langsung di arsip).
+- Verdict sintesis: acceptance fase D ≥1,5× tercapai di kedua site (dev
+  2,880×, server 2,665× — jalur mongo-cache); file-store parity
+  (0,95×/0,99× — keunggulan tidak generik di lapisan repository); Phase E
+  signifikan hanya di server (1,134×, 15/15 ronde, p=6,1e-5) — dev
+  1,076×/1,041× dengan CI mencakup 1,0 (H₀ proposal tidak tertolak di
+  boundary ini).
+
 ## 2026-11-17 - ND-11 Phase E di saq_server (koeksistensi penuh dengan produksi)
 
 ### Added
@@ -141,10 +187,13 @@ repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Harness `scripts/bench/nd11_phase_e.mjs` (root) — ukur `GET /rekap`
   **end-to-end**: 2 instance aplikasi di localhost (v8 vs
   `SAQ_JSON_ENGINE=ze`, kode+store identik, toggle engine saja),
-  warmup untimed, 15 ronde × 20 request/engine dengan alternation
+  warmup untimed, 15 ronde × 20 request/ronde TOTAL (10 v8 + 10 ze)
+  dengan alternation
   per-request, tanpa trimming; parity gate byte-identical (1 hash unik
   untuk 300 request — mismatch = run void); record schema v1.0.0 +
   exhibit per-request. As-built dev di `docs/measurement/nd11-phase-e-http.md` §6.
+  *(Errata 2026-11-17: semula tertulis "20 request/engine" — salah baca
+  field `reps_per_round`; lihat `reports/nd11-phase-d-e-synthesis.md` §3.)*
 - Boot gate `SAQ_DISABLE_WHATSAPP=1` di `saq-report` (PR saq-report #5
   → `501cc03`) — puppeteer WA + cron reminder dimatikan saat pengukuran;
   handler/route/template aplikasi tidak diubah.
