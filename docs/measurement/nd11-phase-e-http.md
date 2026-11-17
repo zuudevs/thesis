@@ -83,3 +83,23 @@ port; bind 0.0.0.0 dengan endpoint mutasi + lazy-init WA; seed-on-empty
 menulis ke DB produksi). Hardening E1–E5 diterapkan di harness +
 knob `SAQ_BIND_HOST` (saq-report) — detail risiko/bukti/runbook/acceptance
 criteria di [`../../reports/nd11-coexistence-audit.md`](../../reports/nd11-coexistence-audit.md).
+
+## 8. As-built server (2026-11-17) — koeksistensi penuh
+
+Eksekusi server (`reports/nd11-phase-e-server.md`, run
+`server-lanjut-20261117003513-530f751`, record PASS) — produksi utuh
+(pid 15640, WA `ready`, cron aktif), benchmark membaca store LIVE yang
+sama (mongo lokal `test`, dibuktikan render-identik + koneksi established
+produksi; URI non-sekret via env sesi karena server tidak memakai
+`.env`). Deviasi/as-built tambahan dari §6:
+
+| Aspek | As-built dev §6 | As-built server §8 |
+|---|---|---|
+| Store | korpus anonim di-copy ke `saq-report/` | **LIVE mongo `127.0.0.1:27017/test`** (6 file seed tetap di-copy, sha256 == MANIFEST — provenance saja) |
+| Guard koeksistensi | off (tidak ada produksi) | **on**: preflight counts + boot-log seed guard + bind loopback (`--coexist-prod-port 3000`) |
+| Port | 3000/3001 | 3100/3101 (produksi = 3000) |
+| Monitoring | — | snapshot produksi tiap 5 s selama run (pid/cpu/ws/rekap/RAM/bench ports); `/rekap` produksi 200 di semua snapshot |
+| Hasil | 1,08× (paired 1,048×; cv 18–19%) | **1,13× (paired 1,133×; ze menang 15/15; cv 6,9–9,5%)** |
+
+Lintas-site (dev vs server) = narasi riset — mesin/hash berbeda; bukti =
+rasio in-run per site.

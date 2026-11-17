@@ -106,18 +106,24 @@ menutup; menghindari perubahan perilaku app tambahan).
 
 ## 5. Acceptance criteria
 
-- [ ] Production tidak restart (PID sama pre/post)
-- [ ] WA Production authenticated/ready; `.wwebjs_auth` hanya disentuh produksi
-- [ ] Cron Production tidak berubah
-- [ ] Port tidak bentrok (preflight lulus)
-- [ ] Dua benchmark instance teridentifikasi via marker boot-log child + 200
-- [ ] Tidak ada request benchmark ke endpoint mutasi (hanya `GET /rekap`)
-- [ ] Tidak ada mutasi DB tak terduga (count `json_store` pre = post;
+Hasil verifikasi run 2026-11-17 (`server-lanjut-20261117003513-530f751`)
+— semua butir lulus dengan bukti per butir di
+[`reports/nd11-phase-e-server.md`](../reports/nd11-phase-e-server.md) §5
+(pid produksi 15640 utuh; WA `ready`; counts pre=post; parity 1
+hash/300; validator PASS; port bersih pasca-run). Checklist asli:
+
+- [x] Production tidak restart (PID sama pre/post)
+- [x] WA Production authenticated/ready; `.wwebjs_auth` hanya disentuh produksi
+- [x] Cron Production tidak berubah
+- [x] Port tidak bentrok (preflight lulus)
+- [x] Dua benchmark instance teridentifikasi via marker boot-log child + 200
+- [x] Tidak ada request benchmark ke endpoint mutasi (hanya `GET /rekap`)
+- [x] Tidak ada mutasi DB tak terduga (count `json_store` pre = post;
       boot log tanpa seed marker)
-- [ ] Parity gate PASS (1 hash / 300 request)
-- [ ] Validator record PASS + sidecar registry + metadata coexistence
-- [ ] Hanya child benchmark yang dihentikan
-- [ ] Production sehat setelah eksperimen
+- [x] Parity gate PASS (1 hash / 300 request)
+- [x] Validator record PASS + sidecar registry + metadata coexistence
+- [x] Hanya child benchmark yang dihentikan
+- [x] Production sehat setelah eksperimen
 
 ## 6. Batas metodologi (dinyatakan)
 

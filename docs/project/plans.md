@@ -299,10 +299,15 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   preflight port, health 200 & boot-marker child, abort child-exit,
   guard seed-to-prod (`--coexist-prod-port`), knob `SAQ_BIND_HOST`
   (saq-report `0a62581`), metadata coexistence; laporan
-  `reports/nd11-coexistence-audit.md`. **Sisa terbuka: server run**
-  (skrip identik, store LIVE, arsitektur koeksistensi: produksi utuh
-  dengan WA/cron AKTIF, dua instance benchmark nonaktif WA/cron +
-  bind loopback) + opsional boundary berat (`/rekap/asisten`).
+  `reports/nd11-coexistence-audit.md`. **Server run TEREKSEKUSI
+  2026-11-17** (`server-lanjut-20261117003513-530f751`, mode koeksistensi
+  penuh: produksi pid 15640 utuh — WA `ready`, cron aktif, `/rekap` 200
+  di semua snapshot; benchmark baca store LIVE mongo lokal yang sama,
+  provenance render-identik + counts pre=post): **1,13× in-run, ze
+  menang 15/15 ronde** (paired 1,133×; cv 6,9–9,5%; share parser ≈12%);
+  11/11 acceptance criteria lulus; validator PASS. Laporan
+  `reports/nd11-phase-e-server.md`; lintas-site = narasi. Sisa terbuka
+  (opsional): boundary berat (`/rekap/asisten`).
 
 ## 6. Paper kunci (mapping DOI → penggunaan)
 

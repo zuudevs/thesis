@@ -5,6 +5,47 @@ workspace ini bukan paket yang dirilis; versi dari artefak terkait
 (`ze_json` 0.1.x, npm `@zuudevs/ze-json`) tercatat di changelog masing-masing
 repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 2026-11-17 - ND-11 Phase E di saq_server (koeksistensi penuh dengan produksi)
+
+### Added
+
+- Run `server-lanjut-20261117003513-530f751` (root `530f751`, ze_json
+  `01a143f`, saq-report `534d9a8`, wasm `9795f2e8…` byte-identik
+  dev/server) — **speedup in-run 1,13×** (v8 median 5,401 ms vs ze
+  4,764 ms; p95 6,136/5,501 ms; **paired per-ronde 1,133×, ze menang
+  15/15 ronde**; cv 6,9%/9,5% — jauh lebih stabil dari dev), parity 1
+  hash/300 request (`a6236b6c…`), validator **PASS**. Laporan
+  `reports/nd11-phase-e-server.md` + arsip `reports/nd11/` + sidecar
+  `reports/registry/`.
+- **Koeksistensi penuh terverifikasi** — SAQ Production tidak disentuh:
+  pid 15640 utuh di 36 snapshot monitoring, `GET /rekap` produksi 200
+  di semua snapshot (RAM ≤78,5%, CPU produksi +0,3 s), WA produksi
+  `ready` (`GET /whatsapp/status` diagnostics), cron aktif, counts
+  `json_store` pre=post (guard seed aktif, boot log child tanpa seed
+  marker), hanya `GET /rekap` dikirim ke benchmark, port 3100/3101
+  bersih pasca-run. 11/11 acceptance criteria audit §5 lulus.
+- Provenance store LIVE: produksi membaca mongo lokal `test`
+  (8 koneksi established `127.0.0.1:27017`); instance probe
+  `mongodb://127.0.0.1:27017/test` merender `/rekap` **identik
+  teks-per-teks** dengan produksi (beda byte = line-ending template
+  LF vs CRLF antar working copy); hash probe = hash parity run.
+  Temuan operasional: server tanpa `.env` — URI produksi di console
+  pemilik; benchmark diberi URI non-sekret setara via env sesi.
+- Helper server reusable: `scripts/ssh-remote/nd11/`
+  (`nd11_monitor.ps1`, `nd11_json_store_counts.cjs`, `nd11_seed_copy.ps1`).
+- Design doc §8 (as-built server), laporan audit §5 checklist
+  ditandai lulus (bukti per butir di laporan server).
+
+### Notes
+
+- Lintas-site dev 1,04×/1,08× vs server 1,13× = **narasi riset** (mesin
+  + hash berbeda; aturan AGENTS §4). Bukti = rasio in-run per site:
+  dev 1,08× (run 2026-11-16), dev re-run 1,04×, server 1,13×.
+- Percobaan pertama dihentikan harness sendiri (cek file store seed
+  belum ada di server) — perilaku desain; diperbaiki dgn copy 6 file
+  seed korpus (sha256 6/6 == MANIFEST, gitignored, provenance saja —
+  sumber data = Mongo LIVE).
+
 ## 2026-11-17 - ND-11.a: audit koeksistensi + hardening harness
 
 ### Added
