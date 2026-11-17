@@ -1040,8 +1040,10 @@
   toggle engine saja), boot gate `SAQ_DISABLE_WHATSAPP=1` (saq-report PR
   #5 — puppeteer WA + cron dimatikan; handler/route/template aplikasi tak
   diubah), mongod lokal + store korpus anonim (sha256 per file tercatat),
-  warmup 3, 15 ronde × 20 request/engine, alternation per-request, tanpa
-  trimming, **parity gate byte-identical: 1 hash unik untuk 300 request**.
+  warmup 3, 15 ronde × 20 request/ronde TOTAL (10 v8 + 10 ze — field
+  `reps_per_round` di record = total lintas engine), alternation
+  per-request `(r+k)%2`, tanpa trimming, **parity gate byte-identical: 1
+  hash unik untuk 300 request**.
   **Verdict: speedup in-run 1,08×** (median 4,397 → 4,085 ms; p95 1,035×;
   paired per-ronde 1,048×) — non-parser ~95% waktu request → keunggulan
   parser terkompresi dari 2,88×/2,67× (fase D) di endpoint render-penuh;

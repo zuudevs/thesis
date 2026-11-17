@@ -19,7 +19,7 @@ mengukur apa yang benar-benar ditanggung endpoint.
 | Site | `dev_device` (ZenBook UX425UAZ) — tree bersih (tracked), gate fail-fast lulus |
 | Korpus/store | `saq_payload_v1-live-store`: 6 file store anonim di-copy ke `saq-report/` (semua path gitignored), sha256 per file di `extras.store_sha256` record + exhibit |
 | Instance | 2× `node server.js` di localhost: v8 (`SAQ_JSON_ENGINE` kosong) port 3000 · ze (`SAQ_JSON_ENGINE=ze`) port 3001; `SAQ_DISABLE_WHATSAPP=1` di keduanya (saq-report PR #5 — boot WA/cron dimatikan, **handler/route/template tidak diubah**) |
-| Protokol | warmup untimed 3 request/jalur; 15 ronde × 20 request per engine; **alternation v8↔ze per-request** (offset rotasi per ronde); tanpa trimming; n=150/engine; latensi = `performance.now()` di sekitar `fetch` (load generator di mesin yang sama, localhost) |
+| Protokol | warmup untimed 3 request/jalur; 15 ronde × 20 request/ronde **TOTAL** (10 v8 + 10 ze — field record `reps_per_round=20` berarti total lintas engine, bukan per engine); **alternation v8↔ze per-request** (offset rotasi per ronde, `(r+k)%2`); tanpa trimming; n=150/engine (300 total); latensi = `performance.now()` di sekitar `fetch` (load generator di mesin yang sama, localhost) |
 | Parity gate | seluruh respons harus byte-identik: **1 hash unik untuk 300 request** (`a18c7b4a…`) — mismatch = run void. Pilot (2 ronde × 3) hash identik dengan run penuh. |
 | Validator | **PASS** (`out/measurements/…-nd11-phase-e-dev_device.record.json`); arsip `reports/nd11/` + exhibit `reports/nd11/raw/` |
 
@@ -93,7 +93,7 @@ aman untuk koeksistensi dengan SAQ Production.
 | root / ze_json / saq-report | `6979e3f` / `01a143f` (core 0.3.2, js 0.3.0, abi `2026000302` — identik run pertama) / `534d9a8` (knob `SAQ_BIND_HOST`, PR #6) |
 | Mode | normal — **tanpa** `--coexist-prod-port` (di dev tidak ada SAQ Production berjalan; metadata jujur: `production_same_host=false`, write guard off) |
 | Port | 3100 (v8) / 3101 (ze) — preflight wajib-kosong lulus sebelum spawn |
-| Protokol | identik §1: warmup untimed 3, 15 ronde × 20 request/engine, alternation per-request, tanpa trimming, n=150/engine |
+| Protokol | identik §1: warmup untimed 3, 15 ronde × 20 request/ronde TOTAL (10 v8 + 10 ze), alternation per-request, tanpa trimming, n=150/engine (300 total) |
 | Parity gate | 1 hash unik untuk 300 request (`a18c7b4a…` — sama dengan run pertama; store identik) |
 | Validator | **PASS**; arsip `reports/nd11/` + sidecar `reports/registry/zuu-20261117000112-6979e3f.json` |
 

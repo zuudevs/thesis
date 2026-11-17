@@ -1,8 +1,15 @@
 # ND-11 — Desain Phase E: HTTP `/rekap` End-to-End (eksperimen TERPISAH)
 
-> Status: **desain, belum dieksekusi**. Phase E adalah satu-satunya dasar
-> sah untuk klaim "berhasil pada endpoint produksi" — Phase D ND-6 mengukur
-> lapisan repository (lihat errata di plan doc §2 dan AGENTS §6).
+> Status: **TEREKSEKUSI** — dev 2026-11-16 (`zuu-20261116101458-8556513`,
+> re-run `zuu-20261117000112-6979e3f`) dan server 2026-11-17
+> (`server-lanjut-20261117003513-530f751`); laporan:
+> [`reports/nd11-phase-e-dev.md`](../../reports/nd11-phase-e-dev.md) ·
+> [`reports/nd11-phase-e-server.md`](../../reports/nd11-phase-e-server.md) ·
+> sintesis D↔E
+> [`reports/nd11-phase-d-e-synthesis.md`](../../reports/nd11-phase-d-e-synthesis.md).
+> Phase E adalah satu-satunya dasar sah untuk klaim "berhasil pada endpoint
+> produksi" — Phase D ND-6 mengukur lapisan repository (lihat errata di plan
+> doc §2 dan AGENTS §6).
 
 ## 1. Boundary yang diukur
 
@@ -63,7 +70,7 @@ server menyusul. Deviasi protokol dari §3 (semua lebih ketat):
 | Aspek | Desain §3 | As-built |
 |---|---|---|
 | Alternation | v8↔ze per **ronde** | per **request** (offset rotasi per ronde) |
-| Sampel | 1 request/engine/ronde (n=15) | 20 request/engine/ronde (n=150) — presisi median |
+| Sampel | 1 request/engine/ronde (n=15) | 20 request/ronde **TOTAL** (10 v8 + 10 ze; n=150/engine, 300 total) — presisi median |
 | Parity | body HTML byte-identik per ronde | **1 hash unik untuk seluruh 300 request** (kedua engine) — lebih ketat |
 | Boot | npm install + 2 instance | + boot gate `SAQ_DISABLE_WHATSAPP=1` (saq-report PR #5 — puppeteer WA + cron dimatikan; handler/route/template tak diubah) + mongod lokal + store korpus anonim (sha per file tercatat) |
 

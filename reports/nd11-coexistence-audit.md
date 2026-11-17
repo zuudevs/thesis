@@ -56,8 +56,8 @@ harness menang atas `.env` (dotenv v17 non-override, terverifikasi
 | Benchmark ze | 3101 (contoh) | `SAQ_JSON_ENGINE=ze` | nonaktif (sama) | 127.0.0.1 |
 
 Controller = harness: spawn 2 child → preflight → health (200 + marker
-child) → warmup untimed → 15 ronde × 20 request/engine alternation
-per-request → parity byte-identical → record → kill **hanya** child.
+child) → warmup untimed → 15 ronde × 20 request/ronde TOTAL (10 v8 + 10
+ze) alternation per-request → parity byte-identical → record → kill **hanya** child.
 Produksi tidak pernah dihentikan/diubah; benchmark membaca DB produksi
 yang sama (LIVE store) secara read-only.
 
