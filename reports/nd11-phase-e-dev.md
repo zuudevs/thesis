@@ -76,3 +76,43 @@ mengukur apa yang benar-benar ditanggung endpoint.
 - Opsional (keputusan pemilik): boundary lebih berat (`/rekap/asisten`,
   read+enrich penuh) untuk mengukur apakah keunggulan count-only
   bertahan saat decode per-item dominan.
+
+## 6. Re-run pasca-hardening (2026-11-17)
+
+Run penuh kedua di dev dengan harness ter-hardening hasil audit
+ND-11.a (`reports/nd11-coexistence-audit.md`): preflight port wajib
+kosong, health = HTTP 200 + boot-marker child, abort void saat
+child-exit, metadata `config.coexistence`. **Protokol ukur tidak
+berubah** — tujuan run: memverifikasi bahwa hardening tidak menggeser
+protokol dan mengonfirmasi arah temuan §2 dengan harness yang kini
+aman untuk koeksistensi dengan SAQ Production.
+
+| Sifat | Nilai |
+|---|---|
+| run_id | `zuu-20261117000112-6979e3f` |
+| root / ze_json / saq-report | `6979e3f` / `01a143f` (core 0.3.2, js 0.3.0, abi `2026000302` — identik run pertama) / `534d9a8` (knob `SAQ_BIND_HOST`, PR #6) |
+| Mode | normal — **tanpa** `--coexist-prod-port` (di dev tidak ada SAQ Production berjalan; metadata jujur: `production_same_host=false`, write guard off) |
+| Port | 3100 (v8) / 3101 (ze) — preflight wajib-kosong lulus sebelum spawn |
+| Protokol | identik §1: warmup untimed 3, 15 ronde × 20 request/engine, alternation per-request, tanpa trimming, n=150/engine |
+| Parity gate | 1 hash unik untuk 300 request (`a18c7b4a…` — sama dengan run pertama; store identik) |
+| Validator | **PASS**; arsip `reports/nd11/` + sidecar `reports/registry/zuu-20261117000112-6979e3f.json` |
+
+| Jalur | median | p95 | mean | std | cv |
+|---|---:|---:|---:|---:|---:|
+| `E/rekap/v8` | 4,146 ms | 6,504 ms | 4,508 ms | 1,217 ms | 27,0% |
+| `E/rekap/ze` | 3,984 ms | 5,976 ms | 4,243 ms | 0,925 ms | 21,8% |
+
+- **Speedup in-run = 1,04×** (median v8/ze); estimat paired per-ronde:
+  median rasio **1,029×**, ze menang 10/15 ronde — arah konsisten §2.
+- cv lebih tinggi dari run pertama (27,0%/21,8% vs 18,4%/19,5%) — ada
+  satu outlier v8 13,2 ms (laptop, background aktif); median + paired
+  per-ronde menahan dampaknya, parity & protokol utuh.
+- **Lintas-run (1,08× vs 1,04×) = narasi riset, bukan bukti** — hash
+  root berbeda (harness berubah; aturan AGENTS §4: dilarang
+  membandingkan lintas git-hash). Yang konsisten lintas run: arah
+  keunggulan ze kecil (~4–8%) pada boundary HTTP penuh, non-parser
+  ~95% waktu request.
+- Verifikasi guard tampak di exhibit: boot log child memuat
+  "📴 WhatsApp/cron boot dimatikan (SAQ_DISABLE_WHATSAPP=1)"; boot
+  v8 3,78 s vs ze 0,04 s; port 3100/3101 bersih pasca-run (0
+  listener — shutdown bersih).

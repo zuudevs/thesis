@@ -37,6 +37,20 @@ repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   tasks → arsitektur koeksistensi (produksi utuh, gate pada instance
   benchmark).
 
+### Measurement (re-run dev pasca-hardening)
+
+- Run penuh ND-11 Phase E kedua di dev dengan harness ter-hardening
+  (protokol identik): `zuu-20261117000112-6979e3f` — **1,04×** in-run
+  (v8 median 4,146 ms vs ze 3,984 ms; p95 6,504/5,976 ms; paired
+  per-ronde 1,029×, ze menang 10/15), parity 1 hash/300 request
+  (`a18c7b4a…`), validator **PASS**. Lintas-run vs 1,08× (run
+  2026-11-16) = narasi riset (hash root berbeda). Arsip `reports/nd11/`
+  + sidecar `reports/registry/zuu-20261117000112-6979e3f.json`; seksi
+  baru di `reports/nd11-phase-e-dev.md` §6.
+- Pilot verifikasi koeksistensi `zuu-20261116235636-ab255f5`
+  (2 ronde × 3, n=3/engine — dikutip sebagai bukti di PR root #76)
+  diarsipkan permanen: record + exhibit `reports/nd11/`.
+
 ### Notes
 
 - Tidak menyentuh handler/route/template/repository read-path/parity
