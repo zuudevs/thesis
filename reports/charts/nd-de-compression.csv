@@ -1,0 +1,4 @@
+site,S_D_run,S_D_path,S_D_median,S_E_run,S_E_label,S_E_median,C_ratio,note
+dev_device,zuu-20261115080840-6d87bf3,mongo-cache,2.88019732,zuu-20261116101458-8556513,dev run 1,1.07623395,2.67618143,descriptive index across two different boundaries; not a parser-time share
+dev_device,zuu-20261115080840-6d87bf3,mongo-cache,2.88019732,zuu-20261117000112-6979e3f,dev re-run,1.04052206,2.76803102,descriptive index across two different boundaries; not a parser-time share
+saq_server,server-lanjut-20261116060933-8a1324b,mongo-cache,2.6654252,server-lanjut-20261117003513-530f751,server,1.13377835,2.35092265,descriptive index across two different boundaries; not a parser-time share

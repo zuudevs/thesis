@@ -23,7 +23,7 @@ keunggulan jalur ze_json?**
 | Store | **LIVE** — MongoDB lokal `127.0.0.1:27017/test`, koleksi `json_store` (6 storeKey, counts 1/1/1/1/1/1); URI diberikan via env sesi (`mongodb://127.0.0.1:27017/test`, non-sekret) |
 | Instance | 2× `node server.js` localhost: v8 port 3100 · ze (`SAQ_JSON_ENGINE=ze`) port 3101; keduanya `SAQ_DISABLE_WHATSAPP=1` + `SAQ_BIND_HOST=127.0.0.1` |
 | Produksi | pid 15640, `node server.js`, listen port 3000 — **tidak disentuh** (`--coexist-prod-port 3000`; guard aktif) |
-| Protokol | warmup untimed 3 request/jalur; 15 ronde × 20 request/engine; **alternation v8↔ze per-request** (offset rotasi per ronde); tanpa trimming; n=150/engine |
+| Protokol | warmup untimed 3 request/jalur; 15 ronde × 20 request/ronde **TOTAL** (10 v8 + 10 ze); **alternation v8↔ze per-request** (offset rotasi per ronde); tanpa trimming; n=150/engine (300 total) |
 | Parity gate | **1 hash unik untuk 300 request** (`a6236b6c…`) — sama dengan hash probe db-match §2 |
 | Validator | **PASS**; arsip `reports/nd11/` + exhibit + sidecar `reports/registry/` |
 
