@@ -1,0 +1,133 @@
+{
+  "run_id": "zuu-20261116235636-ab255f5",
+  "site": "dev_device",
+  "protocol": {
+    "rounds": 2,
+    "per_round": 3,
+    "warmup": 2,
+    "order": "alternating per-request (round-robin offset per round)",
+    "trimming": "none — every request reported"
+  },
+  "void_reason": null,
+  "coexistence": {
+    "production_same_host": true,
+    "production_port": 3000,
+    "production_untouched": true,
+    "wa_production": "active (untouched)",
+    "cron_production": "active (untouched)",
+    "benchmark_bind_host": "127.0.0.1",
+    "benchmark_whatsapp": "SAQ_DISABLE_WHATSAPP=1 (both benchmark instances)",
+    "write_guard": "preflight json_store counts + refuse on boot seed marker"
+  },
+  "mongo_json_store_counts": {
+    "assistants": 1,
+    "courses": 1,
+    "lecturers": 1,
+    "schedules": 1,
+    "reports": 1,
+    "globalConfig": 1
+  },
+  "boot": {
+    "v8_seconds": 3.7364524,
+    "ze_seconds": 0.04007180000000062,
+    "v8_log": [
+      "◇ injected env (3) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }",
+      "",
+      "✅ [MongoDB] Terhubung ke database via localhost:27017.",
+      "",
+      "[MongoDB] Loaded 'assistants' from MongoDB.",
+      "",
+      "[MongoDB] Loaded 'schedules' from MongoDB.",
+      "",
+      "[MongoDB] Loaded 'reports' from MongoDB.",
+      "",
+      "[MongoDB] Loaded 'globalConfig' from MongoDB.",
+      "",
+      "[MongoDB] Loaded 'courses' from MongoDB.",
+      "",
+      "[MongoDB] Loaded 'lecturers' from MongoDB.",
+      "",
+      "🚀 Server berjalan di http://localhost:3100",
+      "",
+      "📴 WhatsApp/cron boot dimatikan (SAQ_DISABLE_WHATSAPP=1) — mode pengukuran ND-11.",
+      ""
+    ],
+    "ze_log": [
+      "◇ injected env (3) from .env // tip: ◈ secrets for agents [www.dotenvx.com]",
+      "",
+      "✅ [MongoDB] Terhubung ke database via localhost:27017.",
+      "",
+      "[MongoDB] Loaded 'assistants' from MongoDB.",
+      "",
+      "[MongoDB] Loaded 'schedules' from MongoDB.",
+      "",
+      "[MongoDB] Loaded 'reports' from MongoDB.",
+      "",
+      "[MongoDB] Loaded 'globalConfig' from MongoDB.",
+      "",
+      "[MongoDB] Loaded 'courses' from MongoDB.",
+      "",
+      "[MongoDB] Loaded 'lecturers' from MongoDB.",
+      "",
+      "🚀 Server berjalan di http://localhost:3101",
+      "",
+      "📴 WhatsApp/cron boot dimatikan (SAQ_DISABLE_WHATSAPP=1) — mode pengukuran ND-11.",
+      ""
+    ]
+  },
+  "parity": {
+    "unique_response_hashes": 1,
+    "void": false
+  },
+  "speedup_in_run": 0.8661392327789941,
+  "requests": {
+    "v8": [
+      {
+        "round": 1,
+        "seconds": 0.007094199999999546,
+        "body_bytes": 47888,
+        "body_sha256": "a18c7b4a9c3c098143b50fff3f32fbe757f2250b006d0b025fc264c09452ad84"
+      },
+      {
+        "round": 2,
+        "seconds": 0.008025200000000041,
+        "body_bytes": 47888,
+        "body_sha256": "a18c7b4a9c3c098143b50fff3f32fbe757f2250b006d0b025fc264c09452ad84"
+      },
+      {
+        "round": 2,
+        "seconds": 0.0061379999999999196,
+        "body_bytes": 47888,
+        "body_sha256": "a18c7b4a9c3c098143b50fff3f32fbe757f2250b006d0b025fc264c09452ad84"
+      }
+    ],
+    "ze": [
+      {
+        "round": 1,
+        "seconds": 0.009336299999999938,
+        "body_bytes": 47888,
+        "body_sha256": "a18c7b4a9c3c098143b50fff3f32fbe757f2250b006d0b025fc264c09452ad84"
+      },
+      {
+        "round": 1,
+        "seconds": 0.006986700000000383,
+        "body_bytes": 47888,
+        "body_sha256": "a18c7b4a9c3c098143b50fff3f32fbe757f2250b006d0b025fc264c09452ad84"
+      },
+      {
+        "round": 2,
+        "seconds": 0.008190599999999904,
+        "body_bytes": 47888,
+        "body_sha256": "a18c7b4a9c3c098143b50fff3f32fbe757f2250b006d0b025fc264c09452ad84"
+      }
+    ]
+  },
+  "store_sha256": {
+    "config_asisten.json": "8f3d896b141d1172e04b1e8b5ecefbe12895d17fb2963625ce6fbc69f04c0c1e",
+    "config_global.json": "af079aef392c53f07fa9cb268d06410e77bcadb2ff95da3ed4aa5713bc218a0c",
+    "courses.json": "684a5fe266690291139f88a9fd8fe9af0fa37fcd180f2af0de6aa9ec6928134c",
+    "lecturers.json": "a58b7f45dcbf8daa44a2bc16b19a3bcf40d29bf00c6e1a9d15eaf1bafff735e6",
+    "reports.json": "f52c5e4c0a0a07e3fd641c54ca9b5045d3ee55b71b3269d00366809b052705da",
+    "schedules.json": "14c953d6097e53b7c46803cc343b511090106481d4f5412225c7f038d214628e"
+  }
+}

@@ -1048,7 +1048,11 @@
   temuan menjawab RQ (manfaat muncul di jalur count/read-only, bukan
   endpoint penuh). Record PASS `reports/nd11/` (sidecar
   `reports/registry/`); laporan `reports/nd11-phase-e-dev.md`; as-built di
-  `docs/measurement/nd11-phase-e-http.md` §6. **Server run menyusul**
+  `docs/measurement/nd11-phase-e-http.md` §6. **Re-run pasca-hardening
+  2026-11-17** (`zuu-20261117000112-6979e3f`, harness aman-koeksistensi,
+  protokol identik): **1,04×** in-run (paired 1,029×, ze menang 10/15) —
+  arah konsisten dengan run pertama 1,08× (lintas-run = narasi, hash
+  root berbeda); arsip `reports/nd11/`. **Server run menyusul**
   (skrip identik, store LIVE, arsitektur koeksistensi — produksi utuh,
   WA/cron produksi AKTIF) — prasyarat urutan ND-11 §5 kini terpenuhi
   (re-run bersih D server = ND-14 §8).

@@ -99,8 +99,10 @@ disimpan apa adanya di `reports/nd6/` (exhibit, tidak diubah).
   2026-11-16)**: `GET /rekap` HTTP end-to-end, 2 instance localhost
   (engine toggle saja), parity byte-identical 300 request — **speedup
   in-run 1,08×** (median; p95 1,035×); non-parser ~95% waktu request →
-  keunggulan parser terkompresi dari fase D. Arsip `nd11/`. Server run
-  (store LIVE) menyusul.
+  keunggulan parser terkompresi dari fase D. Arsip `nd11/`. Re-run
+  pasca-hardening 2026-11-17 (`zuu-20261117000112-6979e3f`, §6): **1,04×**
+  in-run — arah konsisten (lintas-run = narasi, hash harness berbeda);
+  pilot coexist `ab255f5` diarsipkan. Server run (store LIVE) menyusul.
 - [`nd11-coexistence-audit.md`](nd11-coexistence-audit.md) — **ND-11.a
   audit koeksistensi (2026-11-17)**: verdict **SAFE WITH CHANGES**
   sebelum server run berdampingan dengan SAQ Production — 4 temuan
