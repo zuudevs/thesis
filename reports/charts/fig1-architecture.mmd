@@ -1,0 +1,30 @@
+%% ND-6 Phase D vs ND-11 Phase E measurement boundaries (synthesis figure 1)
+%% Data flow of the SAQ Express app and where each boundary starts/stops.
+flowchart LR
+    subgraph GEN["Load generator (same host, localhost)"]
+        H["nd6_bench.mjs / nd11_phase_e.mjs"]
+    end
+
+    subgraph APP["SAQ Express app - two byte-identical instances<br/>(v8 baseline port A / ze port B, SAQ_JSON_ENGINE toggle)"]
+        MW["Express middleware"] --> RT["GET /rekap handler"]
+        RT --> RP["Repository layer"]
+        RP --> EJ["EJS render"] --> RS["HTTP response"]
+    end
+
+    subgraph REP["Repository internals (per store)"]
+        V8P["baseline: canonical bytes -> JSON.parse / clone -> .length"]
+        ZEP["ze: canonical bytes -> wasm64 C-ABI -> structural scan + count"]
+    end
+
+    subgraph ST["Store"]
+        MG[("dev: anonymized corpus mirror (file / local throwaway Mongo)<br/>server: LIVE MongoDB json_store (counts pre = post)")]
+    end
+
+    H -- "HTTP GET /rekap" --> MW
+    V8P -.-> RP
+    ZEP -.-> RP
+    RP <--> MG
+
+    style MW stroke-dasharray: 3 3
+    classDef dbound stroke:#2E7D32,stroke-width:2px;
+    class V8P,ZEP dbound;

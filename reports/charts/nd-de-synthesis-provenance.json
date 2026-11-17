@@ -1,0 +1,321 @@
+{
+  "compression_index": {
+    "caveat": "crosses boundaries AND saq-report commits; descriptive only",
+    "definition": "C = S_D/S_E (in-run medians)"
+  },
+  "environment": {
+    "matplotlib": "3.11.0",
+    "numpy": "2.4.6",
+    "python": "3.14.5",
+    "scipy": "1.18.1"
+  },
+  "evidence": [
+    {
+      "abi_version": 2026000301,
+      "coexistence_prod_same_host": "n/a",
+      "core_version": "0.3.1",
+      "corpus_manifest_sha16": "9f826c8a0afbe67d",
+      "corpus_store": "saq_payload_v1",
+      "evidence_class": "supporting",
+      "exhibit_source": "out/raw/nd6_phase_D.json",
+      "js_version": "0.3.0",
+      "phase": "D",
+      "protocol": "15 rounds x 2 reps/engine/path; warmup 3; alternating rounds; no trimming; round value = mean of reps (dt/reps)",
+      "root_commit": "3376d07",
+      "run_id": "zuu-20261115010155-3376d07",
+      "runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+      "saq_report_commit": "8c7f2d4",
+      "site": "dev_device",
+      "validator": "PASS",
+      "wasm_sha256_16": "1d8960c9834c6872",
+      "ze_json_commit": "0aacd82"
+    },
+    {
+      "abi_version": 2026000302,
+      "coexistence_prod_same_host": "n/a",
+      "core_version": "0.3.2",
+      "corpus_manifest_sha16": "9f826c8a0afbe67d",
+      "corpus_store": "saq_payload_v1",
+      "evidence_class": "primary",
+      "exhibit_source": "out/raw/nd6_phase_D.json",
+      "js_version": "0.3.0",
+      "phase": "D",
+      "protocol": "15 rounds x 2 reps/engine/path; warmup 3; alternating rounds; no trimming; round value = mean of reps (dt/reps)",
+      "root_commit": "6d87bf3",
+      "run_id": "zuu-20261115080840-6d87bf3",
+      "runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+      "saq_report_commit": "8c7f2d4",
+      "site": "dev_device",
+      "validator": "PASS",
+      "wasm_sha256_16": "9795f2e80a4a5e2c",
+      "ze_json_commit": "01a143f"
+    },
+    {
+      "abi_version": 2026000302,
+      "coexistence_prod_same_host": "n/a",
+      "core_version": "0.3.2",
+      "corpus_manifest_sha16": "9f826c8a0afbe67d",
+      "corpus_store": "saq_payload_v1",
+      "evidence_class": "primary",
+      "exhibit_source": "out/raw/nd6_phase_D.json",
+      "js_version": "0.3.0",
+      "phase": "D",
+      "protocol": "15 rounds x 2 reps/engine/path; warmup 3; alternating rounds; no trimming; round value = mean of reps (dt/reps)",
+      "root_commit": "8a1324b",
+      "run_id": "server-lanjut-20261116060933-8a1324b",
+      "runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+      "saq_report_commit": "8c7f2d4",
+      "site": "saq_server",
+      "validator": "PASS",
+      "wasm_sha256_16": "9795f2e80a4a5e2c",
+      "ze_json_commit": "01a143f"
+    },
+    {
+      "abi_version": 2026000302,
+      "coexistence_prod_same_host": "False",
+      "core_version": "0.3.2",
+      "corpus_manifest_sha16": "9f826c8a0afbe67d",
+      "corpus_store": "saq_payload_v1-live-store",
+      "evidence_class": "primary",
+      "exhibit_source": "out/raw/nd11_phase_e.json",
+      "js_version": "0.3.0",
+      "phase": "E",
+      "protocol": "rounds=15, per_round=20 TOTAL (10 v8 + 10 ze)/round, warmup 3/engine untimed, n=150+150=300 requests, alternation (r+k)%2, no trimming",
+      "root_commit": "8556513",
+      "run_id": "zuu-20261116101458-8556513",
+      "runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+      "saq_report_commit": "501cc03",
+      "site": "dev_device",
+      "validator": "PASS",
+      "wasm_sha256_16": "9795f2e80a4a5e2c",
+      "ze_json_commit": "01a143f"
+    },
+    {
+      "abi_version": 2026000302,
+      "coexistence_prod_same_host": "True",
+      "core_version": "0.3.2",
+      "corpus_manifest_sha16": "9f826c8a0afbe67d",
+      "corpus_store": "saq_payload_v1-live-store",
+      "evidence_class": "pilot",
+      "exhibit_source": "out/raw/nd11_phase_e.json",
+      "js_version": "0.3.0",
+      "phase": "E",
+      "protocol": "rounds=2, per_round=3 TOTAL (alternating, uneven split), warmup 2/engine untimed, n=3+3=6 requests, alternation (r+k)%2, no trimming",
+      "root_commit": "ab255f5",
+      "run_id": "zuu-20261116235636-ab255f5",
+      "runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+      "saq_report_commit": "0a62581",
+      "site": "dev_device",
+      "validator": "PASS",
+      "wasm_sha256_16": "9795f2e80a4a5e2c",
+      "ze_json_commit": "01a143f"
+    },
+    {
+      "abi_version": 2026000302,
+      "coexistence_prod_same_host": "False",
+      "core_version": "0.3.2",
+      "corpus_manifest_sha16": "9f826c8a0afbe67d",
+      "corpus_store": "saq_payload_v1-live-store",
+      "evidence_class": "primary",
+      "exhibit_source": "out/raw/nd11_phase_e.json",
+      "js_version": "0.3.0",
+      "phase": "E",
+      "protocol": "rounds=15, per_round=20 TOTAL (10 v8 + 10 ze)/round, warmup 3/engine untimed, n=150+150=300 requests, alternation (r+k)%2, no trimming",
+      "root_commit": "6979e3f",
+      "run_id": "zuu-20261117000112-6979e3f",
+      "runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+      "saq_report_commit": "534d9a8",
+      "site": "dev_device",
+      "validator": "PASS",
+      "wasm_sha256_16": "9795f2e80a4a5e2c",
+      "ze_json_commit": "01a143f"
+    },
+    {
+      "abi_version": 2026000302,
+      "coexistence_prod_same_host": "True",
+      "core_version": "0.3.2",
+      "corpus_manifest_sha16": "9f826c8a0afbe67d",
+      "corpus_store": "saq_payload_v1-live-store",
+      "evidence_class": "primary",
+      "exhibit_source": "out/raw/nd11_phase_e.json",
+      "js_version": "0.3.0",
+      "phase": "E",
+      "protocol": "rounds=15, per_round=20 TOTAL (10 v8 + 10 ze)/round, warmup 3/engine untimed, n=150+150=300 requests, alternation (r+k)%2, no trimming",
+      "root_commit": "530f751",
+      "run_id": "server-lanjut-20261117003513-530f751",
+      "runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+      "saq_report_commit": "534d9a8",
+      "site": "saq_server",
+      "validator": "PASS",
+      "wasm_sha256_16": "9795f2e80a4a5e2c",
+      "ze_json_commit": "01a143f"
+    }
+  ],
+  "inference": {
+    "bootstrap": {
+      "B": 10000,
+      "interval": "percentile 2.5/97.5",
+      "rng": "numpy default_rng (PCG64)",
+      "seed": 20261117,
+      "statistic": "median(v8*)/median(ze*) over jointly resampled rounds"
+    },
+    "headline_statistic": "speedup = median(T_v8,i)/median(T_ze,i) over the 15 paired rounds (harness speedup_in_run convention)",
+    "not_independent": "300 Phase E requests are alternated within rounds on one host session; only the 15 round pairs carry inferential weight",
+    "sign_test": "exact binomial two-sided (scipy binomtest)",
+    "unit": "measurement round (15 per run)",
+    "wilcoxon": "exact signed-rank two-sided, zero_method=wilcox (scipy; statistic = min(W+, W-))"
+  },
+  "inputs_sha256": {
+    "out\\raw\\server-lanjut-20261116060843-8a1324b\\nd6_phase_A.json": "8a00529158dadeceeefc4fe1193f23ee52988d9f801f7788ff127a5cf7a797a5",
+    "out\\raw\\server-lanjut-20261116060900-8a1324b\\nd6_phase_B.json": "a69dafaa36005cd3a257a0c380f9a1d0ccf81c8dcfeacdc27d142f2d6de466e2",
+    "out\\raw\\server-lanjut-20261116060915-8a1324b\\nd6_phase_C.json": "c2f4807b1b510fd802d725effc756bd04014dcaba03334d43185d81a9a2c0503",
+    "out\\raw\\server-lanjut-20261116060933-8a1324b\\nd6_phase_D.json": "34a9572303610a219b054a12fddceba814d9309d3bf5d5986715431d6c1dd41b",
+    "out\\raw\\server-lanjut-20261117003513-530f751\\nd11_phase_e.json": "18b52cc93ce7e650d642fd359a6cd6bc71a830891b23783de630c53b0dae1b81",
+    "out\\raw\\zuu-20261115010155-3376d07\\nd6_phase_D.json": "65baee9a37da56b6cbaf4c427499680558d9e9c12cf3763cc53132e174ce73b8",
+    "out\\raw\\zuu-20261115071747-6d87bf3\\nd6_phase_A.json": "227ee3d14e33079f465ee19b010526cf7a3841969420f933003e9086b4adce7a",
+    "out\\raw\\zuu-20261115075332-6d87bf3\\nd6_phase_B.json": "c654c2f64f70b030a1a59ee12a956f4359481a40519a69ddc0c69bd1e81229d9",
+    "out\\raw\\zuu-20261115080838-6d87bf3\\nd6_phase_C.json": "823e777d3dbd526b02cae55b261bc64a3aee524d648702a3fe52a2a6e323d440",
+    "out\\raw\\zuu-20261115080840-6d87bf3\\nd6_phase_D.json": "eaa51c25afd30f29fb687f2c533f9d06eb1c417b022cb823b5bb738ddef063aa",
+    "out\\raw\\zuu-20261116101458-8556513\\nd11_phase_e.json": "8f73ec00ddcc7b4c0b1a02f80d84264cfb0001dbb56eb9b1175f5c7d0543baeb",
+    "out\\raw\\zuu-20261116235636-ab255f5\\nd11_phase_e.json": "88883f4895c1f122ea5da7ae984d7d94ec260a6142aa9a421d5520819839ea41",
+    "out\\raw\\zuu-20261117000112-6979e3f\\nd11_phase_e.json": "45891abecc56ab6e78c72ac0196f6647284aa4957a8669fa553789c381b135b0",
+    "reports/nd11/server-lanjut-20261117003513-530f751-nd11-phase-e-saq_server.record.json": "4727a2af894e1103d6beb492af031f564c59ae8140159c0fd930fa2a8f6aacac",
+    "reports/nd11/zuu-20261116101458-8556513-nd11-phase-e-dev_device.record.json": "528f81b24572f4aa5c63e1edeccfa37f8fb0ef30ec0ac3134d612f41c0b254a0",
+    "reports/nd11/zuu-20261116235636-ab255f5-nd11-phase-e-dev_device.record.json": "595e7be5d53943ee829ba41391bd18b7d4dd82d9065da934143934f7a809623f",
+    "reports/nd11/zuu-20261117000112-6979e3f-nd11-phase-e-dev_device.record.json": "1d1f47e4606ff87ef24fa4f084307031688d148a4b432baeaa676aa71578279a",
+    "reports/nd14/server-lanjut-20261116060933-8a1324b-nd6-d-saq_server.record.json": "2cd094dfc1496ef693786053a1477b483a542df76cd724b92d5bf1b75c9625f6",
+    "reports/nd14/zuu-20261115010155-3376d07-nd6-d-dev_device.record.json": "1efc725ff79641d8bba4957f2e9fab831a2bdbed9f9cb81003ae504eb546d1ca",
+    "reports/nd14/zuu-20261115080840-6d87bf3-nd6-d-dev_device.record.json": "dafc394321054e9d7e089a9404648618a7c11fe6ffbfe7d7db7d79c39878eb9d"
+  },
+  "integrity": [
+    {
+      "copies": 1,
+      "file": "reports/nd14/zuu-20261115010155-3376d07-nd6-d-dev_device.record.json",
+      "source": "reports/nd14/zuu-20261115010155-3376d07-nd6-d-dev_device.record.json",
+      "status": "validator-PASS"
+    },
+    {
+      "copies": 2,
+      "file": "zuu-20261115010155-3376d07/nd6_phase_D.json",
+      "source": "out\\raw\\zuu-20261115010155-3376d07\\nd6_phase_D.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 1,
+      "file": "reports/nd14/zuu-20261115080840-6d87bf3-nd6-d-dev_device.record.json",
+      "source": "reports/nd14/zuu-20261115080840-6d87bf3-nd6-d-dev_device.record.json",
+      "status": "validator-PASS"
+    },
+    {
+      "copies": 2,
+      "file": "zuu-20261115080840-6d87bf3/nd6_phase_D.json",
+      "source": "out\\raw\\zuu-20261115080840-6d87bf3\\nd6_phase_D.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 1,
+      "file": "reports/nd14/server-lanjut-20261116060933-8a1324b-nd6-d-saq_server.record.json",
+      "source": "reports/nd14/server-lanjut-20261116060933-8a1324b-nd6-d-saq_server.record.json",
+      "status": "validator-PASS"
+    },
+    {
+      "copies": 2,
+      "file": "server-lanjut-20261116060933-8a1324b/nd6_phase_D.json",
+      "source": "out\\raw\\server-lanjut-20261116060933-8a1324b\\nd6_phase_D.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 1,
+      "file": "reports/nd11/zuu-20261116101458-8556513-nd11-phase-e-dev_device.record.json",
+      "source": "reports/nd11/zuu-20261116101458-8556513-nd11-phase-e-dev_device.record.json",
+      "status": "validator-PASS"
+    },
+    {
+      "copies": 2,
+      "file": "zuu-20261116101458-8556513/nd11_phase_e.json",
+      "source": "out\\raw\\zuu-20261116101458-8556513\\nd11_phase_e.json",
+      "status": "byte-identical"
+    },
+    {
+      "copies": 1,
+      "file": "reports/nd11/zuu-20261116235636-ab255f5-nd11-phase-e-dev_device.record.json",
+      "source": "reports/nd11/zuu-20261116235636-ab255f5-nd11-phase-e-dev_device.record.json",
+      "status": "validator-PASS"
+    },
+    {
+      "copies": 2,
+      "file": "zuu-20261116235636-ab255f5/nd11_phase_e.json",
+      "source": "out\\raw\\zuu-20261116235636-ab255f5\\nd11_phase_e.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 1,
+      "file": "reports/nd11/zuu-20261117000112-6979e3f-nd11-phase-e-dev_device.record.json",
+      "source": "reports/nd11/zuu-20261117000112-6979e3f-nd11-phase-e-dev_device.record.json",
+      "status": "validator-PASS"
+    },
+    {
+      "copies": 2,
+      "file": "zuu-20261117000112-6979e3f/nd11_phase_e.json",
+      "source": "out\\raw\\zuu-20261117000112-6979e3f\\nd11_phase_e.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 1,
+      "file": "reports/nd11/server-lanjut-20261117003513-530f751-nd11-phase-e-saq_server.record.json",
+      "source": "reports/nd11/server-lanjut-20261117003513-530f751-nd11-phase-e-saq_server.record.json",
+      "status": "validator-PASS"
+    },
+    {
+      "copies": 2,
+      "file": "server-lanjut-20261117003513-530f751/nd11_phase_e.json",
+      "source": "out\\raw\\server-lanjut-20261117003513-530f751\\nd11_phase_e.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 2,
+      "file": "zuu-20261115071747-6d87bf3/nd6_phase_A.json",
+      "source": "out\\raw\\zuu-20261115071747-6d87bf3\\nd6_phase_A.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 2,
+      "file": "zuu-20261115075332-6d87bf3/nd6_phase_B.json",
+      "source": "out\\raw\\zuu-20261115075332-6d87bf3\\nd6_phase_B.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 2,
+      "file": "zuu-20261115080838-6d87bf3/nd6_phase_C.json",
+      "source": "out\\raw\\zuu-20261115080838-6d87bf3\\nd6_phase_C.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 2,
+      "file": "server-lanjut-20261116060843-8a1324b/nd6_phase_A.json",
+      "source": "out\\raw\\server-lanjut-20261116060843-8a1324b\\nd6_phase_A.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 2,
+      "file": "server-lanjut-20261116060900-8a1324b/nd6_phase_B.json",
+      "source": "out\\raw\\server-lanjut-20261116060900-8a1324b\\nd6_phase_B.json",
+      "status": "eol-normalized-identical"
+    },
+    {
+      "copies": 2,
+      "file": "server-lanjut-20261116060915-8a1324b/nd6_phase_C.json",
+      "source": "out\\raw\\server-lanjut-20261116060915-8a1324b\\nd6_phase_C.json",
+      "status": "eol-normalized-identical"
+    }
+  ],
+  "mismatches": [],
+  "purpose": "ND-6 Phase D + ND-11 Phase E synthesis (read-only)",
+  "reconciliation": {
+    "conventions": "stddev population ddof=0; p95 linear interpolation (both harnesses)",
+    "exhibit_tol_relative": 1e-09,
+    "record_stored_precision": "Phase D: seconds_mean/median/p95 toPrecision(9), seconds_stddev toPrecision(6) (nd6_bench.mjs pushResult); Phase E: full float64",
+    "record_tol_relative": 1e-05
+  },
+  "script": "scripts/analyze_measurement/nd_d_e_synthesis.py"
+}

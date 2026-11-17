@@ -120,6 +120,18 @@ disimpan apa adanya di `reports/nd6/` (exhibit, tidak diubah).
   parity 1 hash/300 request — **speedup in-run 1,13×, ze menang 15/15
   ronde** (paired 1,133×; cv 6,9–9,5%); share parser ≈12% (dev ≈4%).
   Arsip `nd11/`. Lintas-site = narasi.
+- [`nd11-phase-d-e-synthesis.md`](nd11-phase-d-e-synthesis.md) — **Sintesis
+  Phase D ↔ Phase E (audit + rekalkulasi, tanpa eksperimen baru)**: semua
+  angka direkalkulasi dari record PASS + exhibit (script
+  `scripts/analyze_measurement/nd_d_e_synthesis.py`, deterministik, exit 0
+  rekonsiliasi). Acceptance D ≥1,5× **tercapai di kedua site** (dev 2,880×,
+  server 2,665× — mongo-cache); file-store parity (0,95×/0,99×); Phase E:
+  server 1,134× signifikan (15/15, p=6,1e-5), dev 1,076×/1,041× **tidak
+  signifikan** (CI mencakup 1,0); indeks kompresi C = 2,68/2,77 (dev),
+  2,35 (server) — deskriptif. Protokol dikoreksi: 20 request/ronde TOTAL
+  (10 v8 + 10 ze), n=150/engine, 300 total; `reps_per_round` Phase E =
+  total lintas engine (ambiguitas didokumentasikan). Pemetaan RQ1–RQ3 +
+  H₀/H₁ proposal verbatim + 5 klaim berbukti + threats to validity.
 
 ### Loop O2 — optimasi scanner (2026-11-15/16)
 - [`O2-1-interior-skip.md`](O2-1-interior-skip.md) — `scanner8` interior
