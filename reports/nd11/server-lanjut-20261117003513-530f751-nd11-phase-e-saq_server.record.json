@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "benchmark",
+  "run_id": "server-lanjut-20261117003513-530f751",
+  "site": "saq_server",
+  "generator": "node_harness",
+  "library": {
+    "name": "ze_json",
+    "version": "0.3.2 (ze_json@01a143f, saq-report@534d9a8)",
+    "language_runtime": "node v26.13.1 (v8 14.6.202.34-node.40) + wasm64 C-ABI",
+    "js_version": "0.3.0",
+    "core_version": "0.3.2",
+    "abi_version": 2026000302,
+    "artifact_sha256": "9795f2e80a4a5e2cfe980d89f5a911a6796cb69ac91e3815928a78c9845fe373"
+  },
+  "git_commit": {
+    "hash": "530f751",
+    "dirty": false,
+    "repo": "v5"
+  },
+  "host": {
+    "hostname": "server-lanjut",
+    "os": "Windows_NT 10.0.26300",
+    "arch": "x64",
+    "cpu_model": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz",
+    "cpu_cores": 6,
+    "ram_gb": 7.9,
+    "toolchain": "node v26.13.1 (v8 14.6.202.34-node.40) + ze_json wasm64 (ABI 2026000302)"
+  },
+  "corpus": {
+    "name": "saq_payload_v1-live-store",
+    "document_count": 6,
+    "total_bytes": 88381,
+    "max_document_bytes": 39209,
+    "sha256": "9f826c8a0afbe67deb4bde57d9fe411e4b67ad6cc218988fb3393add221d66a1"
+  },
+  "config": {
+    "date_utc": "2026-11-17T00:35:17.678Z",
+    "iterations": 20,
+    "warmup_runs": 3,
+    "repeats": 15,
+    "cpu_pinning": false,
+    "threads": 1,
+    "exploratory": false,
+    "notes": "ND-11 phase E (HTTP GET /rekap end-to-end); alternating v8<->ze per-request, no outlier trimming; load generator on the same machine (localhost); boot WhatsApp/cron gated (SAQ_DISABLE_WHATSAPP=1, saq-report PR #5) — byte-identical apps, engine toggle only; store dev = anonymized corpus mirror (sha per file di extras.store_sha256; server run = LIVE store, jangan bandingkan lintas site); gc not applicable across processes (recorded only); raw: out/raw/server-lanjut-20261117003513-530f751/; git ze_json=01a143f saq-report=534d9a8; dirty=false",
+    "coexistence": {
+      "production_same_host": true,
+      "production_port": 3000,
+      "production_untouched": true,
+      "wa_production": "active (untouched)",
+      "cron_production": "active (untouched)",
+      "benchmark_bind_host": "127.0.0.1",
+      "benchmark_whatsapp": "SAQ_DISABLE_WHATSAPP=1 (both benchmark instances)",
+      "write_guard": "preflight json_store counts + refuse on boot seed marker"
+    }
+  },
+  "results": [
+    {
+      "name": "phase-e/rekap/v8",
+      "engine": "v8",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Latensi request HTTP GET /rekap end-to-end (middleware → handler 4 repo → render EJS → respons) pada aplikasi Express saq-report.",
+        "basis_papers": [
+          "10.1002_spe.3313"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.005462934000000008,
+        "seconds_stddev": 0.0003761367889176974,
+        "bytes_per_second": 8765985.457631363,
+        "documents_per_second": 183.05181794251928
+      },
+      "extras": {
+        "path": "E-rekap-v8",
+        "seconds_median": 0.005401149999999688,
+        "seconds_p95": 0.006135735000000089,
+        "rounds": 15,
+        "reps_per_round": 20,
+        "request_count": 150,
+        "response_bytes": 47888,
+        "response_sha256": "a6236b6c45dd0da645b1fc055b060b8412f35b8d76bc840ad4fb075ff59c6548",
+        "port": 3100,
+        "saq_json_engine": "v8-baseline",
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": null,
+        "index_count": null,
+        "store_sha256": {
+          "config_asisten.json": "8f3d896b141d1172e04b1e8b5ecefbe12895d17fb2963625ce6fbc69f04c0c1e",
+          "config_global.json": "af079aef392c53f07fa9cb268d06410e77bcadb2ff95da3ed4aa5713bc218a0c",
+          "courses.json": "684a5fe266690291139f88a9fd8fe9af0fa37fcd180f2af0de6aa9ec6928134c",
+          "lecturers.json": "a58b7f45dcbf8daa44a2bc16b19a3bcf40d29bf00c6e1a9d15eaf1bafff735e6",
+          "reports.json": "f52c5e4c0a0a07e3fd641c54ca9b5045d3ee55b71b3269d00366809b052705da",
+          "schedules.json": "14c953d6097e53b7c46803cc343b511090106481d4f5412225c7f038d214628e"
+        },
+        "doc_bytes": 88381
+      }
+    },
+    {
+      "name": "phase-e/rekap/ze",
+      "engine": "wasm64_cabi",
+      "status": "ok",
+      "rationale": {
+        "purpose": "Latensi request HTTP GET /rekap end-to-end (middleware → handler 4 repo → render EJS → respons) pada aplikasi Express saq-report.",
+        "basis_papers": [
+          "10.1002_spe.3313"
+        ]
+      },
+      "metrics": {
+        "seconds_mean": 0.004871083333333305,
+        "seconds_stddev": 0.0004596342230391903,
+        "bytes_per_second": 9831077.960070541,
+        "documents_per_second": 205.29314149829895
+      },
+      "extras": {
+        "path": "E-rekap-ze",
+        "seconds_median": 0.004763850000000048,
+        "seconds_p95": 0.005500999999999976,
+        "rounds": 15,
+        "reps_per_round": 20,
+        "request_count": 150,
+        "response_bytes": 47888,
+        "response_sha256": "a6236b6c45dd0da645b1fc055b060b8412f35b8d76bc840ad4fb075ff59c6548",
+        "port": 3101,
+        "saq_json_engine": "ze",
+        "gc_minor": 0,
+        "gc_major": 0,
+        "binding_calls": null,
+        "index_count": null,
+        "store_sha256": {
+          "config_asisten.json": "8f3d896b141d1172e04b1e8b5ecefbe12895d17fb2963625ce6fbc69f04c0c1e",
+          "config_global.json": "af079aef392c53f07fa9cb268d06410e77bcadb2ff95da3ed4aa5713bc218a0c",
+          "courses.json": "684a5fe266690291139f88a9fd8fe9af0fa37fcd180f2af0de6aa9ec6928134c",
+          "lecturers.json": "a58b7f45dcbf8daa44a2bc16b19a3bcf40d29bf00c6e1a9d15eaf1bafff735e6",
+          "reports.json": "f52c5e4c0a0a07e3fd641c54ca9b5045d3ee55b71b3269d00366809b052705da",
+          "schedules.json": "14c953d6097e53b7c46803cc343b511090106481d4f5412225c7f038d214628e"
+        },
+        "doc_bytes": 88381
+      }
+    }
+  ]
+}

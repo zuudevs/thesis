@@ -1052,10 +1052,13 @@
   2026-11-17** (`zuu-20261117000112-6979e3f`, harness aman-koeksistensi,
   protokol identik): **1,04×** in-run (paired 1,029×, ze menang 10/15) —
   arah konsisten dengan run pertama 1,08× (lintas-run = narasi, hash
-  root berbeda); arsip `reports/nd11/`. **Server run menyusul**
-  (skrip identik, store LIVE, arsitektur koeksistensi — produksi utuh,
-  WA/cron produksi AKTIF) — prasyarat urutan ND-11 §5 kini terpenuhi
-  (re-run bersih D server = ND-14 §8).
+  root berbeda); arsip `reports/nd11/`. **Server run TEREKSEKUSI
+  2026-11-17** (`server-lanjut-20261117003513-530f751`, mode koeksistensi
+  penuh — produksi pid utuh/WA `ready`/cron aktif, benchmark baca store
+  LIVE mongo lokal yang sama): **1,13× in-run, ze menang 15/15 ronde**
+  (paired 1,133×; cv 6,9–9,5%; share parser ≈12%); 11/11 acceptance
+  criteria audit lulus; validator PASS. Laporan
+  `reports/nd11-phase-e-server.md`; arsip `reports/nd11/`.
 - [x] **ND-11.a** — Audit koeksistensi + hardening harness **SELESAI
   2026-11-17**: verdict **SAFE WITH CHANGES** — 4 temuan
   (health-check menerima status apa pun; tanpa preflight port; bind

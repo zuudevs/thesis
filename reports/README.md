@@ -110,7 +110,16 @@ disimpan apa adanya di `reports/nd6/` (exhibit, tidak diubah).
   port; bind 0.0.0.0 + 20 endpoint mutasi + lazy-init WA; seed-on-empty
   ke DB produksi) + hardening E1–E5 yang diterapkan (preflight,
   boot-marker identity, abort child-exit, seed guard, `SAQ_BIND_HOST`)
-  + runbook server + acceptance criteria.
+  + runbook server + acceptance criteria. **Kriteria §5 lulus semua**
+  (server run 2026-11-17, bukti per butir di laporan server).
+- [`nd11-phase-e-server.md`](nd11-phase-e-server.md) — **ND-11 Phase E
+  (server, 2026-11-17)**: mode koeksistensi penuh — SAQ Production utuh
+  (pid utuh, WA `ready`, cron aktif, `/rekap` 200 di semua snapshot),
+  benchmark membaca store LIVE mongo lokal yang sama (render-identik
+  dengan produksi; URI non-sekret karena server tanpa `.env`),
+  parity 1 hash/300 request — **speedup in-run 1,13×, ze menang 15/15
+  ronde** (paired 1,133×; cv 6,9–9,5%); share parser ≈12% (dev ≈4%).
+  Arsip `nd11/`. Lintas-site = narasi.
 
 ### Loop O2 — optimasi scanner (2026-11-15/16)
 - [`O2-1-interior-skip.md`](O2-1-interior-skip.md) — `scanner8` interior
