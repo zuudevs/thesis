@@ -15,6 +15,9 @@ repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Provenance bibliografi artikel: PR #2 merged pada commit `cc0bbe2`;
   snapshot 42 entri dibuat sebagai filter byte-identik dari canonical root
   commit `5f2043a`, dengan sidecar commit/blob/SHA-256 dan verifier 16/16 PASS.
+- Stabilisasi provenance bibliografi lintas-platform: PR #3 merged pada commit
+  `fbcf44f`; hash teks dinormalisasi ke LF dan `.gitattributes` menjaga
+  checkout Windows/Unix tetap byte-stable.
 - `tools/` sebagai area tracked: dashboard monitoring research dan generic
   Mermaid→SVG grapher; source dashboard kini versioned bersama root.
 - ADR 0008 yang menetapkan root `v5` sebagai research superproject dan batas

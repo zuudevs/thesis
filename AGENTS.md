@@ -177,7 +177,7 @@
 - Batas repo workspace: `v5` = research superproject; `ze_json`,
   `saq-report`, `thesis-proposal`, dan `article` = submodule terpisah.
   `article` tracking di repo `zuu-inner/thesis-article`, dipin pada commit
-  `cc0bbe2cb1996173f99fec9d235a3cf10fbda6e1`; state lokal tetap diabaikan
+  `fbcf44f79b367f0eecfc6c4d1006fb7f9bc5d3e0`; state lokal tetap diabaikan
   Git. Repo submission lama sudah diarsipkan (read-only) dan tidak lagi
   dipetakan sebagai submodule.
 - Build aktif sekarang: `ze_json/build/native-release` dan `build/wasm64-release`

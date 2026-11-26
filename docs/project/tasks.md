@@ -1151,12 +1151,14 @@
   README, AGENTS, template PR, dan dukungan `THESIS_WORKSPACE_ROOT`; PR #1
   merged pada commit `5d02b8a`; verifier final 19/19 PASS. PR #2 menambahkan
   filter bibliografi canonical 42 entri dan provenance commit/blob/SHA-256;
-  merged pada commit `cc0bbe2`, verifier snapshot 16/16 PASS.
+  merged pada commit `cc0bbe2`, verifier snapshot 16/16 PASS. PR #3 menormalisasi
+  hash teks terhadap konversi EOL dan merged pada commit `fbcf44f`; unit test
+  5/5 PASS dan verifier snapshot tetap 16/16 PASS.
 - [x] **RS-3** — Root superproject: `submission-thesis-supervisor` dihapus
   dari `.gitmodules`/gitlink; repo historis ditandai archived/read-only dan
   diberi tag `archive/2026-11-26` pada commit `015188c`. `article` menjadi
   submodule dari `zuu-inner/thesis-article` dan dipin ke commit provenance
-  `cc0bbe2`.
+  `fbcf44f`.
 - [x] **RS-4** — `thesis-proposal` dipulihkan ke upstream melalui PR #3;
   symlink absolut `utils` diganti file tracked, PR merged pada commit
   `e9cee64`, helper root `utils/typ` dihapus, dan smoke import/assert Typst

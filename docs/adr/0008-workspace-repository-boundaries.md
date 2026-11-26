@@ -68,8 +68,9 @@ root workspace, sehingga checkout proposal tidak portabel.
   symlink lama.
 - Registri canonical root commit `5f2043a426e52ee5af193920bccaafcbb2dc1aab`
   berisi 68 entri/66 DOI unik. PR `zuu-inner/thesis-article#2` merged pada
-  `cc0bbe2cb1996173f99fec9d235a3cf10fbda6e1`; snapshot artikel 42 entri
-  (41 DOI + satu paper URL-only) beserta provenance dan verifier 16/16 menjadi
-  pointer submodule root.
+  `cc0bbe2cb1996173f99fec9d235a3cf10fbda6e1`; PR #3 menambahkan normalisasi
+  EOL dan merged pada `fbcf44f79b367f0eecfc6c4d1006fb7f9bc5d3e0`. Snapshot
+  artikel 42 entri (41 DOI + satu paper URL-only) beserta provenance dan
+  verifier 16/16 menjadi pointer submodule root.
 - PR restrukturisasi root tidak mengubah record pengukuran historis dan tidak
   memerlukan bump versi core/JS `ze_json`.
