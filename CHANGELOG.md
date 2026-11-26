@@ -20,6 +20,8 @@ repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   checkout Windows/Unix tetap byte-stable.
 - Output audit artikel sekarang ditulis dengan newline LF eksplisit; PR #4
   merged pada commit `8cc881b` agar fresh clone tetap clean setelah verifier.
+- Atribut LF untuk laporan validasi artikel ditambahkan melalui PR #5, merged
+  pada commit `cb22c9c`, menutup dirty-status terakhir pada fresh clone.
 - `tools/` sebagai area tracked: dashboard monitoring research dan generic
   Mermaid→SVG grapher; source dashboard kini versioned bersama root.
 - ADR 0008 yang menetapkan root `v5` sebagai research superproject dan batas

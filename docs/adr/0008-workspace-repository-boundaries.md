@@ -71,7 +71,9 @@ root workspace, sehingga checkout proposal tidak portabel.
   `cc0bbe2cb1996173f99fec9d235a3cf10fbda6e1`; PR #3 menambahkan normalisasi
   EOL dan merged pada `fbcf44f79b367f0eecfc6c4d1006fb7f9bc5d3e0`; PR #4
   mengatur output teks tracked dengan newline LF eksplisit dan merged pada
-  `8cc881b18dfa3eb0ace446618d80052905df63d1`. Snapshot artikel 42 entri
+  `8cc881b18dfa3eb0ace446618d80052905df63d1`; PR #5 menambahkan atribut LF
+  untuk laporan validasi dan merged pada
+  `cb22c9cffc8489132780807d5af59e5cf3bba696`. Snapshot artikel 42 entri
   (41 DOI + satu paper URL-only) beserta provenance dan verifier 16/16 menjadi
   pointer submodule root.
 - PR restrukturisasi root tidak mengubah record pengukuran historis dan tidak

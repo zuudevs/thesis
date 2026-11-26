@@ -327,7 +327,7 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   unik). Snapshot artikel harus merupakan hasil filter yang dapat diaudit
   terhadap DOI canonical dan menyimpan provenance commit/hash—bukan salinan
   key/DOI mentah. Implementasi aktif memakai canonical commit `5f2043a`,
-  snapshot artikel 42 entri pada repo commit `8cc881b`, dan policy tahun
+  snapshot artikel 42 entri pada repo commit `cb22c9c`, dan policy tahun
   `>= 2016` dengan exception key-based eksplisit untuk metodologi SC'15.
 
 ## 6. Paper kunci (mapping DOI → penggunaan)

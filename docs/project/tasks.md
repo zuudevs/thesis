@@ -1154,12 +1154,13 @@
   merged pada commit `cc0bbe2`, verifier snapshot 16/16 PASS. PR #3 menormalisasi
   hash teks terhadap konversi EOL dan merged pada commit `fbcf44f`; unit test
   5/5 PASS dan verifier snapshot tetap 16/16 PASS. PR #4 menulis seluruh output
-  teks tracked dengan LF eksplisit dan merged pada commit `8cc881b`.
+  teks tracked dengan LF eksplisit dan merged pada commit `8cc881b`; PR #5
+  menambahkan atribut LF untuk laporan validasi dan merged pada `cb22c9c`.
 - [x] **RS-3** — Root superproject: `submission-thesis-supervisor` dihapus
   dari `.gitmodules`/gitlink; repo historis ditandai archived/read-only dan
   diberi tag `archive/2026-11-26` pada commit `015188c`. `article` menjadi
   submodule dari `zuu-inner/thesis-article` dan dipin ke commit provenance
-  `8cc881b`.
+  `cb22c9c`.
 - [x] **RS-4** — `thesis-proposal` dipulihkan ke upstream melalui PR #3;
   symlink absolut `utils` diganti file tracked, PR merged pada commit
   `e9cee64`, helper root `utils/typ` dihapus, dan smoke import/assert Typst
