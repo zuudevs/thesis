@@ -1174,10 +1174,15 @@
   plans/tasks, dan changelog disinkronkan. Registri canonical PR #80 berisi
   68 entri/66 DOI unik; policy `year >= 2016` memakai exception key-based
   eksplisit untuk metodologi SC'15 `10.1145_2807591.2807644`.
-- [ ] **RS-7** — Final gate setelah push branch: fresh clone root,
-  `git submodule update --init --recursive`, `git submodule status` clean,
-  Typst utils self-contained smoke, validator/measurement smoke, dan
-  workspace clean-tree check.
+- [x] **RS-7** — Final gate setelah push branch pada commit `574790a`: fresh
+  clone root dengan `git submodule update --init --recursive` menghasilkan
+  pointer submodule exact dan `git submodule status` clean. Dashboard backend
+  13/13 PASS + frontend production build PASS, grapher Mermaid→SVG smoke PASS,
+  validator bibliografi 68 entri PASS + unit 4/4, measurement validator dan
+  analyzer smoke PASS (termasuk expected reject cross-host), Typst utility smoke
+  PASS, article unit 5/5 + snapshot 16/16 + manuscript 19/19 + literature audit
+  PASS. Setelah seluruh command, root dan keempat submodule clean serta
+  `git diff --check` PASS.
 
 ## Status mesin & environment
 
