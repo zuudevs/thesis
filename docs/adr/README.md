@@ -13,6 +13,7 @@ menggantikan keputusan lama ditulis sebagai ADR baru yang merujuk ADR lama.
 | [0005](0005-repository-readcount-sole-owner-slot.md) | `readCount()` repositori dengan slot parser sole-owner | Accepted |
 | [0006](0006-mongo-cache-bytes.md) | Kandidat cache-bytes Mongo (`_cacheBytes`) | Accepted |
 | [0007](0007-measurement-schema-v1-extras.md) | Measurement schema v1 + mekanisme `extras` | Accepted |
+| [0008](0008-workspace-repository-boundaries.md) | Batas repository workspace skripsi | Accepted |
 
 ## Konvensi penomoran
 

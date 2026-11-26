@@ -1139,6 +1139,42 @@
   submodule ze_json naik ke rilis 0.1.2 (publish GitHub Packages
   terverifikasi, run 43182598841).
 
+## RS — Restrukturisasi batas repository workspace (2026-11-26)
+
+- [x] **RS-1** — Snapshot aman sebelum restrukturisasi: diff binary, status
+  porcelain-v2, salinan `article/`, source `tools/`, checkout proposal lama,
+  dan manifest SHA-256 disimpan pada backup lokal
+  `%LOCALAPPDATA%\Temp\opencode\thesis-v5-restructure-backup-20261126-150309`.
+- [x] **RS-2** — Naskah artikel dipisah ke repo
+  `zuu-inner/thesis-article` (akun GitHub aktif memiliki owner write; repo
+  target `zuudevs/thesis-article` belum dapat dibuat). Snapshot awal 125 file,
+  README, AGENTS, template PR, dan dukungan `THESIS_WORKSPACE_ROOT`; PR #1
+  merged pada commit `5d02b8a`; verifier final 19/19 PASS. PR #2 menambahkan
+  filter bibliografi canonical 42 entri dan provenance commit/blob/SHA-256;
+  merged pada commit `cc0bbe2`, verifier snapshot 16/16 PASS.
+- [x] **RS-3** — Root superproject: `submission-thesis-supervisor` dihapus
+  dari `.gitmodules`/gitlink; repo historis ditandai archived/read-only dan
+  diberi tag `archive/2026-11-26` pada commit `015188c`. `article` menjadi
+  submodule dari `zuu-inner/thesis-article` dan dipin ke commit provenance
+  `cc0bbe2`.
+- [x] **RS-4** — `thesis-proposal` dipulihkan ke upstream melalui PR #3;
+  symlink absolut `utils` diganti file tracked, PR merged pada commit
+  `e9cee64`, helper root `utils/typ` dihapus, dan smoke import/assert Typst
+  PASS pada checkout submodule.
+- [x] **RS-5** — `tools/` dinormalisasi: `scripts/grapher` dipindahkan via
+  `git mv` ke `tools/grapher`; source dashboard tracking; `.env`, database,
+  dependency, build output, dan cache tetap di-ignore. Verifikasi lokal:
+  backend `npm ci` + syntax PASS, frontend production build PASS, generic
+  Mermaid→SVG smoke PASS, dan path root dashboard PASS.
+- [x] **RS-6** — Dokumentasi batas repo: README root, AGENTS, ADR 0008,
+  plans/tasks, dan changelog disinkronkan. Registri canonical PR #80 berisi
+  68 entri/66 DOI unik; policy `year >= 2016` memakai exception key-based
+  eksplisit untuk metodologi SC'15 `10.1145_2807591.2807644`.
+- [ ] **RS-7** — Final gate setelah push branch: fresh clone root,
+  `git submodule update --init --recursive`, `git submodule status` clean,
+  Typst utils self-contained smoke, validator/measurement smoke, dan
+  workspace clean-tree check.
+
 ## Status mesin & environment
 
 - Dev device = workspace ini (Windows x86_64, toolchain portabel). **Update

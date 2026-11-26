@@ -3,7 +3,6 @@
 .cache/
 out/
 data/
-dashboard/
 
 compile_commands.json
 
@@ -18,5 +17,11 @@ scripts/ssh-remote/.env
 
 # owner-local workspace (never commit — personal data / local tooling)
 journal/
-scripts/grapher/node_modules/
-utils/typ/metadata.json
+
+# tracked tools: keep source, exclude local runtime state and dependencies
+/tools/dashboard/.env
+/tools/dashboard/database/
+/tools/dashboard/**/node_modules/
+/tools/dashboard/frontend/dist/
+/tools/dashboard/frontend/*.tsbuildinfo
+/tools/grapher/node_modules/

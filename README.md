@@ -23,12 +23,32 @@ V8 (acceptance ≥ 1.5× tercapai) — rincian
 | [`reports/`](reports/README.md) | Laporan hasil eksperimen per-task (15 laporan + arsip record) |
 | [`schemas/`](schemas/README.md) | Measurement record schema v1 + validator |
 | [`corpus/`](corpus/benchmarks/README.md) | Korpus benchmark (42 file, manifest sha256) + korpus json_checker |
-| `scripts/` | Harness benchmark, validator, analyzer, codegen korpus, tooling |
+| `scripts/` | Harness benchmark, validator, analyzer, codegen korpus, tooling riset |
+| `tools/` | Workspace tooling tracked: dashboard monitoring + generic Mermaid grapher |
 | `out/` | Hasil ukur (raw exhibit + record tervalidasi) — gitignored |
 | `out/rag/` | Korpus paper (~50 DOI) untuk provenance literatur |
 | `ze_json/` | Submodule — library parser (sumber: [repo ze_json](https://github.com/zuudevs/ze_json)) |
 | `saq-report/` | Submodule — aplikasi Node.js SAQ (baseline) |
-| `assets/bib/cites.bib` | Bibliografi (entri wajib year ≥ 2016) |
+| `thesis-proposal/` | Submodule — sumber dokumen proposal Typst |
+| `article/` | Submodule — sumber, build pipeline, dan audit naskah artikel |
+| `assets/bib/cites.bib` | Registri bibliografi riset canonical (68 entri, 66 DOI unik) |
+
+Repo root berfungsi sebagai **research superproject**: protokol, data
+pengukuran, dan laporan tetap tinggal di sini; parser, baseline aplikasi,
+proposal, dan artikel memiliki repo/submodule masing-masing.
+
+Kebijakan tahun bibliografi adalah `year >= 2016`, dengan satu exception
+key-based eksplisit untuk metodologi SC'15
+`10.1145_2807591.2807644`. Snapshot bibliografi artikel adalah filter
+terverifikasi dari registri canonical, bukan sumber kebenaran kedua.
+
+Checkout lengkap:
+
+```sh
+git clone --recurse-submodules https://github.com/zuudevs/thesis.git
+# checkout yang sudah ada:
+git submodule update --init --recursive
+```
 
 ## Prinsip kerja
 

@@ -193,7 +193,7 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   - `development/` — alur build/harness/korpus/testing dari perspektif kontributor.
   - `requirement/` — dependensi, toolchain, python, korpus, env variables.
 - Chart + angka konsisten untuk dokumen skripsi (`thesis-proposal/` /
-  `submission-thesis-supervisor/` — dikelola pemilik).
+  `article/` — repo/submodule terpisah, dikelola pemilik).
 - Update `AGENTS.md` / `plans.md` / `tasks.md` bila keputusan berubah.
 
 ### P8 — Chart progres benchmark & pelengkapan Bab 3 (direktif pemilik 2026-11-13)
@@ -309,6 +309,27 @@ field `corpus.sha256` pada record — provenance korpus jadi provable.
   `reports/nd11-phase-e-server.md`; lintas-site = narasi. Sisa terbuka
   (opsional): boundary berat (`/rekap/asisten`).
 
+### P9 — Struktur repository workspace (2026-11-26)
+
+> Keputusan penuh tercatat pada [ADR 0008](../adr/0008-workspace-repository-boundaries.md).
+
+- Root `v5` menjadi research superproject: protokol pengukuran, schema,
+  corpus, laporan, bibliografi kanonik, dan tooling workspace tetap tracking.
+- `ze_json/`, `saq-report/`, `thesis-proposal/`, dan `article/` menjadi
+  submodule dengan repo masing-masing; perubahan naskah tidak lagi bercampur
+  dengan source parser/measurement.
+- Repo submission lama dinonaktifkan sebagai submodule, diarsipkan read-only,
+  dan diberi tag snapshot; proposal dipulihkan ke upstream serta utility
+  Typst disimpan tracked di repo proposal tanpa symlink absolut.
+- `tools/dashboard` dan `tools/grapher` menjadi source tracked; credential,
+  database lokal, dependency, build output, dan cache tetap transient.
+- Bibliografi riset kanonik tetap `assets/bib/cites.bib` (68 entri/66 DOI
+  unik). Snapshot artikel harus merupakan hasil filter yang dapat diaudit
+  terhadap DOI canonical dan menyimpan provenance commit/hash—bukan salinan
+  key/DOI mentah. Implementasi aktif memakai canonical commit `5f2043a`,
+  snapshot artikel 42 entri pada repo commit `cc0bbe2`, dan policy tahun
+  `>= 2016` dengan exception key-based eksplisit untuk metodologi SC'15.
+
 ## 6. Paper kunci (mapping DOI → penggunaan)
 
 | DOI (file di `out/rag/`) | Judul | Dipakai untuk |
@@ -372,8 +393,9 @@ Fase hanya dianggap selesai bila:
 
 ## 10. Alur kerja Git & Pull Request (berlaku di semua repo)
 
-- Lingkup: **root `v5`, `ze_json`, `saq-report`** (dan submodul dokumen bila nanti
-  disentuh). Tidak ada push langsung ke `main` — buat branch (contoh:
+- Lingkup: **root `v5`, `ze_json`, `saq-report`, `thesis-proposal`,
+  `thesis-article`** (dan submodul dokumen bila nanti disentuh). Tidak ada push
+  langsung ke `main` — buat branch (contoh:
   `perf/scanner-simd`, `feat/measurement-schema`) → **Pull Request** → review → merge.
 - Judul PR & commit mengikuti **Conventional Commits 1.0.0** (English):
   `type(scope): subject`

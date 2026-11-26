@@ -495,7 +495,7 @@ function runPhaseD() {
 
 // Metadata host/git --------------------------------------------------------
 // Definisi dirty: modifikasi file TRACKED (+ mismatch pointer submodule).
-// File untracked milik pemilik (mis. utils/typ/*, ze_json README.md) tidak
+// File untracked milik pemilik (mis. catatan lokal atau output sementara) tidak
 // memengaruhi kode yang diukur — dicatat transparan, tidak menodai hash
 // (rencana ND-6 §3.9).
 const git = (cmd) => String(execSync(cmd, { cwd: ROOT })).trim();

@@ -1,0 +1,24 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard monitoring hasil pengukuran riset (benchmark & test) — skripsi v5",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "mongo": "mongod --dbpath database --port 27017",
+    "backend": "npm run dev --prefix backend",
+    "frontend": "npm run dev --prefix frontend",
+    "dev": "concurrently -n mongo,backend,frontend -c blue,green,magenta \"npm:mongo\" \"npm:backend\" \"npm:frontend\"",
+    "start:backend": "npm run start --prefix backend",
+    "import": "npm run import --prefix backend",
+    "import:prune": "node backend/scripts/import-measurements.js --prune",
+    "test": "npm test --prefix backend",
+    "build:frontend": "npm run build --prefix frontend"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "dependencies": {
+    "concurrently": "^10.0.7",
+    "dotenv": "^18.0.10"
+  }
+}

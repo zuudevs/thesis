@@ -1,0 +1,14 @@
+# Local credentials and configuration
+.env
+.env.*
+!.env.example
+
+# Runtime state
+database/
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Generated frontend output and incremental cache
+frontend/dist/
+frontend/*.tsbuildinfo
