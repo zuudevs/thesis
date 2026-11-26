@@ -1139,6 +1139,51 @@
   submodule ze_json naik ke rilis 0.1.2 (publish GitHub Packages
   terverifikasi, run 43182598841).
 
+## RS — Restrukturisasi batas repository workspace (2026-11-26)
+
+- [x] **RS-1** — Snapshot aman sebelum restrukturisasi: diff binary, status
+  porcelain-v2, salinan `article/`, source `tools/`, checkout proposal lama,
+  dan manifest SHA-256 disimpan pada backup lokal
+  `%LOCALAPPDATA%\Temp\opencode\thesis-v5-restructure-backup-20261126-150309`.
+- [x] **RS-2** — Naskah artikel dipisah ke repo
+  `zuu-inner/thesis-article` (akun GitHub aktif memiliki owner write; repo
+  target `zuudevs/thesis-article` belum dapat dibuat). Snapshot awal 125 file,
+  README, AGENTS, template PR, dan dukungan `THESIS_WORKSPACE_ROOT`; PR #1
+  merged pada commit `5d02b8a`; verifier final 19/19 PASS. PR #2 menambahkan
+  filter bibliografi canonical 42 entri dan provenance commit/blob/SHA-256;
+  merged pada commit `cc0bbe2`, verifier snapshot 16/16 PASS. PR #3 menormalisasi
+  hash teks terhadap konversi EOL dan merged pada commit `fbcf44f`; unit test
+  5/5 PASS dan verifier snapshot tetap 16/16 PASS. PR #4 menulis seluruh output
+  teks tracked dengan LF eksplisit dan merged pada commit `8cc881b`; PR #5
+  menambahkan atribut LF untuk laporan validasi dan merged pada `cb22c9c`.
+- [x] **RS-3** — Root superproject: `submission-thesis-supervisor` dihapus
+  dari `.gitmodules`/gitlink; repo historis ditandai archived/read-only dan
+  diberi tag `archive/2026-11-26` pada commit `015188c`. `article` menjadi
+  submodule dari `zuu-inner/thesis-article` dan dipin ke commit provenance
+  `cb22c9c`.
+- [x] **RS-4** — `thesis-proposal` dipulihkan ke upstream melalui PR #3;
+  symlink absolut `utils` diganti file tracked, PR merged pada commit
+  `e9cee64`, helper root `utils/typ` dihapus, dan smoke import/assert Typst
+  PASS pada checkout submodule.
+- [x] **RS-5** — `tools/` dinormalisasi: `scripts/grapher` dipindahkan via
+  `git mv` ke `tools/grapher`; source dashboard tracking; `.env`, database,
+  dependency, build output, dan cache tetap di-ignore. Verifikasi lokal:
+  backend `npm ci` + syntax PASS, frontend production build PASS, generic
+  Mermaid→SVG smoke PASS, dan path root dashboard PASS.
+- [x] **RS-6** — Dokumentasi batas repo: README root, AGENTS, ADR 0008,
+  plans/tasks, dan changelog disinkronkan. Registri canonical PR #80 berisi
+  68 entri/66 DOI unik; policy `year >= 2016` memakai exception key-based
+  eksplisit untuk metodologi SC'15 `10.1145_2807591.2807644`.
+- [x] **RS-7** — Final gate setelah push branch pada commit `574790a`: fresh
+  clone root dengan `git submodule update --init --recursive` menghasilkan
+  pointer submodule exact dan `git submodule status` clean. Dashboard backend
+  13/13 PASS + frontend production build PASS, grapher Mermaid→SVG smoke PASS,
+  validator bibliografi 68 entri PASS + unit 4/4, measurement validator dan
+  analyzer smoke PASS (termasuk expected reject cross-host), Typst utility smoke
+  PASS, article unit 5/5 + snapshot 16/16 + manuscript 19/19 + literature audit
+  PASS. Setelah seluruh command, root dan keempat submodule clean serta
+  `git diff --check` PASS.
+
 ## Status mesin & environment
 
 - Dev device = workspace ini (Windows x86_64, toolchain portabel). **Update

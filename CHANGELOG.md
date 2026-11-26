@@ -5,6 +5,49 @@ workspace ini bukan paket yang dirilis; versi dari artefak terkait
 (`ze_json` 0.1.x, npm `@zuudevs/ze-json`) tercatat di changelog masing-masing
 repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 2026-11-26 - Restrukturisasi batas repository workspace
+
+### Added
+
+- Repo naskah artikel `zuu-inner/thesis-article` dengan source/build/audit
+  pipeline, provenance snapshot, README, AGENTS, dan template PR; PR #1 merged
+  pada commit `5d02b8a` dan verifier final 19/19 PASS.
+- Provenance bibliografi artikel: PR #2 merged pada commit `cc0bbe2`;
+  snapshot 42 entri dibuat sebagai filter byte-identik dari canonical root
+  commit `5f2043a`, dengan sidecar commit/blob/SHA-256 dan verifier 16/16 PASS.
+- Stabilisasi provenance bibliografi lintas-platform: PR #3 merged pada commit
+  `fbcf44f`; hash teks dinormalisasi ke LF dan `.gitattributes` menjaga
+  checkout Windows/Unix tetap byte-stable.
+- Output audit artikel sekarang ditulis dengan newline LF eksplisit; PR #4
+  merged pada commit `8cc881b` agar fresh clone tetap clean setelah verifier.
+- Atribut LF untuk laporan validasi artikel ditambahkan melalui PR #5, merged
+  pada commit `cb22c9c`, menutup dirty-status terakhir pada fresh clone.
+- `tools/` sebagai area tracked: dashboard monitoring research dan generic
+  Mermaid→SVG grapher; source dashboard kini versioned bersama root.
+- ADR 0008 yang menetapkan root `v5` sebagai research superproject dan batas
+  repo untuk parser, baseline, proposal, artikel, serta tooling.
+
+### Changed
+
+- `submission-thesis-supervisor` dihapus dari submodule aktif root; repo
+  upstream historis ditandai archived/read-only dan diberi tag
+  `archive/2026-11-26` pada commit `015188c`.
+- `article/` ditambahkan sebagai submodule pada workspace root.
+- `scripts/grapher` dipindahkan ke `tools/grapher` dengan `git mv`.
+- `thesis-proposal` dipulihkan ke upstream melalui PR #3; symlink absolut
+  `utils` diganti file tracked dan PR merged pada commit `e9cee64`. Helper
+  root `utils/typ` kemudian dihapus.
+- Registri bibliografi canonical disatukan pada PR root #80: 68 entri, 66 DOI
+  unik, validator key-aware, dan satu exception tahun 2015 yang eksplisit
+  untuk metodologi SC'15 `10.1145_2807591.2807644`.
+
+### Notes
+
+- Tidak ada kode `ze_json`/`saq-report`, record pengukuran, corpus, atau
+  baseline yang berubah; tidak ada bump versi core/JS dan tidak ada klaim
+  performa baru. Exception tahun bibliografi tidak mengubah tahun publikasi
+  paper sumber.
+
 ## 2026-11-17 - ND-11 Phase E di saq_server (koeksistensi penuh dengan produksi)
 
 ### Added

@@ -1,0 +1,16 @@
+{
+  "name": "workspace-mermaid-grapher",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Render Mermaid diagrams to SVG for the thesis workspace",
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15"
+  },
+  "dependencies": {
+    "pele": "^1.13.0"
+  },
+  "scripts": {
+    "make": "tsx make-graph.ts"
+  }
+}

@@ -35,10 +35,12 @@
   per-domain: `assistants`, `courses`, `lecturers`, `schedules`, `reports`,
   `globalConfig`), dan `services/exportService.js` (`JSON.stringify` untuk export
   XLSX/DOCX). Tidak ada parser JSON pihak ketiga — baseline tetap V8 apa adanya.
-- **Abaikan** `thesis-proposal/` dan `submission-thesis-supervisor/` (dokumen skripsi,
-  bukan domain riset — arahan pemilik).
-- Semua kecuali root `v5` adalah **submodules**. Direktori submodule yang kosong
-  berarti belum init → `git submodule update --init`.
+- **Abaikan** `thesis-proposal/` dan `article/` (dokumen skripsi terpisah,
+  bukan domain riset — arahan pemilik; perubahan hanya bila diminta eksplisit).
+- Komponen source terpisah (`ze_json/`, `saq-report/`, `thesis-proposal/`,
+  `article/`) adalah **submodule**. Direktori submodule yang kosong berarti
+  belum init → `git submodule update --init --recursive`. `tools/` tetap
+  source tracked di root dan bukan bagian ABI library.
 
 ## 2. Literatur & provenance tabel codegen
 
@@ -59,8 +61,15 @@
   Tabel di `lookups.hpp` dan benchmark/test code juga membawa `@cite` yang sama.
 - Dokumentasi `ze_json/docs/` ditulis dalam **English**, diagram memakai sintaks
   **Mermaid** (bukan gambar biner) — lihat TASKS P6.
-- Bibliografi hidup di `assets/bib/cites.bib`; semua entri **wajib year >= 2016** —
-  validasi: `python scripts/eval-cite/check_valid_year.py`.
+- Registri bibliografi canonical berada di `assets/bib/cites.bib` (68 entri,
+  66 DOI unik). Kebijakan tahun adalah `year >= 2016`, dengan satu exception
+  key-based eksplisit untuk metodologi SC'15
+  `10.1145_2807591.2807644`; validator:
+  `python scripts/eval-cite/check_valid_year.py`.
+- Snapshot artikel bukan sumber kebenaran: `article/data/bib/cites.bib` harus
+  digenerate sebagai filter dari canonical commit
+  `5f2043a426e52ee5af193920bccaafcbb2dc1aab` dan memiliki sidecar provenance
+  commit/hash. Jangan menyunting snapshot tersebut secara manual.
 
 ## 3. Lingkungan build (ze_json)
 
@@ -165,6 +174,12 @@
   direstrukturisasi 2026-11-12 (parser on-demand as-built + ABI v3 tercakup);
   `docs/` root = `research/audit-2026-11-12.md` (audit Stage 1, snapshot
   historis, Bahasa Indonesia).
+- Batas repo workspace: `v5` = research superproject; `ze_json`,
+  `saq-report`, `thesis-proposal`, dan `article` = submodule terpisah.
+  `article` tracking di repo `zuu-inner/thesis-article`, dipin pada commit
+  `cb22c9cffc8489132780807d5af59e5cf3bba696`; state lokal tetap diabaikan
+  Git. Repo submission lama sudah diarsipkan (read-only) dan tidak lagi
+  dipetakan sebagai submodule.
 - Build aktif sekarang: `ze_json/build/native-release` dan `build/wasm64-release`
   (keduanya gitignored).
 
@@ -230,12 +245,15 @@
 | Binding JS | `ze_json/bindings/js/ze_json.mjs` (`ZeJson`/`ZeDocument`/`ZeParser`) |
 | Audit arah on-demand | `docs/research/audit-2026-11-12.md` (snapshot historis; feed Stage 2–7) |
 | Baseline Node | `saq-report/` (`MongoJsonRepository.js` clone hot path, `JsonRepository.js`, `exportService.js`, `express.json()`) |
+| Workspace tools | `tools/` (dashboard monitoring + generic Mermaid grapher) |
+| Naskah artikel | `article/` (submodule `thesis-article`; source/build/audit boundary terpisah) |
 | Kontrak C-ABI | `ze_json/include/ze_json/abi/cabi.hpp` (+ `src/abi/cabi.cpp`) |
 | Schema pengukuran | `schemas/`, `scripts/measurement-schema/` (dibuat di fase P0) |
 
 ## 8. Alur kerja Git (berlaku di semua repo)
 
-Scope: root `v5`, `ze_json`, `saq-report` (serta submodul dokumen bila nanti disentuh).
+Scope: root `v5`, `ze_json`, `saq-report`, `thesis-proposal`, dan
+`thesis-article` (submodul dokumen bila nanti disentuh).
 
 - **Jangan push langsung ke `main`** — buat branch (contoh: `perf/scanner-simd`) lalu
   **Pull Request** dulu; merge setelah pratinjau lulus. Kalau akses proteksi branch
