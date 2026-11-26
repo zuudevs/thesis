@@ -18,6 +18,8 @@ repo. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Stabilisasi provenance bibliografi lintas-platform: PR #3 merged pada commit
   `fbcf44f`; hash teks dinormalisasi ke LF dan `.gitattributes` menjaga
   checkout Windows/Unix tetap byte-stable.
+- Output audit artikel sekarang ditulis dengan newline LF eksplisit; PR #4
+  merged pada commit `8cc881b` agar fresh clone tetap clean setelah verifier.
 - `tools/` sebagai area tracked: dashboard monitoring research dan generic
   Mermaid→SVG grapher; source dashboard kini versioned bersama root.
 - ADR 0008 yang menetapkan root `v5` sebagai research superproject dan batas
